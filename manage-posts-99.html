@@ -2,105 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Moderation</title>
+    <title>Admin - Confess India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-6">
-    <div id="adminContent" class="hidden"> <div class="max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-8 border-b border-gray-700 pb-4">
-                <h1 class="text-2xl font-bold text-purple-400">Secret Admin Panel</h1>
-                <div class="flex items-center space-x-4">
-                    <span id="postCount" class="text-xs bg-gray-700 px-3 py-1 rounded-full text-gray-300">Loading count...</span>
-                    <a href="index.html" class="text-sm text-gray-400 hover:text-white">← Public Feed</a>
-                </div>
-            </div>
-
-            <div id="admin-feed" class="space-y-4">
-                </div>
-        </div>
+<body class="bg-gray-900 text-white p-6">
+    <div id="adminUI" class="hidden max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6 text-purple-400 border-b border-gray-800 pb-4">Moderation Panel</h1>
+        <div id="feed" class="space-y-4"></div>
     </div>
-
     <script>
-        // 1. SET YOUR SECRET PIN HERE
-        const MY_SECRET_PIN = "2122"; // <--- CHANGE THIS
-        
-        const userEntry = prompt("Enter Admin PIN to manage confessions:");
+        const PIN = "2122"; // <--- CHANGE THIS
+        if(prompt("Admin PIN:") !== PIN) { window.location.href="index.html"; } 
+        else { document.getElementById('adminUI').classList.remove('hidden'); start(); }
 
-        if (userEntry !== MY_SECRET_PIN) {
-            alert("Unauthorized Access!");
-            window.location.href = "index.html";
-        } else {
-            // Show the content and start Firebase
-            document.getElementById('adminContent').classList.remove('hidden');
-            startAdminApp();
-        }
-
-        function startAdminApp() {
-            const firebaseConfig = {
-                apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI",
-                authDomain: "confession-india.firebaseapp.com",
-                projectId: "confession-india",
-                storageBucket: "confession-india.firebasestorage.app",
-                messagingSenderId: "345080016810",
-                appId: "1:345080016810:web:3032f570077ea8d6dd45d3"
-            };
-            
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
+        function start() {
+            const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
+            firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
 
-            // Load Admin Feed
-            db.collection('confessions').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-                const feed = document.getElementById('admin-feed');
-                document.getElementById('postCount').textContent = `${snapshot.size} Total Posts`;
+            db.collection('confessions').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                const feed = document.getElementById('feed');
                 feed.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    feed.innerHTML = `<p class="text-center text-gray-500 py-20">No confessions found in database.</p>`;
-                    return;
-                }
-
-                snapshot.forEach(doc => {
-                    const post = doc.data();
-                    const postDiv = document.createElement('div');
-                    postDiv.className = "bg-gray-800 p-6 rounded-xl border border-gray-700 flex justify-between items-start transition hover:border-gray-500";
-                    
-                    const time = post.timestamp ? post.timestamp.toDate().toLocaleString('en-IN') : 'No Date';
-                    
-                    postDiv.innerHTML = `
-                        <div class="flex-1 pr-4">
-                            <div class="flex items-center space-x-2 mb-2">
-                                <span class="bg-purple-900 text-purple-200 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-widest">${post.category || 'Other'}</span>
-                                <span class="text-gray-500 text-[10px]">${time}</span>
-                            </div>
-                            <p class="font-bold text-purple-300 mb-1">${post.username || 'Anonymous'}</p>
-                            <p class="text-gray-300 text-sm leading-relaxed">${post.content}</p>
+                snap.forEach(doc => {
+                    const p = doc.data();
+                    const div = document.createElement('div');
+                    div.className = "bg-gray-800 p-4 rounded-xl flex justify-between items-center border " + (p.reportCount > 0 ? 'border-orange-500' : 'border-gray-700');
+                    div.innerHTML = `
+                        <div>
+                            <span class="text-[10px] font-bold uppercase bg-gray-700 px-2 py-1 rounded">Reports: ${p.reportCount || 0}</span>
+                            <p class="text-sm font-bold mt-2 text-purple-300">${p.username}</p>
+                            <p class="text-xs text-gray-400 mt-1">${p.content}</p>
                         </div>
-                        <div class="flex flex-col space-y-2">
-                            <button onclick="deletePost('${doc.id}')" class="bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white text-[10px] px-4 py-2 rounded-lg font-bold border border-red-600/30 transition-all uppercase tracking-tighter">
-                                Delete
-                            </button>
-                        </div>
+                        <button onclick="del('${doc.id}')" class="bg-red-600 px-4 py-2 rounded text-xs font-bold">DELETE</button>
                     `;
-                    feed.appendChild(postDiv);
+                    feed.appendChild(div);
                 });
-            }, err => {
-                console.error("Admin Listener Error:", err);
-                alert("Firebase Error: Check Console");
             });
-
-            // Delete Function
-            window.deletePost = function(id) {
-                if (confirm("Permanently delete this confession? This cannot be undone.")) {
-                    db.collection('confessions').doc(id).delete()
-                        .then(() => console.log("Deleted"))
-                        .catch(err => alert("Error deleting: " + err.message));
-                }
-            };
+            window.del = (id) => { if(confirm("Delete?")) db.collection('confessions').doc(id).delete(); }
         }
     </script>
 </body>
