@@ -3,69 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confess India - Speak Your Heart</title>
+    <title>Confess India - Feel Heard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .post-card { border-radius: 24px; }
+        .post-card { border-radius: 28px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .post-card:hover { transform: translateY(-4px); }
         
-        /* Skeleton Shimmer Animation */
-        @keyframes shimmer {
-            0% { background-position: -468px 0; }
-            100% { background-position: 468px 0; }
-        }
+        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
         .skeleton {
             background: #f6f7f8;
             background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
             background-repeat: no-repeat;
             background-size: 800px 104px;
-            display: inline-block;
-            position: relative;
-            animation-duration: 1.2s;
-            animation-fill-mode: forwards;
-            animation-iteration-count: infinite;
-            animation-name: shimmer;
-            animation-timing-function: linear;
+            animation: shimmer 1.2s forwards infinite linear;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans">
+<body class="bg-[#fdfdff] min-h-screen font-sans">
 
-    <header class="bg-white/70 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+    <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div class="flex flex-col">
-                <h1 class="text-2xl font-black bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent leading-none">Confess India</h1>
-                <span class="text-[10px] text-gray-400 font-bold tracking-tighter uppercase mt-1">Anonymous Community</span>
+                <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
+                <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
             </div>
-            <a href="post.html" class="bg-indigo-600 text-white px-6 py-2.5 rounded-2xl hover:bg-indigo-700 transition-all shadow-lg hover:shadow-indigo-200 font-bold text-sm">
-                + New Post
+            <a href="post.html" class="bg-slate-900 text-white px-6 py-2.5 rounded-2xl hover:bg-indigo-600 transition-all shadow-xl shadow-slate-200 font-bold text-sm">
+                + Share Secret
             </a>
         </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
-        <div class="flex overflow-x-auto py-4 space-x-3 no-scrollbar items-center">
-            <button class="cat-btn shrink-0 bg-indigo-600 text-white px-6 py-2 rounded-2xl font-bold shadow-md transition-all text-sm" data-cat="all">All Feed</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="relationship">Relationships</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="family">Family</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="marriage">Marriage</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="other">Other</button>
+        <div class="flex overflow-x-auto py-6 space-x-3 no-scrollbar items-center">
+            <button class="cat-btn shrink-0 bg-slate-900 text-white px-6 py-2 rounded-2xl font-bold shadow-lg transition-all text-sm" data-cat="all">Latest</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="relationship">Relationships</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="family">Family</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="marriage">Marriage</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="other">Other</button>
         </div>
 
-        <div id="feed" class="space-y-6 mt-2 min-h-screen"></div>
+        <div id="feed" class="grid grid-cols-1 md:grid-cols-1 gap-6 mt-2"></div>
 
         <div id="skeleton-loader" class="space-y-6 mt-2 hidden">
-            <div class="bg-white p-6 post-card shadow-sm border border-gray-50">
+            <div class="bg-white p-8 post-card shadow-sm border border-gray-50">
                 <div class="skeleton h-4 w-24 rounded-lg mb-4"></div>
-                <div class="skeleton h-6 w-48 rounded-lg mb-2"></div>
-                <div class="skeleton h-20 w-full rounded-xl"></div>
-            </div>
-            <div class="bg-white p-6 post-card shadow-sm border border-gray-50">
-                <div class="skeleton h-4 w-24 rounded-lg mb-4"></div>
-                <div class="skeleton h-6 w-48 rounded-lg mb-2"></div>
-                <div class="skeleton h-20 w-full rounded-xl"></div>
+                <div class="skeleton h-8 w-full rounded-xl mb-4"></div>
+                <div class="skeleton h-4 w-3/4 rounded-lg"></div>
             </div>
         </div>
     </main>
@@ -83,12 +69,29 @@
         const db = firebase.firestore();
         let unsubscribe = null;
 
+        // International standard Relative Time function
+        function timeAgo(timestamp) {
+            if (!timestamp) return 'Just now';
+            const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + "y ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + "mo ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + "d ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + "h ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + "m ago";
+            return "Just now";
+        }
+
         function getCategoryStyles(cat) {
             const config = {
                 relationship: { color: 'pink', icon: '💔' },
                 family: { color: 'blue', icon: '👨‍👩‍👧' },
-                marriage: { color: 'green', icon: '💍' },
-                other: { color: 'indigo', icon: '📝' }
+                marriage: { color: 'purple', icon: '💍' },
+                other: { color: 'slate', icon: '📝' }
             };
             return config[cat.toLowerCase()] || config.other;
         }
@@ -96,59 +99,62 @@
         function loadPosts(category = 'all') {
             const feed = document.getElementById('feed');
             const skeleton = document.getElementById('skeleton-loader');
-            
             if (unsubscribe) unsubscribe();
             
-            // Show Skeleton and Clear Feed
             feed.innerHTML = '';
             skeleton.classList.remove('hidden');
             
             let query = db.collection('confessions').orderBy('timestamp', 'desc');
-            
-            // FIX: Ensure exact lowercase match for Firestore
-            if (category !== 'all') {
-                query = query.where('category', '==', category.toLowerCase());
-            }
+            if (category !== 'all') query = query.where('category', '==', category.toLowerCase());
 
-            unsubscribe = query.limit(30).onSnapshot(snapshot => {
+            unsubscribe = query.limit(40).onSnapshot(snapshot => {
                 skeleton.classList.add('hidden');
                 let html = '';
                 
                 if(snapshot.empty) {
-                    html = `<div class="bg-white p-20 rounded-[32px] text-center shadow-sm border border-dashed border-gray-200">
-                        <p class="text-gray-400 font-medium italic text-lg">Nothing here yet in ${category}. <br> Why not share yours?</p>
-                    </div>`;
-                    feed.innerHTML = html;
+                    feed.innerHTML = `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets in ${category} yet...</div>`;
                     return;
                 }
 
                 snapshot.forEach(doc => {
                     const post = doc.data();
                     const style = getCategoryStyles(post.category || 'other');
-                    const time = post.timestamp ? post.timestamp.toDate().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'}) : 'Just now';
                     
                     html += `
-                        <div class="bg-white p-6 post-card shadow-sm border border-gray-50 hover:shadow-xl hover:shadow-indigo-100/50 transition-all duration-300">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="text-[10px] font-black uppercase tracking-widest text-${style.color}-500 bg-${style.color}-50 px-3 py-1 rounded-lg">
-                                    ${style.icon} ${post.category || 'other'}
-                                </span>
-                                <span class="text-[10px] text-gray-400 font-bold">${time}</span>
-                            </div>
-                            <h4 class="text-sm font-black text-gray-900 mb-2">${post.username || 'Anonymous'}</h4>
-                            <p class="text-gray-600 text-sm leading-relaxed mb-6 font-medium">${post.content}</p>
-                            
-                            <div class="flex items-center justify-between border-t border-gray-50 pt-4 mt-auto">
-                                <div class="flex items-center space-x-6">
-                                    <button onclick="supportPost('${doc.id}')" class="flex items-center space-x-2 text-pink-500 hover:scale-110 transition active:scale-90 group">
-                                        <span class="text-lg group-hover:drop-shadow-sm">❤️</span>
-                                        <span class="text-xs font-bold">${post.supportCount || 0}</span>
-                                    </button>
-                                    <button onclick="reportPost('${doc.id}')" class="text-gray-300 hover:text-orange-500 text-[10px] font-black transition uppercase">Report</button>
+                        <div class="bg-white p-8 post-card shadow-sm border border-gray-50 relative overflow-hidden group">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="flex flex-col">
+                                    <span class="text-[9px] font-black uppercase tracking-[2px] text-${style.color}-500 mb-1">
+                                        ${style.icon} ${post.category || 'other'}
+                                    </span>
+                                    <h4 class="text-sm font-black text-slate-900 uppercase tracking-tighter">${post.username || 'Anonymous'}</h4>
                                 </div>
-                                <button onclick="sharePost('${encodeURIComponent(post.content)}')" class="p-2 bg-green-50 rounded-xl text-green-600 hover:bg-green-600 hover:text-white transition-all">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                                </button>
+                                <span class="text-[10px] font-bold text-slate-300 bg-slate-50 px-2 py-1 rounded-md">${timeAgo(post.timestamp)}</span>
+                            </div>
+
+                            <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
+                            
+                            <div class="flex items-center justify-between pt-6 border-t border-slate-50">
+                                <div class="flex items-center space-x-4">
+                                    <button onclick="interact('${doc.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 hover:bg-pink-100 transition active:scale-90 group/heart">
+                                        <span class="group-hover/heart:scale-125 transition-transform inline-block">❤️</span>
+                                        <span class="text-xs font-black">${post.supportCount || 0}</span>
+                                    </button>
+
+                                    <button onclick="interact('${doc.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 hover:bg-indigo-100 transition active:scale-90 group/hug">
+                                        <span class="group-hover/hug:scale-125 transition-transform inline-block">🫂</span>
+                                        <span class="text-xs font-black">Me Too (${post.meTooCount || 0})</span>
+                                    </button>
+                                </div>
+
+                                <div class="flex items-center space-x-3">
+                                    <button onclick="sharePost('${encodeURIComponent(post.content)}')" class="p-2.5 text-slate-400 hover:text-green-500 hover:bg-green-50 rounded-xl transition-all">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                    </button>
+                                    <button onclick="reportPost('${doc.id}')" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>`;
                 });
@@ -156,17 +162,22 @@
             });
         }
 
-        window.supportPost = (id) => db.collection('confessions').doc(id).update({supportCount: firebase.firestore.FieldValue.increment(1)});
-        window.reportPost = (id) => { if(confirm("Report this post for moderation?")) db.collection('confessions').doc(id).update({reportCount: firebase.firestore.FieldValue.increment(1)}); }
-        window.sharePost = (content) => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out this confession: " + decodeURIComponent(content).substring(0,100) + "... Read more at " + window.location.href)}`, '_blank');
+        window.interact = (id, field) => {
+            db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+        };
+
+        window.reportPost = (id) => { if(confirm("Report this post?")) db.collection('confessions').doc(id).update({reportCount: firebase.firestore.FieldValue.increment(1)}); }
+        window.sharePost = (content) => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Read this anonymous confession: " + decodeURIComponent(content).substring(0,100) + "... " + window.location.href)}`, '_blank');
 
         document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click', () => {
             document.querySelectorAll('.cat-btn').forEach(b => {
-                b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
-                b.classList.add('bg-white', 'text-gray-500');
+                b.classList.replace('bg-slate-900', 'bg-white');
+                b.classList.replace('text-white', 'text-gray-500');
+                b.classList.remove('shadow-lg');
             });
-            btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-            btn.classList.remove('bg-white', 'text-gray-500');
+            btn.classList.replace('bg-white', 'bg-slate-900');
+            btn.classList.replace('text-gray-500', 'text-white');
+            btn.classList.add('shadow-lg');
             loadPosts(btn.dataset.cat);
         }));
 
