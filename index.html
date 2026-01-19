@@ -6,12 +6,10 @@
     <title>Anonymous Confessions India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="manifest" href="manifest.json">
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-indigo-100 min-h-screen">
-    <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -33,18 +31,17 @@
         </div>
     </header>
 
-    <!-- Categories -->
     <div class="max-w-4xl mx-auto p-4">
         <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-8">
-            <button class="cat-btn bg-purple-100 hover:bg-purple-200 px-4 py-2 rounded-lg active-cat font-medium" data-cat="all">All</button>
+            <button class="cat-btn bg-purple-600 text-white px-4 py-2 rounded-lg active-cat font-medium" data-cat="all">All</button>
             <button class="cat-btn bg-pink-100 hover:bg-pink-200 px-4 py-2 rounded-lg font-medium" data-cat="relationship">💔 Relationships</button>
             <button class="cat-btn bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg font-medium" data-cat="family">👨‍👩‍👧 Family</button>
             <button class="cat-btn bg-green-100 hover:bg-green-200 px-4 py-2 rounded-lg font-medium" data-cat="marriage">💍 Marriage</button>
             <button class="cat-btn bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium" data-cat="other">📝 Other</button>
         </div>
 
-        <!-- Feed -->
         <div id="feed" class="space-y-4 min-h-96"></div>
+        
         <div id="loading" class="text-center py-12 hidden">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mx-auto mb-4"></div>
             <p class="text-lg font-medium text-gray-600">Loading confessions...</p>
@@ -63,45 +60,59 @@
         };
         
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
 
-        // Load ALL posts (NO approved filter - shows your 2 posts!)
+        // Helper function for UI colors based on category
+        function getCategoryStyles(category) {
+            const styles = {
+                relationship: { border: 'border-pink-500 bg-pink-50', badge: 'bg-pink-500' },
+                family: { border: 'border-blue-500 bg-blue-50', badge: 'bg-blue-500' },
+                marriage: { border: 'border-green-500 bg-green-50', badge: 'bg-green-500' },
+                other: { border: 'border-gray-500 bg-gray-50', badge: 'bg-gray-500' }
+            };
+            return styles[category] || styles.other;
+        }
+
+        // Load posts with filtering
         function loadPosts(category = 'all') {
-            console.log('🔥 Loading', category, 'posts...');
             const feed = document.getElementById('feed');
             const loading = document.getElementById('loading');
             
             loading.classList.remove('hidden');
             feed.innerHTML = '';
             
-            let query = db.collection('confessions').orderBy('timestamp', 'desc').limit(20);
-            
+            // Base query: order by time
+            let query = db.collection('confessions').orderBy('timestamp', 'desc');
+
+            // Add filter if not "all" (Needs Composite Index in Firebase)
             if (category !== 'all') {
                 query = query.where('category', '==', category);
             }
             
-            query.get().then(snapshot => {
-                console.log('📊 Found', snapshot.size, 'posts');
+            query.limit(20).get().then(snapshot => {
                 loading.classList.add('hidden');
                 
                 if (snapshot.empty) {
                     feed.innerHTML = `
                         <div class="bg-white rounded-2xl p-12 shadow-xl text-center">
                             <div class="text-5xl mb-6">✨</div>
-                            <h2 class="text-2xl font-bold text-gray-700 mb-4">${category === 'all' ? 'No confessions yet' : `No ${category} confessions`}</h2>
-                            <p class="text-gray-500 mb-8">Be the first Hyderabadi to share!</p>
+                            <h2 class="text-2xl font-bold text-gray-700 mb-4">${category === 'all' ? 'No confessions yet' : 'No ' + category + ' confessions'}</h2>
+                            <p class="text-gray-500 mb-8">Be the first to share!</p>
                             <a href="post.html" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all">
                                 + Share Your Secret
                             </a>
-                        </div>
-                    `;
+                        </div>`;
                     return;
                 }
                 
                 let html = '';
                 snapshot.forEach(doc => {
                     const post = doc.data();
+                    const style = getCategoryStyles(post.category);
+                    
                     const time = post.timestamp ? post.timestamp.toDate().toLocaleString('en-IN', {
                         timeZone: 'Asia/Kolkata',
                         hour: 'numeric',
@@ -110,56 +121,55 @@
                         month: 'short'
                     }) : 'Just now';
                     
-                    const categoryColor = post.category === 'relationship' ? 'border-pink-500 bg-pink-50' :
-                                        post.category === 'family' ? 'border-blue-500 bg-blue-50' :
-                                        post.category === 'marriage' ? 'border-green-500 bg-green-50' : 'border-gray-500 bg-gray-50';
-                    
                     html += `
-                        <div class="group bg-white hover:bg-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-l-4 ${categoryColor}">
+                        <div class="group bg-white hover:bg-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-l-4 ${style.border}">
                             <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${
-                                    post.category === 'relationship' ? 'bg-pink-500' :
-                                    post.category === 'family' ? 'bg-blue-500' :
-                                    post.category === 'marriage' ? 'bg-green-500' : 'bg-gray-500'
-                                }">
-                                    ${post.category?.charAt(0).toUpperCase() + post.category?.slice(1) || 'Other'}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${style.badge}">
+                                    ${(post.category || 'Other').toUpperCase()}
                                 </span>
-                                <span class="text-xs text-gray-500">${post.charCount || post.content?.length || 0} chars</span>
+                                <span class="text-xs text-gray-400">${post.content?.length || 0} chars</span>
                             </div>
                             <h3 class="font-bold text-xl text-gray-900 mb-3">${post.username || 'Anonymous'}</h3>
-                            <p class="text-gray-700 leading-relaxed mb-4">${post.content || 'No content'}</p>
+                            <p class="text-gray-700 leading-relaxed mb-4">${post.content || ''}</p>
                             <div class="flex items-center text-xs text-gray-500">
-                                <span>${time}</span>
+                                <span class="flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"></path></svg>
+                                    ${time}
+                                </span>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
                 feed.innerHTML = html;
             }).catch(error => {
-                console.error('❌ Error:', error);
-                feed.innerHTML = `<div class="text-center p-12"><p class="text-red-500 text-lg mb-4">Error loading posts</p><button onclick="loadPosts()" class="bg-purple-600 text-white px-6 py-2 rounded-full">Retry</button></div>`;
+                console.error('❌ Error fetching posts:', error);
+                loading.classList.add('hidden');
+                feed.innerHTML = `
+                    <div class="text-center p-12 bg-red-50 rounded-xl">
+                        <p class="text-red-500 font-medium mb-4 text-lg">Error loading posts</p>
+                        <p class="text-sm text-gray-600 mb-6">If you just added an index, please wait 2-3 minutes for it to finish building.</p>
+                        <button onclick="location.reload()" class="bg-purple-600 text-white px-6 py-2 rounded-full">Retry</button>
+                    </div>`;
             });
         }
 
-        // Category buttons
+        // Setup Event Listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // Category button clicks
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
+                    // Reset all buttons
                     document.querySelectorAll('.cat-btn').forEach(b => {
-                        b.classList.remove('bg-purple-600', 'text-white', 'active-cat');
+                        b.classList.remove('bg-purple-600', 'text-white');
+                        b.classList.add('bg-opacity-10'); // Restore lighter look
                     });
-                    btn.classList.add('bg-purple-600', 'text-white', 'active-cat');
+                    // Highlight selected
+                    btn.classList.add('bg-purple-600', 'text-white');
                     loadPosts(btn.dataset.cat);
                 });
             });
             
-            // Load all posts on start
-            setTimeout(() => loadPosts('all'), 500);
-        });
-
-        // Language switcher (visual only)
-        document.getElementById('langSwitcher')?.addEventListener('change', function() {
-            console.log('Language:', this.value);
+            // Initial Load
+            loadPosts('all');
         });
     </script>
 </body>
