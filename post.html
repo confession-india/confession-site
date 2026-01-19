@@ -3,99 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Confession - Anonymous India</title>
+    <title>Post - Confess India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-indigo-100 min-h-screen p-4">
-    <div class="max-w-2xl mx-auto">
-        <a href="index.html" class="inline-block mb-8 text-purple-600 hover:underline text-lg font-medium">
-            ← Back to Feed
-        </a>
-        
-        <div class="bg-white p-8 rounded-2xl shadow-xl">
-            <h1 class="text-3xl font-bold mb-6 text-gray-800">Share Your Secret</h1>
-            
-            <form id="confessionForm">
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2 text-gray-700">Username (fake OK)</label>
-                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500" maxlength="20" placeholder="Anonymous">
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2 text-gray-700">Category</label>
-                    <select id="category" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
-                        <option value="relationship">Relationships</option>
-                        <option value="family">Family Pressure</option>
-                        <option value="marriage">Marriage Issues</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="mb-8">
-                    <label class="block text-sm font-medium mb-2 text-gray-700">Your Confession</label>
-                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 resize-vertical" maxlength="500" placeholder="Type your secret here..."></textarea>
-                    <p class="text-sm text-gray-500 mt-1"><span id="charCount">0</span>/500 chars</p>
-                </div>
-                
-                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:shadow-lg transition-all">
-                    Post Anonymously
-                </button>
-            </form>
-        </div>
+    <div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-xl mt-10">
+        <h1 class="text-2xl font-bold mb-6">Share Secret Anonymously</h1>
+        <form id="postForm">
+            <input type="text" id="user" placeholder="Fake Username" class="w-full p-3 border rounded-xl mb-4" maxlength="20">
+            <select id="cat" class="w-full p-3 border rounded-xl mb-4">
+                <option value="relationship">Relationships</option>
+                <option value="family">Family</option>
+                <option value="marriage">Marriage</option>
+                <option value="other">Other</option>
+            </select>
+            <textarea id="msg" rows="5" placeholder="Your confession..." class="w-full p-3 border rounded-xl mb-4" maxlength="500"></textarea>
+            <button id="sub" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">Post Anonymously</button>
+        </form>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI",
-            authDomain: "confession-india.firebaseapp.com",
-            projectId: "confession-india",
-            storageBucket: "confession-india.firebasestorage.app",
-            messagingSenderId: "345080016810",
-            appId: "1:345080016810:web:3032f570077ea8d6dd45d3"
-        };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Character counter
-        document.getElementById('content').addEventListener('input', (e) => {
-            document.getElementById('charCount').textContent = e.target.value.length;
-        });
+        // BLOCK LIST
+        const BANNED = ['porn', 'drugs', 'sex', 'gambling', 'abuse', 'fuck', 'shit', 'call me', 'whatsapp me'];
 
-        document.getElementById('confessionForm').addEventListener('submit', async (e) => {
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const content = document.getElementById('msg').value.toLowerCase();
             
-            const username = document.getElementById('username').value.trim() || 'Anonymous';
-            const category = document.getElementById('category').value;
-            const content = document.getElementById('content').value.trim();
-            const submitBtn = document.getElementById('submitButton');
-            
-            if (content.length < 10) return alert('Confession must be at least 10 characters');
-            
-            submitBtn.textContent = '⏳ Posting...';
-            submitBtn.disabled = true;
-            
-            try {
-                await db.collection('confessions').add({
-    username: username,
-    category: category,
-    content: content,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    supportCount: 0 // <--- ADD THIS LINE
-                });
-                
-                alert('✅ Posted successfully!');
-                window.location.href = 'index.html'; // Go back to feed
-            } catch (error) {
-                console.error("Error:", error);
-                alert('Error: ' + error.message);
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Post Anonymously';
-            }
+            // Check Banned Words
+            const bad = BANNED.find(w => content.includes(w));
+            if(bad) return alert(`⚠️ Restricted word found: "${bad}". Please keep it clean.`);
+            if(content.length < 10) return alert("Too short!");
+
+            document.getElementById('sub').disabled = true;
+            await db.collection('confessions').add({
+                username: document.getElementById('user').value || 'Anonymous',
+                category: document.getElementById('cat').value,
+                content: document.getElementById('msg').value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                supportCount: 0,
+                reportCount: 0
+            });
+            window.location.href = 'index.html';
         });
     </script>
 </body>
