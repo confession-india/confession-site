@@ -3,68 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Confession</title>
+    <title>Share Secret - Confess India</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        body { background: radial-gradient(circle at top right, #fdfcfb 0%, #e2d1f9 100%); }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-purple-50 to-indigo-100 min-h-screen p-4">
-    <div class="max-w-2xl mx-auto">
-        <!-- Back button with language support -->
-        <a id="backButton" href="index.html" class="inline-block mb-8 text-purple-600 hover:underline text-lg font-medium">
-            ← Back to Feed
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="max-w-xl w-full mb-6 flex items-center justify-between">
+        <a href="index.html" class="flex items-center text-purple-600 font-semibold hover:text-purple-800 transition group">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back to Feed
         </a>
-        
-        <!-- Language Switcher (same as index) -->
-        <div class="flex justify-end mb-6">
-            <select id="langSwitcher" class="p-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-purple-500">
-                <option value="en">🇮🇳 English</option>
-                <option value="te">🇮🇳 తెలుగు</option>
-                <option value="hi">🇮🇳 हिंदी</option>
-                <option value="ta">🇮🇳 தமிழ்</option>
-                <option value="kn">🇮🇳 ಕನ್ನಡ</option>
-                <option value="ml">🇮🇳 മലയാളം</option>
-            </select>
-        </div>
-        
-        <div class="bg-white p-8 rounded-2xl shadow-xl">
-            <h1 id="postFormTitle" class="text-3xl font-bold mb-6 text-gray-800">Share Your Secret</h1>
-            
-            <form id="confessionForm">
-                <div class="mb-6">
-                    <label data-i18n="postForm.username" class="block text-sm font-medium mb-2">
-                        Username (fake OK)
-                    </label>
-                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" maxlength="20" placeholder="Anonymous123...">
-                </div>
-                
-                <div class="mb-6">
-                    <label data-i18n="postForm.category" class="block text-sm font-medium mb-2">
-                        Category
-                    </label>
-                    <select id="category" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none">
-                        <option value="relationship" data-i18n="categories.relationship">Past Relationships</option>
-                        <option value="family" data-i18n="categories.family">Family Pressure</option>
-                        <option value="marriage" data-i18n="categories.marriage">Marriage Issues</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                
-                <div class="mb-8">
-                    <label data-i18n="postForm.content" class="block text-sm font-medium mb-2">
-                        Your Confession
-                    </label>
-                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-vertical outline-none" maxlength="500" placeholder="Be honest, be anonymous..."></textarea>
-                    <p data-i18n="postForm.charLimit" class="text-sm text-gray-500 mt-1">
-                        Max 500 chars
-                    </p>
-                </div>
-                
-                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-200">
-                    Post Anonymously
-                </button>
-            </form>
-        </div>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Confess India</h1>
     </div>
 
-    <script type="module" src="script.js"></script>
+    <div class="max-w-xl w-full glass rounded-3xl shadow-2xl overflow-hidden border border-white/50">
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white text-center">
+            <h2 class="text-2xl font-bold">Share your secret</h2>
+            <p class="text-purple-100 text-sm opacity-80">It’s 100% anonymous. We don't track you.</p>
+        </div>
+
+        <form id="postForm" class="p-8">
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Identity</label>
+            <input type="text" id="user" placeholder="e.g. BrokenHeart99" 
+                class="w-full p-4 bg-gray-50 border-none rounded-2xl mb-6 focus:ring-2 focus:ring-purple-500 outline-none transition shadow-sm" maxlength="30">
+
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Category</label>
+            <select id="cat" class="w-full p-4 bg-gray-50 border-none rounded-2xl mb-6 focus:ring-2 focus:ring-purple-500 outline-none transition shadow-sm appearance-none">
+                <option value="relationship">💔 Relationship</option>
+                <option value="family">👨‍👩‍👧 Family</option>
+                <option value="marriage">💍 Marriage</option>
+                <option value="other">📝 Other</option>
+            </select>
+
+            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1 flex justify-between">
+                <span>Confession</span>
+                <span id="charCounter" class="text-purple-500">0 / 1000</span>
+            </label>
+            <textarea id="msg" rows="6" placeholder="What's on your mind? Spill the tea..." 
+                class="w-full p-4 bg-gray-50 border-none rounded-2xl mb-2 focus:ring-2 focus:ring-purple-500 outline-none transition shadow-sm resize-none" maxlength="1000"></textarea>
+            
+            <p class="text-[10px] text-gray-400 mb-8 italic">Avoid using real names or phone numbers to protect privacy.</p>
+
+            <button id="sub" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg hover:shadow-purple-200 hover:-translate-y-0.5 active:scale-95 transition-all">
+                Submit Anonymously
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Real-time Character Counter
+        const msgArea = document.getElementById('msg');
+        const counter = document.getElementById('charCounter');
+        msgArea.addEventListener('input', () => {
+            const length = msgArea.value.length;
+            counter.textContent = `${length} / 1000`;
+            if(length >= 900) counter.classList.add('text-red-500');
+            else counter.classList.remove('text-red-500');
+        });
+
+        const BANNED = ['porn', 'drugs', 'sex', 'gambling', 'abuse', 'fuck', 'shit', 'call me', 'whatsapp me'];
+
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const content = msgArea.value.toLowerCase();
+            const bad = BANNED.find(w => content.includes(w));
+            
+            if(bad) return alert(`⚠️ Restricted content detected. Please keep it respectful.`);
+            if(msgArea.value.length < 10) return alert("Please write a bit more!");
+
+            const btn = document.getElementById('sub');
+            btn.disabled = true;
+            btn.innerText = "Posting...";
+
+            try {
+                await db.collection('confessions').add({
+                    username: document.getElementById('user').value || 'Anonymous',
+                    category: document.getElementById('cat').value,
+                    content: msgArea.value,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    supportCount: 0,
+                    reportCount: 0
+                });
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert("Error posting. Try again.");
+                btn.disabled = false;
+                btn.innerText = "Submit Anonymously";
+            }
+        });
+    </script>
 </body>
 </html>
