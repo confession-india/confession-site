@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Confession</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-purple-50 to-indigo-100 min-h-screen p-4">
+    <div class="max-w-2xl mx-auto">
+        <!-- Back button with language support -->
+        <a id="backButton" href="index.html" class="inline-block mb-8 text-purple-600 hover:underline text-lg font-medium">
+            ← Back to Feed
+        </a>
+        
+        <!-- Language Switcher (same as index) -->
+        <div class="flex justify-end mb-6">
+            <select id="langSwitcher" class="p-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-purple-500">
+                <option value="en">🇮🇳 English</option>
+                <option value="te">🇮🇳 తెలుగు</option>
+                <option value="hi">🇮🇳 हिंदी</option>
+                <option value="ta">🇮🇳 தமிழ்</option>
+                <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                <option value="ml">🇮🇳 മലയാളം</option>
+            </select>
+        </div>
+        
+        <div class="bg-white p-8 rounded-2xl shadow-xl">
+            <h1 id="postFormTitle" class="text-3xl font-bold mb-6 text-gray-800">Share Your Secret</h1>
+            
+            <form id="confessionForm">
+                <div class="mb-6">
+                    <label data-i18n="postForm.username" class="block text-sm font-medium mb-2">
+                        Username (fake OK)
+                    </label>
+                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" maxlength="20" placeholder="Anonymous123...">
+                </div>
+                
+                <div class="mb-6">
+                    <label data-i18n="postForm.category" class="block text-sm font-medium mb-2">
+                        Category
+                    </label>
+                    <select id="category" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none">
+                        <option value="relationship" data-i18n="categories.relationship">Past Relationships</option>
+                        <option value="family" data-i18n="categories.family">Family Pressure</option>
+                        <option value="marriage" data-i18n="categories.marriage">Marriage Issues</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="mb-8">
+                    <label data-i18n="postForm.content" class="block text-sm font-medium mb-2">
+                        Your Confession
+                    </label>
+                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-vertical outline-none" maxlength="500" placeholder="Be honest, be anonymous..."></textarea>
+                    <p data-i18n="postForm.charLimit" class="text-sm text-gray-500 mt-1">
+                        Max 500 chars
+                    </p>
+                </div>
+                
+                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg focus:outline-none focus:ring-4 focus:ring-purple-200">
+                    Post Anonymously
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
