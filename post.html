@@ -81,10 +81,11 @@
             
             try {
                 await db.collection('confessions').add({
-                    username: username,
-                    category: category,
-                    content: content,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    username: username,
+    category: category,
+    content: content,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    supportCount: 0 // <--- ADD THIS LINE
                 });
                 
                 alert('✅ Posted successfully!');
