@@ -10,41 +10,33 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
 <body class="bg-gradient-to-br from-purple-50 to-indigo-100 min-h-screen">
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+
+    <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Confess Anonymously
+                Confess India
             </h1>
             <div class="flex items-center space-x-4">
-                <select id="langSwitcher" class="p-2 border border-gray-200 rounded-lg bg-white text-sm">
-                    <option value="en">🇮🇳 English</option>
-                    <option value="te">🇮🇳 తెలుగు</option>
-                    <option value="hi">🇮🇳 हिंदी</option>
-                    <option value="ta">🇮🇳 தமிழ்</option>
-                    <option value="kn">🇮🇳 ಕನ್ನಡ</option>
-                    <option value="ml">🇮🇳 മലയാളം</option>
-                </select>
-                <a href="post.html" class="bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition font-semibold">
-                    + Post Confession
+                <a href="post.html" class="bg-purple-600 text-white px-6 py-2 rounded-full hover:bg-purple-700 transition shadow-lg font-semibold text-sm">
+                    + Post
                 </a>
             </div>
         </div>
     </header>
 
     <div class="max-w-4xl mx-auto p-4">
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-8">
-            <button class="cat-btn bg-purple-600 text-white px-4 py-2 rounded-lg active-cat font-medium" data-cat="all">All</button>
-            <button class="cat-btn bg-pink-100 hover:bg-pink-200 px-4 py-2 rounded-lg font-medium" data-cat="relationship">💔 Relationships</button>
-            <button class="cat-btn bg-blue-100 hover:bg-blue-200 px-4 py-2 rounded-lg font-medium" data-cat="family">👨‍👩‍👧 Family</button>
-            <button class="cat-btn bg-green-100 hover:bg-green-200 px-4 py-2 rounded-lg font-medium" data-cat="marriage">💍 Marriage</button>
-            <button class="cat-btn bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg font-medium" data-cat="other">📝 Other</button>
+        <div class="flex overflow-x-auto pb-4 space-x-2 no-scrollbar">
+            <button class="cat-btn shrink-0 bg-purple-600 text-white px-6 py-2 rounded-full font-medium shadow-md" data-cat="all">All</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-600 px-6 py-2 rounded-full font-medium border border-gray-100" data-cat="relationship">💔 Relationships</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-600 px-6 py-2 rounded-full font-medium border border-gray-100" data-cat="family">👨‍👩‍👧 Family</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-600 px-6 py-2 rounded-full font-medium border border-gray-100" data-cat="marriage">💍 Marriage</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-600 px-6 py-2 rounded-full font-medium border border-gray-100" data-cat="other">📝 Other</button>
         </div>
 
-        <div id="feed" class="space-y-4 min-h-96"></div>
+        <div id="feed" class="space-y-4 mt-4 min-h-96"></div>
         
         <div id="loading" class="text-center py-12 hidden">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mx-auto mb-4"></div>
-            <p class="text-lg font-medium text-gray-600">Loading confessions...</p>
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mx-auto"></div>
         </div>
     </div>
 
@@ -59,118 +51,114 @@
             appId: "1:345080016810:web:3032f570077ea8d6dd45d3"
         };
         
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        let unsubscribe = null; // To stop old listeners when changing categories
 
-        // Helper function for UI colors based on category
-        function getCategoryStyles(category) {
-            const styles = {
-                relationship: { border: 'border-pink-500 bg-pink-50', badge: 'bg-pink-500' },
-                family: { border: 'border-blue-500 bg-blue-50', badge: 'bg-blue-500' },
-                marriage: { border: 'border-green-500 bg-green-50', badge: 'bg-green-500' },
-                other: { border: 'border-gray-500 bg-gray-50', badge: 'bg-gray-500' }
+        // Helper for UI colors
+        function getCategoryStyles(cat) {
+            const colors = {
+                relationship: { border: 'border-pink-500', bg: 'bg-pink-50', badge: 'bg-pink-500' },
+                family: { border: 'border-blue-500', bg: 'bg-blue-50', badge: 'bg-blue-500' },
+                marriage: { border: 'border-green-500', bg: 'bg-green-50', badge: 'bg-green-500' },
+                other: { border: 'border-gray-500', bg: 'bg-gray-50', badge: 'bg-gray-500' }
             };
-            return styles[category] || styles.other;
+            return colors[cat] || colors.other;
         }
 
-        // Load posts with filtering
+        // Live Feed Function
         function loadPosts(category = 'all') {
             const feed = document.getElementById('feed');
             const loading = document.getElementById('loading');
             
-            loading.classList.remove('hidden');
-            feed.innerHTML = '';
+            if (unsubscribe) unsubscribe(); // Clear existing listener
             
-            // Base query: order by time
+            loading.classList.remove('hidden');
+            
             let query = db.collection('confessions').orderBy('timestamp', 'desc');
-
-            // Add filter if not "all" (Needs Composite Index in Firebase)
             if (category !== 'all') {
                 query = query.where('category', '==', category);
             }
-            
-            query.limit(20).get().then(snapshot => {
+
+            // Real-time listener: updates instantly when data changes
+            unsubscribe = query.limit(20).onSnapshot(snapshot => {
                 loading.classList.add('hidden');
+                let html = '';
                 
                 if (snapshot.empty) {
-                    feed.innerHTML = `
-                        <div class="bg-white rounded-2xl p-12 shadow-xl text-center">
-                            <div class="text-5xl mb-6">✨</div>
-                            <h2 class="text-2xl font-bold text-gray-700 mb-4">${category === 'all' ? 'No confessions yet' : 'No ' + category + ' confessions'}</h2>
-                            <p class="text-gray-500 mb-8">Be the first to share!</p>
-                            <a href="post.html" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg transition-all">
-                                + Share Your Secret
-                            </a>
-                        </div>`;
+                    feed.innerHTML = `<div class="bg-white p-12 rounded-2xl text-center shadow-sm">
+                        <p class="text-gray-400">No confessions found here yet.</p>
+                    </div>`;
                     return;
                 }
-                
-                let html = '';
+
                 snapshot.forEach(doc => {
                     const post = doc.data();
                     const style = getCategoryStyles(post.category);
-                    
-                    const time = post.timestamp ? post.timestamp.toDate().toLocaleString('en-IN', {
-                        timeZone: 'Asia/Kolkata',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        day: 'numeric',
-                        month: 'short'
+                    const time = post.timestamp ? post.timestamp.toDate().toLocaleDateString('en-IN', {
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
                     }) : 'Just now';
-                    
+
                     html += `
-                        <div class="group bg-white hover:bg-gray-50 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-l-4 ${style.border}">
-                            <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold text-white ${style.badge}">
-                                    ${(post.category || 'Other').toUpperCase()}
+                        <div class="bg-white rounded-2xl shadow-sm border-l-4 ${style.border} p-5 transition-all hover:shadow-md">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="${style.badge} text-white text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
+                                    ${post.category || 'Other'}
                                 </span>
-                                <span class="text-xs text-gray-400">${post.content?.length || 0} chars</span>
+                                <span class="text-gray-400 text-xs">${time}</span>
                             </div>
-                            <h3 class="font-bold text-xl text-gray-900 mb-3">${post.username || 'Anonymous'}</h3>
-                            <p class="text-gray-700 leading-relaxed mb-4">${post.content || ''}</p>
-                            <div class="flex items-center text-xs text-gray-500">
-                                <span class="flex items-center">
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"></path></svg>
-                                    ${time}
-                                </span>
+                            <h3 class="font-bold text-gray-800 mb-1">${post.username || 'Anonymous'}</h3>
+                            <p class="text-gray-600 leading-relaxed text-sm mb-4">${post.content}</p>
+                            
+                            <div class="flex items-center justify-between border-t border-gray-50 pt-3">
+                                <button onclick="supportPost('${doc.id}')" class="flex items-center space-x-2 text-pink-500 bg-pink-50 px-3 py-1.5 rounded-full transition active:scale-95">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                    <span class="text-xs font-bold">${post.supportCount || 0}</span>
+                                </button>
+                                
+                                <button onclick="sharePost('${encodeURIComponent(post.content)}')" class="text-gray-400 hover:text-green-500 transition">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                                </button>
                             </div>
                         </div>`;
                 });
                 feed.innerHTML = html;
-            }).catch(error => {
-                console.error('❌ Error fetching posts:', error);
+            }, err => {
+                console.error(err);
                 loading.classList.add('hidden');
-                feed.innerHTML = `
-                    <div class="text-center p-12 bg-red-50 rounded-xl">
-                        <p class="text-red-500 font-medium mb-4 text-lg">Error loading posts</p>
-                        <p class="text-sm text-gray-600 mb-6">If you just added an index, please wait 2-3 minutes for it to finish building.</p>
-                        <button onclick="location.reload()" class="bg-purple-600 text-white px-6 py-2 rounded-full">Retry</button>
-                    </div>`;
+                feed.innerHTML = `<p class="text-red-500 text-center">Connection error. Please refresh.</p>`;
             });
         }
 
-        // Setup Event Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Category button clicks
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Reset all buttons
-                    document.querySelectorAll('.cat-btn').forEach(b => {
-                        b.classList.remove('bg-purple-600', 'text-white');
-                        b.classList.add('bg-opacity-10'); // Restore lighter look
-                    });
-                    // Highlight selected
-                    btn.classList.add('bg-purple-600', 'text-white');
-                    loadPosts(btn.dataset.cat);
-                });
+        // Support Function
+        window.supportPost = function(id) {
+            db.collection('confessions').doc(id).update({
+                supportCount: firebase.firestore.FieldValue.increment(1)
             });
-            
-            // Initial Load
-            loadPosts('all');
+        };
+
+        // WhatsApp Share Function
+        window.sharePost = function(content) {
+            const text = decodeURIComponent(content).substring(0, 100);
+            const msg = encodeURIComponent(`"${text}..." \n\n Read this anonymous confession here: ${window.location.href}`);
+            window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
+        };
+
+        // Category Switcher Logic
+        document.querySelectorAll('.cat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.cat-btn').forEach(b => {
+                    b.classList.remove('bg-purple-600', 'text-white', 'shadow-md');
+                    b.classList.add('bg-white', 'text-gray-600', 'border-gray-100');
+                });
+                btn.classList.add('bg-purple-600', 'text-white', 'shadow-md');
+                btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-100');
+                loadPosts(btn.dataset.cat);
+            });
         });
+
+        // Initial Load
+        loadPosts('all');
     </script>
 </body>
 </html>
