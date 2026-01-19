@@ -3,54 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post - Confess India</title>
+    <title>Share Your Heart - Confess India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <style>
+        body { background-color: #f8fafc; }
+        .input-focus-effect:focus {
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            border-color: #4f46e5;
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-purple-50 to-indigo-100 min-h-screen p-4">
-    <div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-xl mt-10">
-        <h1 class="text-2xl font-bold mb-6">Share Secret Anonymously</h1>
-        <form id="postForm">
-            <input type="text" id="user" placeholder="Fake Username" class="w-full p-3 border rounded-xl mb-4" maxlength="20">
-            <select id="cat" class="w-full p-3 border rounded-xl mb-4">
-                <option value="relationship">Relationships</option>
-                <option value="family">Family</option>
-                <option value="marriage">Marriage</option>
-                <option value="other">Other</option>
-            </select>
-            <textarea id="msg" rows="5" placeholder="Your confession..." class="w-full p-3 border rounded-xl mb-4" maxlength="500"></textarea>
-            <button id="sub" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">Post Anonymously</button>
-        </form>
-    </div>
+<body class="min-h-screen pb-12">
+
+    <header class="bg-white/70 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <div class="flex flex-col">
+                <h1 class="text-2xl font-black bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent leading-none">Confess India</h1>
+                <span class="text-[10px] text-gray-400 font-bold tracking-tighter uppercase font-sans">Anonymous Community</span>
+            </div>
+            <a href="index.html" class="text-gray-500 hover:text-indigo-600 font-bold text-sm transition-colors flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Cancel
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto p-4 mt-8">
+        <div class="mb-10 text-center md:text-left">
+            <h2 class="text-4xl font-black text-gray-900 tracking-tight mb-2">Create a Post</h2>
+            <p class="text-gray-500 font-medium">Your secrets are safe. No registration, no tracking.</p>
+        </div>
+
+        <div class="bg-white rounded-[32px] shadow-xl shadow-indigo-100/50 border border-gray-100 overflow-hidden">
+            <form id="postForm" class="p-8 md:p-12 space-y-8">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-[11px] font-black text-indigo-500 uppercase tracking-[2px] mb-3 ml-1">Pen Name (Optional)</label>
+                        <input type="text" id="user" placeholder="Anonymous Lion" 
+                            class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none transition-all input-focus-effect text-gray-700 font-medium" maxlength="30">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-black text-indigo-500 uppercase tracking-[2px] mb-3 ml-1">Select Topic</label>
+                        <select id="cat" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none transition-all input-focus-effect text-gray-700 font-medium appearance-none cursor-pointer">
+                            <option value="relationship">Relationships 💔</option>
+                            <option value="family">Family 👨‍👩‍👧</option>
+                            <option value="marriage">Marriage 💍</option>
+                            <option value="other">Other 📝</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-end mb-3 ml-1">
+                        <label class="block text-[11px] font-black text-indigo-500 uppercase tracking-[2px]">Your Confession</label>
+                        <span id="charCounter" class="text-[10px] font-bold text-gray-400 bg-gray-50 px-3 py-1 rounded-full">0 / 1000</span>
+                    </div>
+                    <textarea id="msg" rows="8" placeholder="Start typing your secret here... be honest, be brave." 
+                        class="w-full p-6 bg-slate-50 border-2 border-transparent rounded-[24px] outline-none transition-all input-focus-effect text-gray-700 font-medium leading-relaxed resize-none" maxlength="1000"></textarea>
+                </div>
+
+                <div class="flex items-start p-4 bg-indigo-50 rounded-2xl">
+                    <span class="text-lg mr-3">💡</span>
+                    <p class="text-xs text-indigo-900 leading-relaxed font-medium">
+                        To keep this community safe, please avoid using real names, addresses, or phone numbers. Our word filters are active.
+                    </p>
+                </div>
+
+                <button id="sub" type="submit" class="group w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 transition-all flex justify-center items-center">
+                    <span>Post Anonymously</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </main>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", 
+            authDomain: "confession-india.firebaseapp.com", 
+            projectId: "confession-india", 
+            storageBucket: "confession-india.firebasestorage.app", 
+            messagingSenderId: "345080016810", 
+            appId: "1:345080016810:web:3032f570077ea8d6dd45d3" 
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // BLOCK LIST
+        // High-performance Character Counter
+        const msgArea = document.getElementById('msg');
+        const counter = document.getElementById('charCounter');
+        msgArea.addEventListener('input', () => {
+            const length = msgArea.value.length;
+            counter.textContent = `${length} / 1000`;
+            if (length >= 900) {
+                counter.classList.replace('text-gray-400', 'text-red-500');
+            } else {
+                counter.classList.replace('text-red-500', 'text-gray-400');
+            }
+        });
+
         const BANNED = ['porn', 'drugs', 'sex', 'gambling', 'abuse', 'fuck', 'shit', 'call me', 'whatsapp me'];
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const content = document.getElementById('msg').value.toLowerCase();
+            const content = msgArea.value.toLowerCase();
+            const badWord = BANNED.find(w => content.includes(w));
             
-            // Check Banned Words
-            const bad = BANNED.find(w => content.includes(w));
-            if(bad) return alert(`⚠️ Restricted word found: "${bad}". Please keep it clean.`);
-            if(content.length < 10) return alert("Too short!");
+            if(badWord) return alert(`⚠️ Moderation Note: Please remove inappropriate language (${badWord}).`);
+            if(msgArea.value.length < 15) return alert("Your confession is a bit too short. Share a little more!");
 
-            document.getElementById('sub').disabled = true;
-            await db.collection('confessions').add({
-                username: document.getElementById('user').value || 'Anonymous',
-                category: document.getElementById('cat').value,
-                content: document.getElementById('msg').value,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                supportCount: 0,
-                reportCount: 0
-            });
-            window.location.href = 'index.html';
+            const btn = document.getElementById('sub');
+            btn.disabled = true;
+            btn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-2 border-white/20 border-t-white"></div>`;
+
+            try {
+                await db.collection('confessions').add({
+                    username: document.getElementById('user').value || 'Anonymous',
+                    category: document.getElementById('cat').value,
+                    content: msgArea.value,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    supportCount: 0,
+                    reportCount: 0
+                });
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert("Something went wrong. Please check your connection.");
+                btn.disabled = false;
+                btn.innerText = "Post Anonymously";
+            }
         });
     </script>
 </body>
