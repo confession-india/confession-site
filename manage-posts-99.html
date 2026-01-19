@@ -1,0 +1,31 @@
+<script>
+    // 1. SET YOUR SECRET PIN HERE
+    const MY_SECRET_PIN = "2122"; // <--- Change "7890" to any PIN you want
+
+    // 2. ASK THE USER FOR THE PIN IMMEDIATELY
+    const userEntry = prompt("Enter Admin PIN to manage confessions:");
+
+    if (userEntry !== MY_SECRET_PIN) {
+        alert("Unauthorized Access!");
+        window.location.href = "index.html"; // Redirects strangers back to the home page
+    } else {
+        // Only if the PIN is correct, initialize Firebase and load the posts
+        startAdminApp(); 
+    }
+
+    function startAdminApp() {
+        const firebaseConfig = {
+            apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI",
+            authDomain: "confession-india.firebaseapp.com",
+            projectId: "confession-india",
+            storageBucket: "confession-india.firebasestorage.app",
+            messagingSenderId: "345080016810",
+            appId: "1:345080016810:web:3032f570077ea8d6dd45d3"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ... (rest of the loadAdminFeed and deletePost code I gave you earlier)
+    }
+</script>
