@@ -28,15 +28,15 @@
         <div class="bg-white p-8 rounded-2xl shadow-xl">
             <h1 class="text-3xl font-bold mb-6 text-gray-800">Share Your Secret</h1>
             
-            <form id="confessionForm" novalidate>
+            <form id="confessionForm">
                 <div class="mb-6">
                     <label class="block text-sm font-medium mb-2 text-gray-700">Username (fake OK)</label>
-                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none" maxlength="20" placeholder="Anonymous123">
+                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500" maxlength="20" placeholder="TestUser">
                 </div>
                 
                 <div class="mb-6">
                     <label class="block text-sm font-medium mb-2 text-gray-700">Category</label>
-                    <select id="category" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none">
+                    <select id="category" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
                         <option value="relationship">Past Relationships</option>
                         <option value="family">Family Pressure</option>
                         <option value="marriage">Marriage Issues</option>
@@ -46,11 +46,11 @@
                 
                 <div class="mb-8">
                     <label class="block text-sm font-medium mb-2 text-gray-700">Your Confession</label>
-                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-vertical outline-none" maxlength="500" placeholder="Be honest, be anonymous..."></textarea>
-                    <p class="text-sm text-gray-500 mt-1">Max 500 chars • <span id="charCount">0</span>/500</p>
+                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 resize-vertical" maxlength="500" placeholder="I still think about my college crush..."></textarea>
+                    <p class="text-sm text-gray-500 mt-1"><span id="charCount">0</span>/500 chars</p>
                 </div>
                 
-                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg">
+                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:from-purple-700 hover:to-pink-700">
                     Post Anonymously
                 </button>
             </form>
@@ -58,9 +58,6 @@
     </div>
 
     <script>
-        // **1. DISABLE ALL OTHER SCRIPTS**
-        window.stop(); // Stop script.js loading
-        
         // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI",
@@ -75,47 +72,44 @@
         const db = firebase.firestore();
 
         // Character counter
-        document.getElementById('content').addEventListener('input', function() {
-            document.getElementById('charCount').textContent = this.value.length;
+        document.getElementById('content').addEventListener('input', () => {
+            document.getElementById('charCount').textContent = document.getElementById('content').value.length;
         });
 
-        // **BULLETPROOF FORM HANDLER**
-        document.getElementById('confessionForm').addEventListener('submit', function(e) {
+        // **ONLY FIREBASE HANDLER - NO script.js interference**
+        document.getElementById('confessionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            e.stopImmediatePropagation();
             
             const username = document.getElementById('username').value.trim();
             const category = document.getElementById('category').value;
             const content = document.getElementById('content').value.trim();
             const submitBtn = document.getElementById('submitButton');
             
-            console.log('Form data:', {username: username.length, content: content.length});
+            console.log('POST DATA:', username.length, content.length);
             
-            // Validation
-            if (username.length < 3) return alert('⚠️ Username: 3+ chars');
-            if (!category) return alert('⚠️ Select category');
-            if (content.length < 10) return alert(`⚠️ Confession: ${content.length}/10 chars`);
+            if (username.length < 3) return alert('Username: 3+ chars');
+            if (!category) return alert('Select category');
+            if (content.length < 10) return alert(`Content: ${content.length}/10 chars`);
             
-            submitBtn.innerHTML = '⏳ Posting...';
+            submitBtn.textContent = '⏳ Posting...';
             submitBtn.disabled = true;
             
-            db.collection('confessions').add({
-                username: username.slice(0,20),
-                category,
-                content,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                approved: false,
-                charCount: content.length
-            }).then(() => {
-                alert(`✅ POSTED!\n\n${username}\n${content.length} chars`);
+            try {
+                await db.collection('confessions').add({
+                    username: username.slice(0,20),
+                    category,
+                    content,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    approved: false
+                });
+                alert('✅ POSTED TO FIREBASE!');
                 document.getElementById('confessionForm').reset();
-                document.getElementById('charCount').textContent = '0';
-            }).catch(error => {
-                alert('❌ ' + error.message);
-            }).finally(() => {
-                submitBtn.innerHTML = 'Post Anonymously';
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                submitBtn.textContent = 'Post Anonymously';
                 submitBtn.disabled = false;
-            });
+            }
         });
     </script>
 </body>
