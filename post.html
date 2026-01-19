@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post Confession - confessionindia.in</title>
+    <title>Post Confession - Anonymous India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -14,30 +14,19 @@
             ← Back to Feed
         </a>
         
-        <div class="flex justify-end mb-6">
-            <select id="langSwitcher" class="p-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-purple-500">
-                <option value="en">🇮🇳 English</option>
-                <option value="te">🇮🇳 తెలుగు</option>
-                <option value="hi">🇮🇳 हिंदी</option>
-                <option value="ta">🇮🇳 தமிழ்</option>
-                <option value="kn">🇮🇳 ಕನ್ನಡ</option>
-                <option value="ml">🇮🇳 മലയാളം</option>
-            </select>
-        </div>
-        
         <div class="bg-white p-8 rounded-2xl shadow-xl">
             <h1 class="text-3xl font-bold mb-6 text-gray-800">Share Your Secret</h1>
             
             <form id="confessionForm">
                 <div class="mb-6">
                     <label class="block text-sm font-medium mb-2 text-gray-700">Username (fake OK)</label>
-                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500" maxlength="20" placeholder="TestUser">
+                    <input type="text" id="username" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500" maxlength="20" placeholder="Anonymous">
                 </div>
                 
                 <div class="mb-6">
                     <label class="block text-sm font-medium mb-2 text-gray-700">Category</label>
                     <select id="category" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500">
-                        <option value="relationship">Past Relationships</option>
+                        <option value="relationship">Relationships</option>
                         <option value="family">Family Pressure</option>
                         <option value="marriage">Marriage Issues</option>
                         <option value="other">Other</option>
@@ -46,11 +35,11 @@
                 
                 <div class="mb-8">
                     <label class="block text-sm font-medium mb-2 text-gray-700">Your Confession</label>
-                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 resize-vertical" maxlength="500" placeholder="I still think about my college crush..."></textarea>
+                    <textarea id="content" rows="6" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 resize-vertical" maxlength="500" placeholder="Type your secret here..."></textarea>
                     <p class="text-sm text-gray-500 mt-1"><span id="charCount">0</span>/500 chars</p>
                 </div>
                 
-                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:from-purple-700 hover:to-pink-700">
+                <button type="submit" id="submitButton" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-8 rounded-2xl text-lg font-semibold hover:shadow-lg transition-all">
                     Post Anonymously
                 </button>
             </form>
@@ -58,7 +47,6 @@
     </div>
 
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI",
             authDomain: "confession-india.firebaseapp.com",
@@ -68,47 +56,44 @@
             appId: "1:345080016810:web:3032f570077ea8d6dd45d3"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.firestore();
 
         // Character counter
-        document.getElementById('content').addEventListener('input', () => {
-            document.getElementById('charCount').textContent = document.getElementById('content').value.length;
+        document.getElementById('content').addEventListener('input', (e) => {
+            document.getElementById('charCount').textContent = e.target.value.length;
         });
 
-        // **ONLY FIREBASE HANDLER - NO script.js interference**
         document.getElementById('confessionForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const username = document.getElementById('username').value.trim();
+            const username = document.getElementById('username').value.trim() || 'Anonymous';
             const category = document.getElementById('category').value;
             const content = document.getElementById('content').value.trim();
             const submitBtn = document.getElementById('submitButton');
             
-            console.log('POST DATA:', username.length, content.length);
-            
-            if (username.length < 3) return alert('Username: 3+ chars');
-            if (!category) return alert('Select category');
-            if (content.length < 10) return alert(`Content: ${content.length}/10 chars`);
+            if (content.length < 10) return alert('Confession must be at least 10 characters');
             
             submitBtn.textContent = '⏳ Posting...';
             submitBtn.disabled = true;
             
             try {
                 await db.collection('confessions').add({
-                    username: username.slice(0,20),
-                    category,
-                    content,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    approved: false
+                    username: username,
+                    category: category,
+                    content: content,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                alert('✅ POSTED TO FIREBASE!');
-                document.getElementById('confessionForm').reset();
+                
+                alert('✅ Posted successfully!');
+                window.location.href = 'index.html'; // Go back to feed
             } catch (error) {
+                console.error("Error:", error);
                 alert('Error: ' + error.message);
-            } finally {
-                submitBtn.textContent = 'Post Anonymously';
                 submitBtn.disabled = false;
+                submitBtn.textContent = 'Post Anonymously';
             }
         });
     </script>
