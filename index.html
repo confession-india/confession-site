@@ -10,9 +10,11 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .post-card { border-radius: 28px; transition: all 0.3s ease; }
-        .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; }
+        .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-post { animation: fadeIn 0.5s ease forwards; }
+        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans">
@@ -20,8 +22,8 @@
     <div class="bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800 sticky top-0 z-[60]">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
             <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-te">తెలుగు</button>
-            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-en">English</button>
             <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-hi">हिंदी</button>
+            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-en">English</button>
             <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-ta">தமிழ்</button>
             <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-kn">ಕನ್ನಡ</button>
             <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-ml">മലയാളം</button>
@@ -34,7 +36,7 @@
                 <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
                 <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
             </div>
-            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-900 transition-all shadow-lg shadow-indigo-100 font-bold text-sm">
+            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-900 transition-all shadow-lg font-bold text-sm">
                 + Share Secret
             </a>
         </div>
@@ -53,7 +55,7 @@
         <div id="skeleton-loader" class="space-y-6 mt-2 hidden">
             <div class="bg-white p-8 post-card border border-gray-100">
                 <div class="skeleton h-4 w-24 rounded-lg mb-4"></div>
-                <div class="skeleton h-12 w-full rounded-xl mb-4"></div>
+                <div class="skeleton h-12 w-full rounded-xl"></div>
             </div>
         </div>
     </main>
@@ -74,13 +76,14 @@
             en: { subheading: "Community Feed", share: "+ Share Secret", all: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", time: "ago", justNow: "Just now", meToo: "Me Too" },
             te: { subheading: "కమ్యూనిటీ ఫీడ్", share: "+ రహస్యాన్ని పంచుకోండి", all: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", time: "క్రితం", justNow: "ఇప్పుడే", meToo: "నేను కూడా" },
             hi: { subheading: "सामुदायिक फ़ीड", share: "+ गुप्त साझा करें", all: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", time: "पहले", justNow: "अभी-अभी", meToo: "मैं भी" },
-            ta: { subheading: "சமூக ஊட்டம்", share: "+ ரகசியத்தைப் பகிரவும்", all: "சமீபத்திய", rel: "உறవులు", fam: "குடும்பம்", mar: "திருமணம்", time: "முன்பு", justNow: "இப்போது", meToo: "நானும்" },
+            ta: { subheading: "சமூக ஊட்டம்", share: "+ ரகசியத்தைப் பகிரவும்", all: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", time: "முன்பு", justNow: "இப்போது", meToo: "நானும்" },
             kn: { subheading: "ಸಮುದಾಯ ಫೀಡ್", share: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", all: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", time: "ಹಿಂದೆ", justNow: "ಈಗಷ್ಟೇ", meToo: "ನಾನು ಕೂಡ" },
-            ml: { subheading: "കമ്മ്യൂണിറ്റി ഫೀಡ್", share: "+ രഹസ്യം പങ്കിടുക", all: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", time: "മുമ്പ്", justNow: "ഇപ്പോൾ", meToo: "ഞാനും" }
+            ml: { subheading: "കമ്മ്യൂണിറ്റി ഫീഡ്", share: "+ രഹസ്യം പങ്കിടുക", all: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിవాഹം", time: "മുമ്പ്", justNow: "ഇപ്പോൾ", meToo: "ഞാനും" }
         };
 
-        let currentLang = localStorage.getItem('userLang') || 'te'; // Defaults to Telugu
+        let currentLang = localStorage.getItem('userLang') || 'te';
         let currentCategory = 'all';
+        let unsubscribe = null;
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -95,7 +98,8 @@
             document.getElementById('cat-mar').innerText = t.mar;
 
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            const activeBtn = document.getElementById(`lang-${lang}`);
+            if(activeBtn) activeBtn.classList.add('lang-active');
 
             loadPosts(currentCategory); 
         }
@@ -111,34 +115,40 @@
             return Math.floor(interval) + "m " + t.time;
         }
 
-        let unsubscribe = null;
         function loadPosts(category = 'all') {
             currentCategory = category;
             const feed = document.getElementById('feed');
             const skeleton = document.getElementById('skeleton-loader');
-            if (unsubscribe) unsubscribe();
+            
+            if (unsubscribe) unsubscribe(); // STOP previous listener
             
             feed.innerHTML = '';
             skeleton.classList.remove('hidden');
             
-            // FILTER BY CATEGORY AND LANGUAGE
             let query = db.collection('confessions').orderBy('timestamp', 'desc');
             
             if (category !== 'all') {
                 query = query.where('category', '==', category.toLowerCase());
             }
 
+            // ADDED LANGUAGE FILTER: This ensures Telugu users see Telugu posts
+            query = query.where('language', '==', currentLang);
+
             unsubscribe = query.limit(30).onSnapshot(snapshot => {
                 skeleton.classList.add('hidden');
-                let html = '';
+                feed.innerHTML = ''; // Clear feed for fresh update
                 
+                if (snapshot.empty) {
+                    feed.innerHTML = `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets in this language yet...</div>`;
+                    return;
+                }
+
                 snapshot.forEach(doc => {
                     const post = doc.data();
-                    // Optional: If you add 'postLanguage' to your post.html, you can filter here:
-                    // if(post.lang !== currentLang) return; 
-
-                    html += `
-                        <div class="bg-white p-8 post-card shadow-sm border border-slate-50 animate-post">
+                    const postId = doc.id;
+                    
+                    const postHTML = `
+                        <div class="bg-white p-8 post-card shadow-sm border border-slate-50 animate-post mb-6">
                             <div class="flex justify-between items-start mb-6">
                                 <span class="text-[9px] font-black uppercase tracking-[2px] text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
                                     ${post.category || 'other'}
@@ -150,29 +160,31 @@
                             
                             <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                                 <div class="flex items-center space-x-4">
-                                    <button onclick="interact('${doc.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-95 transition-all">
+                                    <button onclick="interact('${postId}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-90 transition-all hover:bg-pink-100">
                                         <span class="text-xs">❤️</span> <span class="text-xs font-black">${post.supportCount || 0}</span>
                                     </button>
-                                    <button onclick="interact('${doc.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-95 transition-all">
+                                    <button onclick="interact('${postId}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-90 transition-all hover:bg-indigo-100">
                                         <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (${post.meTooCount || 0})</span>
                                     </button>
                                 </div>
                             </div>
                         </div>`;
+                    feed.insertAdjacentHTML('beforeend', postHTML);
                 });
-                feed.innerHTML = html || `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets yet...</div>`;
             });
         }
 
         window.interact = (id, field) => {
-            // This updates Firebase, and onSnapshot automatically redraws the MeToo count
+            // UPDATED: Standard Firestore update. onSnapshot will handle the UI refresh.
             db.collection('confessions').doc(id).update({
                 [field]: firebase.firestore.FieldValue.increment(1)
-            });
+            }).catch(err => console.error("Error updating:", err));
         };
 
+        // Initialize
         setLanguage(currentLang);
 
+        // Category Switch
         document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click', () => {
             document.querySelectorAll('.cat-btn').forEach(b => {
                 b.classList.remove('bg-slate-900', 'text-white', 'shadow-lg');
