@@ -54,8 +54,8 @@
             <form id="postForm" class="p-8 space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2 ml-1">Pen Name</label>
-                        <input type="text" id="userInput" placeholder="Anonymous Lion / Lioness" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold text-slate-700">
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2 ml-1">Pen Name (Required)</label>
+                        <input type="text" id="userInput" placeholder="e.g. Silent Observer" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold text-slate-700" required>
                     </div>
                     <div>
                         <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2 ml-1">Category</label>
@@ -83,7 +83,7 @@
                     </div>
                     <div id="redAlertNote" class="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-3 transition-all">
                         <span class="text-red-500 text-lg">⚠️</span>
-                        <div><p class="text-[9px] text-red-800 font-black uppercase mb-0.5">Red Alert</p><p class="text-[9px] text-red-600 font-bold leading-tight">Contact numbers or Social IDs will be automatically blocked.</p></div>
+                        <div><p class="text-[9px] text-red-800 font-black uppercase mb-0.5">Content Policy</p><p class="text-[9px] text-red-600 font-bold leading-tight">Abusive words, numbers, or Social IDs are strictly blocked.</p></div>
                     </div>
                 </div>
 
@@ -97,7 +97,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Language Mapping for Label
         const langMap = { en: "English", te: "Telugu", ta: "Tamil", kn: "Kannada", ml: "Malayalam", hi: "Hindi" };
         const userLang = localStorage.getItem('userLang') || 'en';
         document.getElementById('p-lang-tag').innerText = langMap[userLang] + " Feed";
@@ -111,6 +110,20 @@
 
         const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
+        
+        // --- MULTI-LANGUAGE BAD WORDS ---
+        const BAD_WORDS = [
+            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick",
+            "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde",
+            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "punda", "baadu", "thevidiya", 
+            "bolimaga", "sule", "thayoli", "kunna", "pooru"
+        ];
+
+        function containsBadWords(text) {
+            if(!text) return false;
+            const normalizedText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return BAD_WORDS.some(word => normalizedText.includes(word.toLowerCase().replace(/[^a-z0-9]/g, '')));
+        }
 
         function updateUI() {
             document.getElementById('p-msg').innerText = msgInput.value || "Your truth starts here...";
@@ -121,9 +134,14 @@
             if (len >= 950) charCount.classList.add('limit-reached');
             else charCount.classList.remove('limit-reached');
             if(len > 2) { previewBox.style.borderColor = "#6366f1"; previewBox.style.background = "#f5f3ff"; }
+            
             const currentText = msgInput.value.toLowerCase();
-            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText)) redAlert.classList.add('shake-active');
-            else redAlert.classList.remove('shake-active');
+            const currentUser = userInput.value.toLowerCase();
+            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText) || containsBadWords(currentUser)) {
+                redAlert.classList.add('shake-active');
+            } else {
+                redAlert.classList.remove('shake-active');
+            }
         }
 
         [msgInput, userInput, catInput].forEach(el => el.addEventListener('input', updateUI));
@@ -132,20 +150,27 @@
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
-            if(PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase())) return alert("🚫 Contact info blocked.");
+            const username = userInput.value.trim();
+
+            if(!username) return alert("🚫 Please enter a Pen Name.");
             if(content.length < 10) return alert("Secret too short!");
 
             const btn = document.getElementById('submitBtn');
             btn.disabled = true; btn.innerText = "Encrypting...";
 
+            // Determine Shadow Ban status
+            const isToxic = containsBadWords(username) || containsBadWords(content) || PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
+
             try {
                 await db.collection('confessions').add({
-                    username: userInput.value || 'Anonymous Lion/Lioness',
+                    username: username,
                     category: catInput.value,
                     content: content,
                     language: userLang,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    supportCount: 0, meTooCount: 0
+                    supportCount: 0, 
+                    meTooCount: 0,
+                    status: isToxic ? "hidden" : "public" // Shadow Ban Logic
                 });
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
