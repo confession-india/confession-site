@@ -9,26 +9,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Professional Hover & Lift Effect */
-        .post-card { 
-            border-radius: 28px; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            border: 1px solid #f1f5f9;
-            background: white;
-        }
-        .post-card:hover { 
-            transform: translateY(-10px); 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-            border-color: #e2e8f0;
-        }
-
+        .post-card { border-radius: 28px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f1f5f9; background: white; }
+        .post-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border-color: #e2e8f0; }
         .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
         .cat-active { background-color: #0f172a !important; color: white !important; border-color: #0f172a !important; }
-        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-post { animation: fadeIn 0.4s ease forwards; }
-        
         #shareModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         #shareModal.show { display: flex; }
     </style>
@@ -105,9 +91,9 @@
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            const target = document.getElementById(`lang-${lang}`);
+            if(target) target.classList.add('lang-active');
             
-            // Translate UI
             document.getElementById('cat-all').innerText = translations[lang].latest;
             document.getElementById('cat-rel').innerText = translations[lang].rel;
             document.getElementById('cat-fam').innerText = translations[lang].fam;
@@ -129,21 +115,26 @@
             currentCategory = category;
             const feed = document.getElementById('feed');
             
-            let query = db.collection('confessions').orderBy('timestamp', 'desc');
-            if (category !== 'all') query = query.where('category', '==', category.toLowerCase());
+            // MAGIC FILTER: status != hidden
+            let query = db.collection('confessions')
+                          .where('status', '!=', 'hidden') 
+                          .where('language', '==', currentLang);
 
-            query.limit(30).onSnapshot(snapshot => {
+            if (category !== 'all') {
+                query = query.where('category', '==', category.toLowerCase());
+            }
+
+            // Note: status filter requires ordering by status first
+            query.orderBy('status').orderBy('timestamp', 'desc').limit(30).onSnapshot(snapshot => {
                 feed.innerHTML = '';
                 snapshot.forEach(doc => {
                     const post = doc.data();
-                    if (post.language && post.language !== currentLang) return; 
-                    
                     feed.insertAdjacentHTML('beforeend', `
                         <div id="post-${doc.id}" class="p-8 post-card animate-post mb-6">
                             <div class="flex justify-between items-start mb-4">
                                 <div>
                                     <span class="text-[10px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span>
-                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ${post.username || 'ANONYMOUS LION'}</h4>
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ${post.username || 'ANONYMOUS'}</h4>
                                 </div>
                                 <button onclick="reportPost('${doc.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                             </div>
@@ -163,6 +154,8 @@
                             </div>
                         </div>`);
                 });
+            }, err => {
+                console.log("If you see an index error, click the link in the Firebase console to create it.");
             });
         }
 
@@ -172,7 +165,10 @@
 
         window.reportPost = (id) => {
             if(confirm("Report this post?")) {
-                db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) });
+                db.collection('confessions').doc(id).update({ 
+                    reportCount: firebase.firestore.FieldValue.increment(1),
+                    status: "hidden" // Auto-hide if reported (optional)
+                });
                 alert("Thank you.");
             }
         };
