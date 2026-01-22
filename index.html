@@ -9,18 +9,28 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .post-card { border-radius: 28px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid #f1f5f9; background: white; }
-        .post-card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border-color: #e2e8f0; }
+        
+        /* Fixed Shake issue with hardware acceleration */
+        .post-card { 
+            border-radius: 28px; 
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; 
+            border: 1px solid #f1f5f9; 
+            background: white;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        .post-card:hover { transform: translateY(-10px) translateZ(0); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border-color: #e2e8f0; }
+        
         .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
         .cat-active { background-color: #0f172a !important; color: white !important; border-color: #0f172a !important; }
         
-        /* New Pop Animation */
+        /* Improved Pop Animation */
         @keyframes pop {
             0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            40% { transform: scale(1.25); }
             100% { transform: scale(1); }
         }
-        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-post { animation: fadeIn 0.4s ease forwards; }
@@ -76,11 +86,11 @@
             <button onclick="filterCat('marriage', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-mar">Marriage</button>
             <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-oth">Other</button>
         </div>
-
         <div id="feed" class="grid grid-cols-1 gap-6 mt-2"></div>
     </main>
 
     <script>
+        // Firebase Config
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -114,34 +124,6 @@
             return "Just now";
         }
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('userLang', lang);
-            document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            const target = document.getElementById(`lang-${lang}`);
-            if(target) target.classList.add('lang-active');
-            
-            document.getElementById('cat-all').innerText = translations[lang].latest;
-            document.getElementById('cat-rel').innerText = translations[lang].rel;
-            document.getElementById('cat-fam').innerText = translations[lang].fam;
-            document.getElementById('cat-mar').innerText = translations[lang].mar;
-            document.getElementById('cat-oth').innerText = translations[lang].oth;
-            document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
-            document.getElementById('ui-subheading').innerText = translations[lang].sub;
-
-            document.getElementById('feed').innerHTML = '';
-            isInitialLoad = true;
-            loadPosts(currentCategory); 
-        }
-
-        function filterCat(cat, btn) {
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
-            btn.classList.add('cat-active');
-            document.getElementById('feed').innerHTML = '';
-            isInitialLoad = true;
-            loadPosts(cat);
-        }
-
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
@@ -164,10 +146,10 @@
                         <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="interact-btn flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="interact-btn flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all outline-none">
                                     <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="interact-btn flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all">
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="interact-btn flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all outline-none">
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
@@ -181,7 +163,7 @@
 
         async function loadPosts(category = 'all') {
             currentCategory = category;
-            db.collection('confessions').limit(100).onSnapshot(snapshot => {
+            db.collection('confessions').onSnapshot(snapshot => {
                 let allPosts = [];
                 snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
 
@@ -195,13 +177,15 @@
                 let finalPosts = langPosts.length > 0 ? langPosts : englishPosts;
 
                 if (finalPosts.length > 0) {
-                    const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', ''));
-                    const newPostIds = finalPosts.map(p => p.id);
+                    // Critical Fix: Sort IDs before comparing to ensure JSON stringify matches correctly
+                    const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', '')).sort();
+                    const newPostIds = finalPosts.map(p => p.id).sort();
 
                     if (isInitialLoad || JSON.stringify(currentPostIds) !== JSON.stringify(newPostIds)) {
                         renderPosts(finalPosts);
                         isInitialLoad = false;
                     } else {
+                        // Surgical update - No shake here
                         finalPosts.forEach(post => {
                             const supEl = document.getElementById(`sup-${post.id}`);
                             const metooEl = document.getElementById(`metoo-${post.id}`);
@@ -209,8 +193,6 @@
                             if(metooEl && metooEl.innerText != (post.meTooCount || 0)) metooEl.innerText = post.meTooCount || 0;
                         });
                     }
-                } else {
-                    document.getElementById('feed').innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No secrets shared yet.</div>';
                 }
             });
         }
@@ -219,10 +201,11 @@
             e.preventDefault();
             e.stopPropagation(); 
             
-            // Add pop animation to the clicked button
-            const clickedBtn = e.currentTarget;
-            clickedBtn.classList.add('animate-pop');
-            setTimeout(() => clickedBtn.classList.remove('animate-pop'), 300);
+            // Fixed Pop Logic
+            const btn = e.currentTarget;
+            btn.classList.remove('animate-pop'); // Reset if already there
+            void btn.offsetWidth; // Trigger reflow to restart animation
+            btn.classList.add('animate-pop');
             
             // Immediate local update
             const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
@@ -230,28 +213,36 @@
             if(el) el.innerText = parseInt(el.innerText) + 1;
             
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+            
+            setTimeout(() => btn.classList.remove('animate-pop'), 400);
         };
+
+        // Helper functions for Language & Categories
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('userLang', lang);
+            document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
+            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            document.getElementById('feed').innerHTML = '';
+            isInitialLoad = true;
+            loadPosts(currentCategory); 
+        }
+
+        function filterCat(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
+            btn.classList.add('cat-active');
+            document.getElementById('feed').innerHTML = '';
+            isInitialLoad = true;
+            loadPosts(cat);
+        }
 
         window.reportPost = (id) => {
             if(confirm("Report this post?")) {
-                db.collection('confessions').doc(id).update({ 
-                    reportCount: firebase.firestore.FieldValue.increment(1),
-                    status: "hidden"
-                });
-                alert("Thank you.");
+                db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1), status: "hidden" });
             }
         };
 
-        function openShare() {
-            const url = window.location.href;
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=Read this secret: ${url}`);
-            document.getElementById('igBtn').onclick = () => window.open(`https://www.instagram.com/`);
-            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`);
-            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${url}`);
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(url); alert("Link copied!"); };
-            document.getElementById('shareModal').classList.add('show');
-        }
-
+        function openShare() { document.getElementById('shareModal').classList.add('show'); }
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
 
         setLanguage(currentLang);
