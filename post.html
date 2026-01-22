@@ -111,7 +111,6 @@
         const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
         
-        // --- MULTI-LANGUAGE BAD WORDS ---
         const BAD_WORDS = [
             "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick",
             "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde",
@@ -155,11 +154,17 @@
             if(!username) return alert("🚫 Please enter a Pen Name.");
             if(content.length < 10) return alert("Secret too short!");
 
+            // HARD BLOCK LOGIC: Check for toxicity BEFORE adding to database
+            const isToxic = containsBadWords(username) || containsBadWords(content) || 
+                            PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
+
+            if (isToxic) {
+                alert("🚫 Your post contains restricted language or contact info. Please edit it to continue.");
+                return; // STOP: Do not save to Firebase
+            }
+
             const btn = document.getElementById('submitBtn');
             btn.disabled = true; btn.innerText = "Encrypting...";
-
-            // Determine Shadow Ban status
-            const isToxic = containsBadWords(username) || containsBadWords(content) || PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
 
             try {
                 await db.collection('confessions').add({
@@ -170,7 +175,7 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, 
                     meTooCount: 0,
-                    status: isToxic ? "hidden" : "public" // Shadow Ban Logic
+                    status: "public"
                 });
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
