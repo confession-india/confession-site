@@ -10,7 +10,7 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Fixed Shake issue with hardware acceleration */
+        /* Prevent Shake with Layer Isolation */
         .post-card { 
             border-radius: 28px; 
             transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; 
@@ -19,18 +19,20 @@
             backface-visibility: hidden;
             transform: translateZ(0);
         }
-        .post-card:hover { transform: translateY(-10px) translateZ(0); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08); border-color: #e2e8f0; }
         
         .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
         .cat-active { background-color: #0f172a !important; color: white !important; border-color: #0f172a !important; }
         
-        /* Improved Pop Animation */
+        /* Pop Animation */
         @keyframes pop {
             0% { transform: scale(1); }
-            40% { transform: scale(1.25); }
+            50% { transform: scale(1.25); }
             100% { transform: scale(1); }
         }
-        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important; }
+        .animate-pop { 
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            will-change: transform;
+        }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-post { animation: fadeIn 0.4s ease forwards; }
@@ -90,14 +92,13 @@
     </main>
 
     <script>
-        // Firebase Config
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: "కుટુંంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: "కుટુંంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫೀഡ്" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ ரகசியத்தைப் பகிரவும்", sub: "சமூக ஊட்டம்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
@@ -107,14 +108,13 @@
         let currentLang = localStorage.getItem('userLang') || 'en';
         let currentCategory = 'all';
         let isInitialLoad = true;
+        let unsubscribe = null;
 
         function timeAgo(date) {
             if (!date) return 'Just now';
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
             let interval = seconds / 31536000;
             if (interval > 1) return Math.floor(interval) + "y ago";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + "mo ago";
             interval = seconds / 86400;
             if (interval > 1) return Math.floor(interval) + "d ago";
             interval = seconds / 3600;
@@ -162,89 +162,77 @@
         }
 
         async function loadPosts(category = 'all') {
-            currentCategory = category;
-            db.collection('confessions').onSnapshot(snapshot => {
+            if (unsubscribe) unsubscribe(); // Kill old listener before starting new one
+            
+            unsubscribe = db.collection('confessions').onSnapshot(snapshot => {
                 let allPosts = [];
                 snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
 
-                let filtered = allPosts;
-                if (category !== 'all') {
-                    filtered = allPosts.filter(p => p.category === category.toLowerCase());
-                }
+                let filtered = category === 'all' ? allPosts : allPosts.filter(p => p.category === category.toLowerCase());
+                let finalPosts = filtered.filter(p => (p.language || 'en') === currentLang);
+                if (finalPosts.length === 0) finalPosts = filtered.filter(p => (p.language || 'en') === 'en');
 
-                let langPosts = filtered.filter(p => (p.language || 'en') === currentLang);
-                let englishPosts = filtered.filter(p => (p.language || 'en') === 'en');
-                let finalPosts = langPosts.length > 0 ? langPosts : englishPosts;
+                const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', '')).sort();
+                const newPostIds = finalPosts.map(p => p.id).sort();
 
-                if (finalPosts.length > 0) {
-                    // Critical Fix: Sort IDs before comparing to ensure JSON stringify matches correctly
-                    const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', '')).sort();
-                    const newPostIds = finalPosts.map(p => p.id).sort();
-
-                    if (isInitialLoad || JSON.stringify(currentPostIds) !== JSON.stringify(newPostIds)) {
-                        renderPosts(finalPosts);
-                        isInitialLoad = false;
-                    } else {
-                        // Surgical update - No shake here
-                        finalPosts.forEach(post => {
-                            const supEl = document.getElementById(`sup-${post.id}`);
-                            const metooEl = document.getElementById(`metoo-${post.id}`);
-                            if(supEl && supEl.innerText != (post.supportCount || 0)) supEl.innerText = post.supportCount || 0;
-                            if(metooEl && metooEl.innerText != (post.meTooCount || 0)) metooEl.innerText = post.meTooCount || 0;
-                        });
-                    }
+                if (isInitialLoad || JSON.stringify(currentPostIds) !== JSON.stringify(newPostIds)) {
+                    renderPosts(finalPosts);
+                    isInitialLoad = false;
+                } else {
+                    finalPosts.forEach(post => {
+                        const supEl = document.getElementById(`sup-${post.id}`);
+                        const metooEl = document.getElementById(`metoo-${post.id}`);
+                        if(supEl && supEl.innerText != (post.supportCount || 0)) supEl.innerText = post.supportCount || 0;
+                        if(metooEl && metooEl.innerText != (post.meTooCount || 0)) metooEl.innerText = post.meTooCount || 0;
+                    });
                 }
             });
         }
 
-        window.interact = (e, id, field) => {
-            e.preventDefault();
-            e.stopPropagation(); 
-            
-            // Fixed Pop Logic
-            const btn = e.currentTarget;
-            btn.classList.remove('animate-pop'); // Reset if already there
-            void btn.offsetWidth; // Trigger reflow to restart animation
-            btn.classList.add('animate-pop');
-            
-            // Immediate local update
-            const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
-            const el = document.getElementById(elId);
-            if(el) el.innerText = parseInt(el.innerText) + 1;
-            
-            db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
-            
-            setTimeout(() => btn.classList.remove('animate-pop'), 400);
-        };
-
-        // Helper functions for Language & Categories
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
             document.getElementById(`lang-${lang}`).classList.add('lang-active');
-            document.getElementById('feed').innerHTML = '';
+            
+            // Re-apply translations to static UI
+            document.getElementById('cat-all').innerText = translations[lang].latest;
+            document.getElementById('cat-rel').innerText = translations[lang].rel;
+            document.getElementById('cat-fam').innerText = translations[lang].fam;
+            document.getElementById('cat-mar').innerText = translations[lang].mar;
+            document.getElementById('cat-oth').innerText = translations[lang].oth;
+            document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
+            document.getElementById('ui-subheading').innerText = translations[lang].sub;
+
             isInitialLoad = true;
-            loadPosts(currentCategory); 
+            loadPosts(currentCategory);
         }
 
         function filterCat(cat, btn) {
+            currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
             btn.classList.add('cat-active');
-            document.getElementById('feed').innerHTML = '';
             isInitialLoad = true;
             loadPosts(cat);
         }
 
-        window.reportPost = (id) => {
-            if(confirm("Report this post?")) {
-                db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1), status: "hidden" });
-            }
+        window.interact = (e, id, field) => {
+            const btn = e.currentTarget;
+            btn.classList.remove('animate-pop');
+            void btn.offsetWidth; 
+            btn.classList.add('animate-pop');
+            
+            const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
+            const el = document.getElementById(elId);
+            if(el) el.innerText = parseInt(el.innerText) + 1;
+            
+            db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
 
         function openShare() { document.getElementById('shareModal').classList.add('show'); }
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
 
+        // Boot the app
         setLanguage(currentLang);
     </script>
 </body>
