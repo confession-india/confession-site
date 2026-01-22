@@ -10,20 +10,26 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Prevent Shake with Layer Isolation */
+        /* Fixed Hover & Highlight */
         .post-card { 
             border-radius: 28px; 
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             border: 1px solid #f1f5f9; 
             background: white;
             backface-visibility: hidden;
             transform: translateZ(0);
         }
+
+        /* The Highlight Effect you were missing */
+        .post-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.15);
+            border-color: #e2e8f0;
+        }
         
         .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
         .cat-active { background-color: #0f172a !important; color: white !important; border-color: #0f172a !important; }
         
-        /* Pop Animation */
         @keyframes pop {
             0% { transform: scale(1); }
             50% { transform: scale(1.25); }
@@ -98,7 +104,7 @@
         
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: "కుટુંంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫೀഡ്" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ ரகசியத்தைப் பகிரவும்", sub: "சமூக ஊட்டம்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
@@ -162,7 +168,7 @@
         }
 
         async function loadPosts(category = 'all') {
-            if (unsubscribe) unsubscribe(); // Kill old listener before starting new one
+            if (unsubscribe) unsubscribe();
             
             unsubscribe = db.collection('confessions').onSnapshot(snapshot => {
                 let allPosts = [];
@@ -195,7 +201,6 @@
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
             document.getElementById(`lang-${lang}`).classList.add('lang-active');
             
-            // Re-apply translations to static UI
             document.getElementById('cat-all').innerText = translations[lang].latest;
             document.getElementById('cat-rel').innerText = translations[lang].rel;
             document.getElementById('cat-fam').innerText = translations[lang].fam;
@@ -232,7 +237,6 @@
         function openShare() { document.getElementById('shareModal').classList.add('show'); }
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
 
-        // Boot the app
         setLanguage(currentLang);
     </script>
 </body>
