@@ -9,30 +9,40 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .post-card { border-radius: 28px; transition: transform 0.2s ease; }
+        
+        /* Professional Hover Effect */
+        .post-card { 
+            border-radius: 28px; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid #f1f5f9;
+        }
+        .post-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            border-color: #e2e8f0;
+        }
+
         .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; transform: scale(1.05); }
-        .cat-active { background-color: #0f172a !important; color: white !important; border-color: #0f172a !important; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .cat-active { background-color: #0f172a !important; color: white !important; border-color: #0f172a !important; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-post { animation: fadeIn 0.4s ease forwards; }
         
-        /* Modal Style */
         #shareModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
         #shareModal.show { display: flex; }
-        .modal-content { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans">
 
     <div id="shareModal" onclick="closeShare()">
-        <div class="bg-white p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 modal-content" onclick="event.stopPropagation()">
+        <div class="bg-white p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3" onclick="event.stopPropagation()">
             <h3 class="font-black text-xl text-center mb-6">Share Secret</h3>
             <div class="grid grid-cols-1 gap-3">
-                <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold transition-transform active:scale-95">WhatsApp</button>
-                <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold transition-transform active:scale-95">Instagram</button>
-                <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold transition-transform active:scale-95">Facebook</button>
-                <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold transition-transform active:scale-95">X (Twitter)</button>
-                <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold transition-transform active:scale-95">Copy Link</button>
+                <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold">WhatsApp</button>
+                <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold">Instagram</button>
+                <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold">Facebook</button>
+                <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold">X (Twitter)</button>
+                <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold">Copy Link</button>
             </div>
             <button onclick="closeShare()" class="w-full text-slate-400 font-bold py-2 mt-2">Close</button>
         </div>
@@ -40,12 +50,12 @@
 
     <div class="bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800 sticky top-0 z-[60]">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
-            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-en">English</button>
-            <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-te">తెలుగు</button>
-            <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-ta">தமிழ்</button>
-            <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-kn">ಕನ್ನಡ</button>
-            <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-ml">മലയാളം</button>
-            <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-hi">हिंदी</button>
+            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-en">English</button>
+            <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-te">తెలుగు</button>
+            <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ta">தமிழ்</button>
+            <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-kn">ಕನ್ನಡ</button>
+            <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ml">മലയാളം</button>
+            <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-hi">हिंदी</button>
         </div>
     </div>
 
@@ -55,7 +65,7 @@
                 <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
                 <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
             </div>
-            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-900 transition-all shadow-lg font-bold text-sm">+ Share Secret</a>
+            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl shadow-lg font-bold text-sm transition-all hover:bg-indigo-700">+ Share Secret</a>
         </div>
     </header>
 
@@ -76,24 +86,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
+        // Expanded translations for Menu
         const translations = {
-            en: { meToo: "Me Too", report: "Report" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్" },
-            hi: { meToo: "मैं भी", report: "रिपोर्ट" },
-            ta: { meToo: "நானும்", report: "புகார்" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്" }
+            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
+            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ ரகசியத்தைப் பகிரவும்", sub: "சமூக ஊட்டம்" },
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
         let currentCategory = 'all';
-        let unsubscribe = null;
 
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
             document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            
+            // Update UI Labels
+            document.getElementById('cat-all').innerText = translations[lang].latest;
+            document.getElementById('cat-rel').innerText = translations[lang].rel;
+            document.getElementById('cat-fam').innerText = translations[lang].fam;
+            document.getElementById('cat-mar').innerText = translations[lang].mar;
+            document.getElementById('cat-oth').innerText = translations[lang].oth;
+            document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
+            document.getElementById('ui-subheading').innerText = translations[lang].sub;
+
             loadPosts(currentCategory); 
         }
 
@@ -106,36 +126,24 @@
         function loadPosts(category = 'all') {
             currentCategory = category;
             const feed = document.getElementById('feed');
-            if (unsubscribe) unsubscribe();
             
             let query = db.collection('confessions').orderBy('timestamp', 'desc');
             if (category !== 'all') query = query.where('category', '==', category.toLowerCase());
 
-            unsubscribe = query.limit(50).onSnapshot(snapshot => {
-                const existingCards = feed.querySelectorAll('.post-card').length;
-                if(snapshot.size === existingCards) {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === "modified") {
-                            const data = change.doc.data();
-                            const card = document.getElementById(`post-${change.doc.id}`);
-                            if(card) {
-                                card.querySelector('.support-val').innerText = data.supportCount || 0;
-                                card.querySelector('.metoo-val').innerText = data.meTooCount || 0;
-                            }
-                        }
-                    });
-                    return;
-                }
-
+            query.limit(30).onSnapshot(snapshot => {
                 feed.innerHTML = '';
                 snapshot.forEach(doc => {
                     const post = doc.data();
                     if (post.language && post.language !== currentLang) return; 
+                    
                     feed.insertAdjacentHTML('beforeend', `
-                        <div id="post-${doc.id}" class="bg-white p-8 post-card shadow-sm border border-slate-50 animate-post mb-6">
-                            <div class="flex justify-between items-start mb-6">
-                                <span class="text-[9px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500">${post.category || 'other'}</span>
-                                <button onclick="reportPost('${doc.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500 transition-colors">${translations[currentLang].report}</button>
+                        <div id="post-${doc.id}" class="bg-white p-8 post-card animate-post mb-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="text-[9px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span>
+                                    <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-tighter inline-block">BY ${post.username || 'ANONYMOUS'}</h4>
+                                </div>
+                                <button onclick="reportPost('${doc.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                             </div>
                             <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                             <div class="flex items-center justify-between pt-6 border-t border-slate-50">
@@ -147,8 +155,8 @@
                                         <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span class="metoo-val">${post.meTooCount || 0}</span>)</span>
                                     </button>
                                 </div>
-                                <button onclick="openShare()" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all group">
-                                    <svg class="w-5 h-5 text-slate-400 group-hover:text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                <button onclick="openShare()" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all">
+                                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                                 </button>
                             </div>
                         </div>`);
@@ -161,25 +169,19 @@
         };
 
         window.reportPost = (id) => {
-            if(confirm("Report this post for inappropriate content?")) {
+            if(confirm("Report this post?")) {
                 db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) });
-                alert("Thank you. Our team will review this.");
+                alert("Thank you.");
             }
         };
 
         function openShare() {
             const url = window.location.href;
-            const text = encodeURIComponent("Read these secrets on Confess India: ");
-            
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${text}${url}`);
+            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=Read this secret: ${url}`);
             document.getElementById('igBtn').onclick = () => window.open(`https://www.instagram.com/`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`);
-            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`);
-            document.getElementById('copyBtn').onclick = () => {
-                navigator.clipboard.writeText(url);
-                alert("Link copied! Paste it in your Instagram Story.");
-            };
-            
+            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${url}`);
+            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(url); alert("Link copied!"); };
             document.getElementById('shareModal').classList.add('show');
         }
 
