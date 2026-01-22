@@ -115,20 +115,22 @@
             currentCategory = category;
             const feed = document.getElementById('feed');
             
-            // MAGIC FILTER: status != hidden
-            let query = db.collection('confessions')
-                          .where('status', '!=', 'hidden') 
-                          .where('language', '==', currentLang);
+            // REMOVED: .where('status', '!=', 'hidden') to fix the Indexing error
+            let query = db.collection('confessions').where('language', '==', currentLang);
 
             if (category !== 'all') {
                 query = query.where('category', '==', category.toLowerCase());
             }
 
-            // Note: status filter requires ordering by status first
-            query.orderBy('status').orderBy('timestamp', 'desc').limit(30).onSnapshot(snapshot => {
+            // Simple order to prevent errors
+            query.orderBy('timestamp', 'desc').limit(30).onSnapshot(snapshot => {
                 feed.innerHTML = '';
                 snapshot.forEach(doc => {
                     const post = doc.data();
+                    
+                    // Simple Client-side Hide for reported/hidden posts
+                    if(post.status === "hidden") return;
+
                     feed.insertAdjacentHTML('beforeend', `
                         <div id="post-${doc.id}" class="p-8 post-card animate-post mb-6">
                             <div class="flex justify-between items-start mb-4">
@@ -155,7 +157,7 @@
                         </div>`);
                 });
             }, err => {
-                console.log("If you see an index error, click the link in the Firebase console to create it.");
+                console.error("Query Error:", err);
             });
         }
 
@@ -167,7 +169,7 @@
             if(confirm("Report this post?")) {
                 db.collection('confessions').doc(id).update({ 
                     reportCount: firebase.firestore.FieldValue.increment(1),
-                    status: "hidden" // Auto-hide if reported (optional)
+                    status: "hidden"
                 });
                 alert("Thank you.");
             }
