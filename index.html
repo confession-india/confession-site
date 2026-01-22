@@ -81,11 +81,27 @@
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ ரகசியத்தைப் பகிரவும்", sub: "சமூக ஊட்டம்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിವಾഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രහസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
         let currentCategory = 'all';
+
+        function timeAgo(date) {
+            if (!date) return 'Just now';
+            const seconds = Math.floor((new Date() - date.toDate()) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + "y ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + "mo ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + "d ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + "h ago";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + "m ago";
+            return "Just now";
+        }
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -122,20 +138,23 @@
                 feed.insertAdjacentHTML('beforeend', `
                     <div id="post-${post.id}" class="p-8 post-card animate-post mb-6">
                         <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span class="text-[10px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span>
-                                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ${post.username || 'ANONYMOUS'}</h4>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center">
+                                    <span class="text-[10px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span>
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ${post.username || 'ANONYMOUS'}</h4>
+                                </div>
+                                <span class="text-[9px] text-slate-300 font-bold ml-0.5">${timeAgo(post.timestamp)}</span>
                             </div>
                             <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                         </div>
                         <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact('${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-90 transition-all">
-                                    <span class="text-xs">❤️</span> <span class="text-xs font-black support-val">${post.supportCount || 0}</span>
+                                <button onclick="interact('${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-95 transition-all">
+                                    <span class="text-xs">❤️</span> <span class="text-xs font-black support-val" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact('${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-90 transition-all">
-                                    <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span class="metoo-val">${post.meTooCount || 0}</span>)</span>
+                                <button onclick="interact('${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-95 transition-all">
+                                    <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span class="metoo-val" id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
                             <button onclick="openShare()" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all">
@@ -146,31 +165,42 @@
             });
         }
 
+        let isInitialLoad = true;
         async function loadPosts(category = 'all') {
             currentCategory = category;
             const feed = document.getElementById('feed');
             
-            // fetch ALL posts but only limit to a reasonable number
             db.collection('confessions').limit(100).onSnapshot(snapshot => {
                 let allPosts = [];
                 snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
 
-                // Filter by Category first
                 let filtered = allPosts;
                 if (category !== 'all') {
                     filtered = allPosts.filter(p => p.category === category.toLowerCase());
                 }
 
-                // Logic: Separate posts by language
-                // Treat posts with NO language field as "en" (English)
                 let langPosts = filtered.filter(p => (p.language || 'en') === currentLang);
                 let englishPosts = filtered.filter(p => (p.language || 'en') === 'en');
+                let finalPosts = langPosts.length > 0 ? langPosts : englishPosts;
 
-                if (langPosts.length > 0) {
-                    renderPosts(langPosts);
-                } else if (englishPosts.length > 0) {
-                    // Fallback to English if no posts in current language
-                    renderPosts(englishPosts);
+                if (finalPosts.length > 0) {
+                    // Only re-render the whole feed if the post count or post IDs changed
+                    // This prevents the "shaking" when just updating a count
+                    const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', ''));
+                    const newPostIds = finalPosts.map(p => p.id);
+
+                    if (isInitialLoad || JSON.stringify(currentPostIds) !== JSON.stringify(newPostIds)) {
+                        renderPosts(finalPosts);
+                        isInitialLoad = false;
+                    } else {
+                        // Just update the numbers (avoids shaking)
+                        finalPosts.forEach(post => {
+                            const supEl = document.getElementById(`sup-${post.id}`);
+                            const metooEl = document.getElementById(`metoo-${post.id}`);
+                            if(supEl) supEl.innerText = post.supportCount || 0;
+                            if(metooEl) metooEl.innerText = post.meTooCount || 0;
+                        });
+                    }
                 } else {
                     feed.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No secrets shared yet.</div>';
                 }
@@ -178,6 +208,12 @@
         }
 
         window.interact = (id, field) => {
+            // Optimistic update (UI changes immediately)
+            const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
+            const el = document.getElementById(elId);
+            if(el) el.innerText = parseInt(el.innerText) + 1;
+            
+            // Database update
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
 
