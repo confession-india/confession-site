@@ -10,15 +10,9 @@
     <style>
         body { background-color: #fdfdff; }
         .input-focus-effect:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        
-        /* Character Count Pulse */
         .limit-reached { color: #ef4444 !important; font-weight: 900; animation: pulse 0.5s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* Secure Typing Glow */
         .secure-glow:focus { border-color: #10b981 !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.1) !important; }
-
-        /* Toast & Animations */
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
@@ -45,7 +39,7 @@
             <div id="previewContainer" class="p-6 bg-white border-2 border-dashed border-slate-200 rounded-[24px] shadow-sm transition-all duration-300">
                 <div class="flex justify-between items-center mb-3">
                     <span id="p-cat" class="text-[9px] font-black uppercase bg-slate-100 px-2 py-1 rounded">📝 OTHER</span>
-                    <span class="text-[9px] text-slate-300 font-bold italic">Just now</span>
+                    <span id="p-lang-tag" class="text-[9px] text-indigo-500 font-bold">English Feed</span>
                 </div>
                 <h4 id="p-user" class="text-xs font-black text-slate-900 mb-1 tracking-tight">Anonymous Lion/Lioness</h4>
                 <p id="p-msg" class="text-slate-500 text-sm leading-relaxed italic">Your truth starts here...</p>
@@ -54,7 +48,6 @@
 
         <div class="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
             <form id="postForm" class="p-8 space-y-6">
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2 ml-1">Pen Name</label>
@@ -77,11 +70,6 @@
                         <span id="charCount" class="text-[10px] font-bold text-slate-300 transition-colors duration-300">0 / 1000</span>
                     </div>
                     <textarea id="msgInput" rows="6" maxlength="1000" placeholder="Feel free to share your heart..." class="w-full p-6 bg-slate-50 border-2 border-transparent rounded-[32px] outline-none secure-glow leading-relaxed resize-none font-medium text-slate-700"></textarea>
-                    
-                    <div class="absolute bottom-6 right-6 flex items-center gap-1 opacity-20 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                        <span class="text-[8px] font-black uppercase tracking-widest">Secure Post</span>
-                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -101,16 +89,14 @@
     </main>
 
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", 
-            authDomain: "confession-india.firebaseapp.com", 
-            projectId: "confession-india", 
-            storageBucket: "confession-india.firebasestorage.app", 
-            messagingSenderId: "345080016810", 
-            appId: "1:345080016810:web:3032f570077ea8d6dd45d3" 
-        };
+        const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        // Language Mapping for Label
+        const langMap = { en: "English", te: "Telugu", ta: "Tamil", kn: "Kannada", ml: "Malayalam", hi: "Hindi" };
+        const userLang = localStorage.getItem('userLang') || 'en';
+        document.getElementById('p-lang-tag').innerText = langMap[userLang] + " Feed";
 
         const msgInput = document.getElementById('msgInput');
         const userInput = document.getElementById('userInput');
@@ -123,39 +109,27 @@
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
 
         function updateUI() {
-            // Update Preview Text
             document.getElementById('p-msg').innerText = msgInput.value || "Your truth starts here...";
             document.getElementById('p-user').innerText = userInput.value || "Anonymous Lion / Lioness";
             document.getElementById('p-cat').innerText = "📝 " + catInput.options[catInput.selectedIndex].text.toUpperCase();
-            
-            // Character Counter Logic
             const len = msgInput.value.length;
             charCount.innerText = `${len} / 1000`;
-            if (len >= 950) { charCount.classList.add('limit-reached'); } 
-            else { charCount.classList.remove('limit-reached'); }
-
-            // Security Border
+            if (len >= 950) charCount.classList.add('limit-reached');
+            else charCount.classList.remove('limit-reached');
             if(len > 2) { previewBox.style.borderColor = "#6366f1"; previewBox.style.background = "#f5f3ff"; }
-
-            // Real-time Red Alert Shake
             const currentText = msgInput.value.toLowerCase();
-            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText)) { redAlert.classList.add('shake-active'); } 
-            else { redAlert.classList.remove('shake-active'); }
+            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText)) redAlert.classList.add('shake-active');
+            else redAlert.classList.remove('shake-active');
         }
 
         [msgInput, userInput, catInput].forEach(el => el.addEventListener('input', updateUI));
         catInput.addEventListener('change', updateUI);
 
-        const BANNED = ['fuck', 'porn', 'sex', 'drugs'];
-
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
-            const lowerContent = content.toLowerCase();
-
-            if(BANNED.some(word => lowerContent.includes(word))) return alert("⚠️ Please use cleaner language.");
-            if(PHONE_REGEX.test(content) || SOCIAL_REGEX.test(lowerContent)) { return alert("🚫 RED ALERT: Personal contact info is blocked."); }
-            if(content.length < 15) return alert("Please share at least 15 characters.");
+            if(PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase())) return alert("🚫 Contact info blocked.");
+            if(content.length < 10) return alert("Secret too short!");
 
             const btn = document.getElementById('submitBtn');
             btn.disabled = true; btn.innerText = "Encrypting...";
@@ -165,14 +139,15 @@
                     username: userInput.value || 'Anonymous Lion/Lioness',
                     category: catInput.value,
                     content: content,
+                    language: userLang,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    supportCount: 0, meTooCount: 0, reportCount: 0
+                    supportCount: 0, meTooCount: 0
                 });
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
                 btn.disabled = false; btn.innerText = "Post Anonymously";
-                alert("Server connection failed.");
+                alert("Connection failed.");
             }
         });
     </script>
