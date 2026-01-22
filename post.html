@@ -10,12 +10,33 @@
     <style>
         body { background-color: #fdfdff; }
         .input-focus-effect:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
-        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; }
+        
+        /* Success Toast */
+        #toast {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px);
+            opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999;
+        }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        #previewContainer { border: 2px dashed #e2e8f0; border-radius: 24px; background: white; transition: all 0.3s ease; }
+
+        /* Preview Card */
+        #previewContainer {
+            border: 2px dashed #e2e8f0; border-radius: 24px; background: white; transition: all 0.3s ease;
+        }
+
+        /* Shake Animation for Red Alert */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .shake-active {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
     </style>
 </head>
-<body class="min-h-screen pb-12 font-sans">
+<body class="min-h-screen pb-12 font-sans text-slate-900">
 
     <div id="toast">
         <div class="bg-slate-900 text-white px-8 py-4 rounded-3xl shadow-2xl font-bold flex items-center gap-3">
@@ -25,12 +46,16 @@
 
     <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
-            <h1 class="text-xl font-black text-indigo-600">Confess India</h1>
-            <a href="index.html" class="text-slate-400 font-bold text-xs uppercase">Cancel</a>
+            <div class="flex flex-col">
+                <h1 class="text-xl font-black text-indigo-600 leading-none">Confess India</h1>
+                <span class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter mt-1">Anonymous & Secure</span>
+            </div>
+            <a href="index.html" class="text-slate-400 font-bold text-xs uppercase bg-slate-50 px-4 py-2 rounded-xl hover:text-slate-900 transition-all">Cancel</a>
         </div>
     </header>
 
     <main class="max-w-2xl mx-auto p-6 mt-6">
+        
         <div class="mb-8">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Live Preview</p>
             <div id="previewContainer" class="p-6 shadow-sm">
@@ -38,21 +63,22 @@
                     <span id="p-cat" class="text-[9px] font-black uppercase bg-slate-100 px-2 py-1 rounded">📝 OTHER</span>
                     <span class="text-[9px] text-slate-300 font-bold">Just now</span>
                 </div>
-                <h4 id="p-user" class="text-xs font-black text-slate-900 mb-1 tracking-tight">Anonymous Member</h4>
+                <h4 id="p-user" class="text-xs font-black text-slate-900 mb-1 tracking-tight uppercase">Anonymous Member</h4>
                 <p id="p-msg" class="text-slate-500 text-sm leading-relaxed italic">Your confession will appear here as you type...</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-[32px] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
             <form id="postForm" class="p-8 space-y-6">
+                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2">Pen Name</label>
-                        <input type="text" id="userInput" placeholder="Anonymous Lion" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold">
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2 ml-1">Pen Name</label>
+                        <input type="text" id="userInput" placeholder="Anonymous Lion" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold text-slate-700">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2">Category</label>
-                        <select id="catInput" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none cursor-pointer font-bold">
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2 ml-1">Topic</label>
+                        <select id="catInput" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none cursor-pointer font-bold text-slate-700">
                             <option value="relationship">Relationships 💔</option>
                             <option value="family">Family 👨‍👩‍👧</option>
                             <option value="marriage">Marriage 💍</option>
@@ -61,22 +87,37 @@
                     </div>
                 </div>
 
-                <div>
-                    <div class="flex justify-between mb-2">
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase">Your Truth</label>
+                <div class="relative">
+                    <div class="flex justify-between mb-2 px-1">
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase">Your Confession</label>
                         <span id="charCount" class="text-[10px] font-bold text-slate-300">0 / 1000</span>
                     </div>
-                    <textarea id="msgInput" rows="6" placeholder="Be brave, be honest..." class="w-full p-6 bg-slate-50 border-2 border-transparent rounded-[24px] outline-none input-focus-effect leading-relaxed resize-none font-medium"></textarea>
+                    <textarea id="msgInput" rows="6" placeholder="Be brave, be honest..." class="w-full p-6 bg-slate-50 border-2 border-transparent rounded-[32px] outline-none input-focus-effect leading-relaxed resize-none font-medium text-slate-700"></textarea>
+                    
+                    <div class="absolute bottom-6 right-6 flex items-center gap-1 opacity-20 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                        <span class="text-[8px] font-black uppercase tracking-widest">End-to-End Private</span>
+                    </div>
                 </div>
 
-                <div class="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-3">
-                    <span class="text-red-500 text-lg">⚠️</span>
-                    <p class="text-[10px] text-red-700 font-bold uppercase tracking-tight leading-relaxed">
-                        Red Alert: Posting Phone Numbers, WhatsApp links, or Social Media IDs will result in an automatic IP Ban.
-                    </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div id="privacyNote" class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-start gap-3 transition-all">
+                        <span class="text-emerald-500 text-lg">🛡️</span>
+                        <div>
+                            <p class="text-[9px] text-emerald-800 font-black uppercase tracking-widest mb-0.5">Privacy Shield</p>
+                            <p class="text-[9px] text-emerald-600 font-bold leading-tight">We don't track your IP, cookies, or location. Zero data stored.</p>
+                        </div>
+                    </div>
+                    <div id="redAlertNote" class="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-3 transition-all">
+                        <span class="text-red-500 text-lg">⚠️</span>
+                        <div>
+                            <p class="text-[9px] text-red-800 font-black uppercase tracking-widest mb-0.5">Red Alert</p>
+                            <p class="text-[9px] text-red-600 font-bold leading-tight">Contact numbers or Social IDs will trigger an automatic system block.</p>
+                        </div>
+                    </div>
                 </div>
 
-                <button id="submitBtn" type="submit" class="w-full bg-slate-900 text-white py-5 rounded-[20px] font-black text-lg shadow-xl hover:bg-indigo-600 transition-all">
+                <button id="submitBtn" type="submit" class="w-full bg-slate-900 text-white py-5 rounded-[24px] font-black text-lg shadow-xl hover:bg-indigo-600 transition-all active:scale-95">
                     Post Anonymously
                 </button>
             </form>
@@ -98,57 +139,56 @@
         const msgInput = document.getElementById('msgInput');
         const userInput = document.getElementById('userInput');
         const catInput = document.getElementById('catInput');
-        const submitBtn = document.getElementById('submitBtn');
+        const redAlert = document.getElementById('redAlertNote');
         const previewBox = document.getElementById('previewContainer');
 
-        // LIVE PREVIEW LOGIC
-        function handlePreview() {
+        // PREVIEW & REAL-TIME VALIDATION
+        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
+        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
+
+        function updateUI() {
+            // Update Preview Text
             document.getElementById('p-msg').innerText = msgInput.value || "Your confession will appear here...";
             document.getElementById('p-user').innerText = userInput.value || "Anonymous Member";
-            document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
+            document.getElementById('p-cat').innerText = "📝 " + catInput.options[catInput.selectedIndex].text.toUpperCase();
             document.getElementById('charCount').innerText = `${msgInput.value.length} / 1000`;
-            
+
+            // Preview Styling
             if(msgInput.value.length > 2) {
                 previewBox.style.borderColor = "#6366f1";
                 previewBox.style.background = "#f5f3ff";
             }
-        }
-        msgInput.addEventListener('input', handlePreview);
-        userInput.addEventListener('input', handlePreview);
-        catInput.addEventListener('change', handlePreview);
 
-        // --- SECURITY SHIELD LOGIC ---
-        const BANNED_WORDS = ['fuck', 'porn', 'sex', 'drugs', 'abuse', 'cheat'];
-        
-        // Regex to find 10-digit phone numbers (detects 9876543210, 987-654-3210, etc.)
-        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
-        
-        // Regex to find IG/Social handles (detects @name, ig:name, insta:, telegram:)
-        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
+            // --- REAL TIME SHAKE TRIGGER ---
+            const currentText = msgInput.value.toLowerCase();
+            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText)) {
+                redAlert.classList.add('shake-active');
+            } else {
+                redAlert.classList.remove('shake-active');
+            }
+        }
+
+        [msgInput, userInput, catInput].forEach(el => el.addEventListener('input', updateUI));
+        catInput.addEventListener('change', updateUI);
+
+        // SUBMIT LOGIC
+        const BANNED = ['fuck', 'porn', 'sex', 'drugs'];
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
             const lowerContent = content.toLowerCase();
 
-            // 1. Check Bad Words
-            const badWord = BANNED_WORDS.find(word => lowerContent.includes(word));
-            if(badWord) return alert(`⚠️ System: Profanity detected ("${badWord}"). Please remove it.`);
-
-            // 2. Check Phone Numbers
-            if(PHONE_REGEX.test(content)) {
-                return alert("🚫 RED ALERT: Phone numbers or WhatsApp IDs are strictly prohibited for your safety.");
+            if(BANNED.some(word => lowerContent.includes(word))) return alert("⚠️ Safety: Please remove inappropriate language.");
+            if(PHONE_REGEX.test(content) || SOCIAL_REGEX.test(lowerContent)) {
+                redAlert.classList.add('shake-active');
+                return alert("🚫 SYSTEM BLOCK: You cannot share personal contact details.");
             }
+            if(content.length < 15) return alert("Please share a bit more detail (min 15 chars).");
 
-            // 3. Check Social IDs
-            if(SOCIAL_REGEX.test(lowerContent)) {
-                return alert("🚫 RED ALERT: Instagram/Social Media IDs are not allowed. Please keep this anonymous.");
-            }
-
-            if(content.length < 15) return alert("Your secret is too short. Please add more detail!");
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Verifying & Posting...";
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerText = "Verifying Privacy...";
 
             try {
                 await db.collection('confessions').add({
@@ -161,9 +201,9 @@
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
-                alert("Error! Check connection.");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Post Anonymously";
+                btn.disabled = false;
+                btn.innerText = "Post Anonymously";
+                alert("Error connecting to server.");
             }
         });
     </script>
