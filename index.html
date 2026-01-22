@@ -81,7 +81,7 @@
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ ரகசியத்தைப் பகிரவும்", sub: "சமூக ஊட்டம்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിವಾഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രහസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
@@ -115,12 +115,7 @@
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
             
-            // Client-side sort to avoid Firebase Index errors
-            posts.sort((a, b) => {
-                const timeA = a.timestamp?.seconds || 0;
-                const timeB = b.timestamp?.seconds || 0;
-                return timeB - timeA;
-            });
+            posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
             posts.forEach(post => {
                 if(post.status === "hidden") return;
@@ -155,36 +150,29 @@
             currentCategory = category;
             const feed = document.getElementById('feed');
             
-            // Try fetching the selected language first
-            let query = db.collection('confessions').where('language', '==', currentLang);
-            if (category !== 'all') {
-                query = query.where('category', '==', category.toLowerCase());
-            }
+            // fetch ALL posts but only limit to a reasonable number
+            db.collection('confessions').limit(100).onSnapshot(snapshot => {
+                let allPosts = [];
+                snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
 
-            query.onSnapshot(async (snapshot) => {
-                let posts = [];
-                snapshot.forEach(doc => posts.push({ id: doc.id, ...doc.data() }));
+                // Filter by Category first
+                let filtered = allPosts;
+                if (category !== 'all') {
+                    filtered = allPosts.filter(p => p.category === category.toLowerCase());
+                }
 
-                // FALLBACK LOGIC: If current language has 0 posts AND it's not English
-                if (posts.length === 0 && currentLang !== 'en') {
-                    console.log("No posts in " + currentLang + ", falling back to English.");
-                    
-                    let fallbackQuery = db.collection('confessions').where('language', '==', 'en');
-                    if (category !== 'all') {
-                        fallbackQuery = fallbackQuery.where('category', '==', category.toLowerCase());
-                    }
-                    
-                    const fallbackSnap = await fallbackQuery.get();
-                    let fallbackPosts = [];
-                    fallbackSnap.forEach(doc => fallbackPosts.push({ id: doc.id, ...doc.data() }));
-                    
-                    if(fallbackPosts.length === 0) {
-                        feed.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No secrets shared yet.</div>';
-                    } else {
-                        renderPosts(fallbackPosts);
-                    }
+                // Logic: Separate posts by language
+                // Treat posts with NO language field as "en" (English)
+                let langPosts = filtered.filter(p => (p.language || 'en') === currentLang);
+                let englishPosts = filtered.filter(p => (p.language || 'en') === 'en');
+
+                if (langPosts.length > 0) {
+                    renderPosts(langPosts);
+                } else if (englishPosts.length > 0) {
+                    // Fallback to English if no posts in current language
+                    renderPosts(englishPosts);
                 } else {
-                    renderPosts(posts);
+                    feed.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No secrets shared yet.</div>';
                 }
             });
         }
