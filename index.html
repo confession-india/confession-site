@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+\<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,34 +9,26 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .post-card { border-radius: 28px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .post-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
-        
-        @keyframes shimmer { 0% { background-position: -468px 0; } 100% { background-position: 468px 0; } }
-        .skeleton {
-            background: #f6f7f8;
-            background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
-            background-repeat: no-repeat;
-            background-size: 800px 104px;
-            animation: shimmer 1.2s forwards infinite linear;
-        }
+        .post-card { border-radius: 28px; transition: all 0.3s ease; }
         .lang-active { background: #6366f1 !important; color: white !important; border-color: #6366f1 !important; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-post { animation: fadeIn 0.5s ease forwards; }
     </style>
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans">
 
-    <div class="bg-slate-900 py-2 overflow-x-auto no-scrollbar border-b border-slate-800">
+    <div class="bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800 sticky top-0 z-[60]">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
-            <button onclick="setLanguage('en')" class="lang-pill px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-en">English</button>
-            <button onclick="setLanguage('hi')" class="lang-pill px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-hi">हिंदी</button>
-            <button onclick="setLanguage('te')" class="lang-pill px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-te">తెలుగు</button>
-            <button onclick="setLanguage('ta')" class="lang-pill px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ta">தமிழ்</button>
-            <button onclick="setLanguage('kn')" class="lang-pill px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-kn">ಕನ್ನಡ</button>
-            <button onclick="setLanguage('ml')" class="lang-pill px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ml">മലയാളം</button>
+            <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-te">తెలుగు</button>
+            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-en">English</button>
+            <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-hi">हिंदी</button>
+            <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-ta">தமிழ்</button>
+            <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-kn">ಕನ್ನಡ</button>
+            <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap transition-all" id="lang-ml">മലയാളം</button>
         </div>
     </div>
 
-    <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+    <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-[52px] z-50">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div class="flex flex-col">
                 <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
@@ -51,9 +43,9 @@
     <main class="max-w-4xl mx-auto p-4">
         <div class="flex overflow-x-auto py-6 space-x-3 no-scrollbar items-center">
             <button class="cat-btn shrink-0 bg-slate-900 text-white px-6 py-2 rounded-2xl font-bold shadow-lg transition-all text-sm" data-cat="all" id="cat-all">Latest</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="relationship" id="cat-rel">Relationships</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="family" id="cat-fam">Family</button>
-            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm hover:border-indigo-200" data-cat="marriage" id="cat-mar">Marriage</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="relationship" id="cat-rel">Relationships</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="family" id="cat-fam">Family</button>
+            <button class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" data-cat="marriage" id="cat-mar">Marriage</button>
         </div>
 
         <div id="feed" class="grid grid-cols-1 gap-6 mt-2"></div>
@@ -62,13 +54,11 @@
             <div class="bg-white p-8 post-card border border-gray-100">
                 <div class="skeleton h-4 w-24 rounded-lg mb-4"></div>
                 <div class="skeleton h-12 w-full rounded-xl mb-4"></div>
-                <div class="skeleton h-4 w-1/2 rounded-lg"></div>
             </div>
         </div>
     </main>
 
     <script>
-        // CONFIG
         const firebaseConfig = { 
             apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", 
             authDomain: "confession-india.firebaseapp.com", 
@@ -80,19 +70,18 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // 1. LANGUAGE MAP
         const translations = {
-            en: { subheading: "Community Feed", share: "+ Share Secret", all: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", time: "ago", justNow: "Just now" },
-            hi: { subheading: "सामुदायिक फ़ीड", share: "+ गुप्त साझा करें", all: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", time: "पहले", justNow: "अभी-अभी" },
-            te: { subheading: "కమ్యూనిటీ ఫీడ్", share: "+ రహస్యాన్ని పంచుకోండి", all: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", time: "క్రితం", justNow: "ఇప్పుడే" },
-            ta: { subheading: "சமூக ஊட்டம்", share: "+ ரகசியத்தைப் பகிரவும்", all: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", time: "முன்பு", justNow: "இப்போது" },
-            kn: { subheading: "ಸಮುದಾಯ ಫೀಡ್", share: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", all: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", time: "ಹಿಂದೆ", justNow: "ಈಗಷ್ಟೇ" },
-            ml: { subheading: "കമ്മ്യൂണിറ്റി ഫീഡ്", share: "+ രഹസ്യം പങ്കിടുക", all: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", time: "മുമ്പ്", justNow: "ഇപ്പോൾ" }
+            en: { subheading: "Community Feed", share: "+ Share Secret", all: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", time: "ago", justNow: "Just now", meToo: "Me Too" },
+            te: { subheading: "కమ్యూనిటీ ఫీడ్", share: "+ రహస్యాన్ని పంచుకోండి", all: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", time: "క్రితం", justNow: "ఇప్పుడే", meToo: "నేను కూడా" },
+            hi: { subheading: "सामुदायिक फ़ीड", share: "+ गुप्त साझा करें", all: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", time: "पहले", justNow: "अभी-अभी", meToo: "मैं भी" },
+            ta: { subheading: "சமூக ஊட்டம்", share: "+ ரகசியத்தைப் பகிரவும்", all: "சமீபத்திய", rel: "உறవులు", fam: "குடும்பம்", mar: "திருமணம்", time: "முன்பு", justNow: "இப்போது", meToo: "நானும்" },
+            kn: { subheading: "ಸಮುದಾಯ ಫೀಡ್", share: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", all: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", time: "ಹಿಂದೆ", justNow: "ಈಗಷ್ಟೇ", meToo: "ನಾನು ಕೂಡ" },
+            ml: { subheading: "കമ്മ്യൂണിറ്റി ഫೀಡ್", share: "+ രഹസ്യം പങ്കിടുക", all: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", time: "മുമ്പ്", justNow: "ഇപ്പോൾ", meToo: "ഞാനും" }
         };
 
-        let currentLang = localStorage.getItem('userLang') || 'en';
+        let currentLang = localStorage.getItem('userLang') || 'te'; // Defaults to Telugu
+        let currentCategory = 'all';
 
-        // 2. APPLY LANGUAGE TO UI
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
@@ -105,28 +94,26 @@
             document.getElementById('cat-fam').innerText = t.fam;
             document.getElementById('cat-mar').innerText = t.mar;
 
-            // Update Active Pill UI
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
             document.getElementById(`lang-${lang}`).classList.add('lang-active');
 
-            loadPosts(); // Refresh feed with new language settings
+            loadPosts(currentCategory); 
         }
 
         function timeAgo(timestamp) {
             if (!timestamp) return translations[currentLang].justNow;
             const seconds = Math.floor((new Date() - timestamp.toDate()) / 1000);
             const t = translations[currentLang];
-            
+            if (seconds < 60) return t.justNow;
             let interval = seconds / 3600;
             if (interval > 1) return Math.floor(interval) + "h " + t.time;
             interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + "m " + t.time;
-            return t.justNow;
+            return Math.floor(interval) + "m " + t.time;
         }
 
-        // 3. LOAD POSTS
         let unsubscribe = null;
         function loadPosts(category = 'all') {
+            currentCategory = category;
             const feed = document.getElementById('feed');
             const skeleton = document.getElementById('skeleton-loader');
             if (unsubscribe) unsubscribe();
@@ -134,8 +121,12 @@
             feed.innerHTML = '';
             skeleton.classList.remove('hidden');
             
+            // FILTER BY CATEGORY AND LANGUAGE
             let query = db.collection('confessions').orderBy('timestamp', 'desc');
-            if (category !== 'all') query = query.where('category', '==', category.toLowerCase());
+            
+            if (category !== 'all') {
+                query = query.where('category', '==', category.toLowerCase());
+            }
 
             unsubscribe = query.limit(30).onSnapshot(snapshot => {
                 skeleton.classList.add('hidden');
@@ -143,58 +134,51 @@
                 
                 snapshot.forEach(doc => {
                     const post = doc.data();
+                    // Optional: If you add 'postLanguage' to your post.html, you can filter here:
+                    // if(post.lang !== currentLang) return; 
+
                     html += `
-                        <div class="bg-white p-8 post-card shadow-sm border border-slate-50 relative overflow-hidden group animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div class="bg-white p-8 post-card shadow-sm border border-slate-50 animate-post">
                             <div class="flex justify-between items-start mb-6">
-                                <div class="flex flex-col">
-                                    <span class="text-[9px] font-black uppercase tracking-[2px] text-indigo-500 mb-1">
-                                        ${post.category || 'other'}
-                                    </span>
-                                    <h4 class="text-sm font-black text-slate-900 uppercase tracking-tighter">${post.username || 'Anonymous'}</h4>
-                                </div>
-                                <span class="text-[10px] font-bold text-slate-300 bg-slate-50 px-2 py-1 rounded-md">${timeAgo(post.timestamp)}</span>
+                                <span class="text-[9px] font-black uppercase tracking-[2px] text-indigo-500 bg-indigo-50 px-2 py-1 rounded">
+                                    ${post.category || 'other'}
+                                </span>
+                                <span class="text-[10px] font-bold text-slate-300">${timeAgo(post.timestamp)}</span>
                             </div>
 
                             <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                             
                             <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                                 <div class="flex items-center space-x-4">
-                                    <button onclick="interact('${doc.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-90 transition-all">
+                                    <button onclick="interact('${doc.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-95 transition-all">
                                         <span class="text-xs">❤️</span> <span class="text-xs font-black">${post.supportCount || 0}</span>
                                     </button>
-                                    <button onclick="interact('${doc.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-90 transition-all">
-                                        <span class="text-xs">🫂</span> <span class="text-xs font-black">Me Too</span>
+                                    <button onclick="interact('${doc.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-95 transition-all">
+                                        <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (${post.meTooCount || 0})</span>
                                     </button>
                                 </div>
-                                <button onclick="sharePost('${encodeURIComponent(post.content)}')" class="p-2.5 text-slate-400 hover:text-green-500 transition-all">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                                </button>
                             </div>
                         </div>`;
                 });
-                feed.innerHTML = html || `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets here yet...</div>`;
+                feed.innerHTML = html || `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets yet...</div>`;
             });
         }
 
         window.interact = (id, field) => {
-            db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+            // This updates Firebase, and onSnapshot automatically redraws the MeToo count
+            db.collection('confessions').doc(id).update({
+                [field]: firebase.firestore.FieldValue.increment(1)
+            });
         };
 
-        window.sharePost = (content) => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Read this secret: " + decodeURIComponent(content).substring(0,100) + "... " + window.location.href)}`, '_blank');
-
-        // Initial Load
         setLanguage(currentLang);
 
-        // Category Switcher Logic
         document.querySelectorAll('.cat-btn').forEach(btn => btn.addEventListener('click', () => {
             document.querySelectorAll('.cat-btn').forEach(b => {
-                b.classList.replace('bg-slate-900', 'bg-white');
-                b.classList.replace('text-white', 'text-gray-500');
-                b.classList.remove('shadow-lg');
+                b.classList.remove('bg-slate-900', 'text-white', 'shadow-lg');
+                b.classList.add('bg-white', 'text-gray-500');
             });
-            btn.classList.replace('bg-white', 'bg-slate-900');
-            btn.classList.replace('text-gray-500', 'text-white');
-            btn.classList.add('shadow-lg');
+            btn.classList.add('bg-slate-900', 'text-white', 'shadow-lg');
             loadPosts(btn.dataset.cat);
         }));
     </script>
