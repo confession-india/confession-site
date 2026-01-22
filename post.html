@@ -8,61 +8,51 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
-        body { background-color: #fdfdff; overflow-x: hidden; }
-        .input-focus-effect:focus {
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            border-color: #6366f1;
-        }
-        #toast {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            z-index: 9999;
-        }
+        body { background-color: #fdfdff; }
+        .input-focus-effect:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-        .preview-card { border-radius: 28px; border: 2px dashed #e2e8f0; }
+        #previewContainer { border: 2px dashed #e2e8f0; border-radius: 24px; background: white; transition: all 0.3s ease; }
     </style>
 </head>
-<body class="min-h-screen pb-20 font-sans text-slate-900">
+<body class="min-h-screen pb-12 font-sans">
 
     <div id="toast">
-        <div class="bg-slate-900 text-white px-8 py-4 rounded-3xl shadow-2xl flex items-center gap-3 border border-slate-700">
-            <span class="text-xl">✨</span>
-            <span class="font-bold text-sm tracking-wide">Confession Shared Successfully!</span>
+        <div class="bg-slate-900 text-white px-8 py-4 rounded-3xl shadow-2xl font-bold flex items-center gap-3">
+            <span>✨</span> Post Shared Successfully!
         </div>
     </div>
 
     <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
-            <div class="flex flex-col">
-                <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
-                <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1">Submit Secret</span>
-            </div>
-            <a href="index.html" class="text-slate-400 hover:text-slate-900 font-bold text-[10px] tracking-widest uppercase transition-all bg-slate-50 px-4 py-2 rounded-xl">Cancel</a>
+            <h1 class="text-xl font-black text-indigo-600">Confess India</h1>
+            <a href="index.html" class="text-slate-400 font-bold text-xs uppercase">Cancel</a>
         </div>
     </header>
 
-    <main class="max-w-3xl mx-auto p-6 mt-8 md:mt-12">
-        <div class="mb-12 text-center md:text-left">
-            <h2 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-4 italic">Unburden Yourself.</h2>
-            <p class="text-slate-500 font-medium text-lg">Your identity is hidden. Your voice is heard.</p>
+    <main class="max-w-2xl mx-auto p-6 mt-6">
+        <div class="mb-8">
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Live Preview</p>
+            <div id="previewContainer" class="p-6 shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <span id="p-cat" class="text-[9px] font-black uppercase bg-slate-100 px-2 py-1 rounded">📝 OTHER</span>
+                    <span class="text-[9px] text-slate-300 font-bold">Just now</span>
+                </div>
+                <h4 id="p-user" class="text-xs font-black text-slate-900 mb-1 tracking-tight">Anonymous Member</h4>
+                <p id="p-msg" class="text-slate-500 text-sm leading-relaxed italic">Your confession will appear here as you type...</p>
+            </div>
         </div>
 
-        <div class="bg-white rounded-[40px] shadow-2xl shadow-indigo-100 border border-gray-100 overflow-hidden">
-            <form id="postForm" class="p-8 md:p-14 space-y-10">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div class="space-y-3">
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-[2px]">Identity</label>
-                        <input type="text" id="user" placeholder="Anonymous Member" 
-                            class="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[24px] outline-none transition-all input-focus-effect text-slate-700 font-bold">
+        <div class="bg-white rounded-[32px] shadow-xl border border-slate-100 overflow-hidden">
+            <form id="postForm" class="p-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2">Pen Name</label>
+                        <input type="text" id="userInput" placeholder="Anonymous Lion" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold">
                     </div>
-                    <div class="space-y-3">
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-[2px]">Topic</label>
-                        <select id="cat" class="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[24px] outline-none transition-all input-focus-effect text-slate-700 font-bold appearance-none cursor-pointer">
+                    <div>
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase mb-2">Category</label>
+                        <select id="catInput" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none cursor-pointer font-bold">
                             <option value="relationship">Relationships 💔</option>
                             <option value="family">Family 👨‍👩‍👧</option>
                             <option value="marriage">Marriage 💍</option>
@@ -71,29 +61,23 @@
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="flex justify-between items-end">
-                        <label class="block text-[10px] font-black text-indigo-500 uppercase tracking-[2px]">Content</label>
-                        <span id="charCounter" class="text-[10px] font-black text-slate-300">0 / 1000</span>
+                <div>
+                    <div class="flex justify-between mb-2">
+                        <label class="block text-[10px] font-black text-indigo-500 uppercase">Your Truth</label>
+                        <span id="charCount" class="text-[10px] font-bold text-slate-300">0 / 1000</span>
                     </div>
-                    <textarea id="msg" rows="6" placeholder="Start typing your truth..." 
-                        class="w-full p-8 bg-slate-50 border-2 border-transparent rounded-[32px] outline-none transition-all input-focus-effect text-slate-700 font-medium text-lg leading-relaxed resize-none" maxlength="1000"></textarea>
+                    <textarea id="msgInput" rows="6" placeholder="Be brave, be honest..." class="w-full p-6 bg-slate-50 border-2 border-transparent rounded-[24px] outline-none input-focus-effect leading-relaxed resize-none font-medium"></textarea>
                 </div>
 
-                <div class="space-y-4">
-                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[2px] text-center">Live Preview</label>
-                    <div class="preview-card p-6 bg-white opacity-60 transition-all duration-500" id="previewContainer">
-                         <div class="flex justify-between items-center mb-4">
-                            <span id="p-cat" class="text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 px-3 py-1 rounded-lg">📝 OTHER</span>
-                            <span class="text-[10px] text-slate-300 font-bold italic">Just now</span>
-                        </div>
-                        <h4 id="p-user" class="text-sm font-black text-slate-900 uppercase tracking-tighter mb-2">Anonymous Member</h4>
-                        <p id="p-msg" class="text-slate-500 text-sm italic">Start typing to see your preview...</p>
-                    </div>
+                <div class="p-4 bg-red-50 rounded-2xl border border-red-100 flex items-start gap-3">
+                    <span class="text-red-500 text-lg">⚠️</span>
+                    <p class="text-[10px] text-red-700 font-bold uppercase tracking-tight leading-relaxed">
+                        Red Alert: Posting Phone Numbers, WhatsApp links, or Social Media IDs will result in an automatic IP Ban.
+                    </p>
                 </div>
 
-                <button id="sub" type="submit" class="group w-full bg-slate-900 text-white py-6 rounded-[28px] font-black text-xl shadow-2xl hover:bg-indigo-600 hover:-translate-y-1 active:scale-95 transition-all flex justify-center items-center gap-3">
-                    <span id="btnText">Share Anonymously</span>
+                <button id="submitBtn" type="submit" class="w-full bg-slate-900 text-white py-5 rounded-[20px] font-black text-lg shadow-xl hover:bg-indigo-600 transition-all">
+                    Post Anonymously
                 </button>
             </form>
         </div>
@@ -111,46 +95,60 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 1. LIVE PREVIEW LOGIC
-        const msgInput = document.getElementById('msg');
-        const userInput = document.getElementById('user');
-        const catInput = document.getElementById('cat');
+        const msgInput = document.getElementById('msgInput');
+        const userInput = document.getElementById('userInput');
+        const catInput = document.getElementById('catInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const previewBox = document.getElementById('previewContainer');
 
-        function updatePreview() {
-            document.getElementById('p-msg').textContent = msgInput.value || "Start typing to see your preview...";
-            document.getElementById('p-user').textContent = userInput.value || "Anonymous Member";
-            document.getElementById('p-cat').textContent = catInput.options[catInput.selectedIndex].text;
+        // LIVE PREVIEW LOGIC
+        function handlePreview() {
+            document.getElementById('p-msg').innerText = msgInput.value || "Your confession will appear here...";
+            document.getElementById('p-user').innerText = userInput.value || "Anonymous Member";
+            document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
+            document.getElementById('charCount').innerText = `${msgInput.value.length} / 1000`;
             
-            if(msgInput.value.length > 5) {
-                document.getElementById('previewContainer').classList.replace('opacity-60', 'opacity-100');
-                document.getElementById('previewContainer').style.borderColor = "#6366f1";
+            if(msgInput.value.length > 2) {
+                previewBox.style.borderColor = "#6366f1";
+                previewBox.style.background = "#f5f3ff";
             }
         }
+        msgInput.addEventListener('input', handlePreview);
+        userInput.addEventListener('input', handlePreview);
+        catInput.addEventListener('change', handlePreview);
 
-        [msgInput, userInput, catInput].forEach(el => el.addEventListener('input', updatePreview));
-
-        // 2. WORD FILTER
-        const BANNED_WORDS = ['porn', 'drugs', 'sex', 'fuck', 'shit', 'abuse', 'call me', 'whatsapp', 'phone number', 'address'];
-
-        function triggerSuccessAndRedirect() {
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => { window.location.href = 'index.html'; }, 2200);
-        }
+        // --- SECURITY SHIELD LOGIC ---
+        const BANNED_WORDS = ['fuck', 'porn', 'sex', 'drugs', 'abuse', 'cheat'];
+        
+        // Regex to find 10-digit phone numbers (detects 9876543210, 987-654-3210, etc.)
+        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
+        
+        // Regex to find IG/Social handles (detects @name, ig:name, insta:, telegram:)
+        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
             const lowerContent = content.toLowerCase();
 
-            const foundWord = BANNED_WORDS.find(word => lowerContent.includes(word));
-            if(foundWord) return alert(`⚠️ Moderation: Please remove "${foundWord}".`);
-            if(content.length < 15) return alert("Please share a bit more detail.");
+            // 1. Check Bad Words
+            const badWord = BANNED_WORDS.find(word => lowerContent.includes(word));
+            if(badWord) return alert(`⚠️ System: Profanity detected ("${badWord}"). Please remove it.`);
 
-            const btn = document.getElementById('sub');
-            const btnText = document.getElementById('btnText');
-            btn.disabled = true;
-            btnText.innerHTML = `<div class="animate-spin rounded-full h-6 w-6 border-4 border-white/20 border-t-white mx-auto"></div>`;
+            // 2. Check Phone Numbers
+            if(PHONE_REGEX.test(content)) {
+                return alert("🚫 RED ALERT: Phone numbers or WhatsApp IDs are strictly prohibited for your safety.");
+            }
+
+            // 3. Check Social IDs
+            if(SOCIAL_REGEX.test(lowerContent)) {
+                return alert("🚫 RED ALERT: Instagram/Social Media IDs are not allowed. Please keep this anonymous.");
+            }
+
+            if(content.length < 15) return alert("Your secret is too short. Please add more detail!");
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Verifying & Posting...";
 
             try {
                 await db.collection('confessions').add({
@@ -160,10 +158,12 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, meTooCount: 0, reportCount: 0
                 });
-                triggerSuccessAndRedirect();
+                document.getElementById('toast').classList.add('show');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
-                btn.disabled = false;
-                btnText.innerHTML = "Share Anonymously";
+                alert("Error! Check connection.");
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Post Anonymously";
             }
         });
     </script>
