@@ -118,12 +118,17 @@
             document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
             document.getElementById('ui-subheading').innerText = translations[lang].sub;
 
+            // Clear feed to force re-render with new translations
+            document.getElementById('feed').innerHTML = '';
+            isInitialLoad = true;
             loadPosts(currentCategory); 
         }
 
         function filterCat(cat, btn) {
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
             btn.classList.add('cat-active');
+            document.getElementById('feed').innerHTML = '';
+            isInitialLoad = true;
             loadPosts(cat);
         }
 
@@ -150,10 +155,10 @@
                         <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact('${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-95 transition-all">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 active:scale-95 transition-all">
                                     <span class="text-xs">❤️</span> <span class="text-xs font-black support-val" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact('${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-95 transition-all">
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 active:scale-95 transition-all">
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span class="metoo-val" id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
@@ -168,7 +173,6 @@
         let isInitialLoad = true;
         async function loadPosts(category = 'all') {
             currentCategory = category;
-            const feed = document.getElementById('feed');
             
             db.collection('confessions').limit(100).onSnapshot(snapshot => {
                 let allPosts = [];
@@ -184,36 +188,36 @@
                 let finalPosts = langPosts.length > 0 ? langPosts : englishPosts;
 
                 if (finalPosts.length > 0) {
-                    // Only re-render the whole feed if the post count or post IDs changed
-                    // This prevents the "shaking" when just updating a count
                     const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', ''));
                     const newPostIds = finalPosts.map(p => p.id);
 
+                    // Check if list structure actually changed
                     if (isInitialLoad || JSON.stringify(currentPostIds) !== JSON.stringify(newPostIds)) {
                         renderPosts(finalPosts);
                         isInitialLoad = false;
                     } else {
-                        // Just update the numbers (avoids shaking)
+                        // Only update text values (prevents shake/re-animation)
                         finalPosts.forEach(post => {
                             const supEl = document.getElementById(`sup-${post.id}`);
                             const metooEl = document.getElementById(`metoo-${post.id}`);
-                            if(supEl) supEl.innerText = post.supportCount || 0;
-                            if(metooEl) metooEl.innerText = post.meTooCount || 0;
+                            if(supEl && parseInt(supEl.innerText) !== post.supportCount) supEl.innerText = post.supportCount || 0;
+                            if(metooEl && parseInt(metooEl.innerText) !== post.meTooCount) metooEl.innerText = post.meTooCount || 0;
                         });
                     }
                 } else {
-                    feed.innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No secrets shared yet.</div>';
+                    document.getElementById('feed').innerHTML = '<div class="text-center py-20 text-slate-400 font-bold">No secrets shared yet.</div>';
                 }
             });
         }
 
-        window.interact = (id, field) => {
-            // Optimistic update (UI changes immediately)
+        window.interact = (e, id, field) => {
+            e.stopPropagation(); // Prevents bubbling
+            
+            // Optimistic update
             const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
             const el = document.getElementById(elId);
             if(el) el.innerText = parseInt(el.innerText) + 1;
             
-            // Database update
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
 
