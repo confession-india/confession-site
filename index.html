@@ -36,9 +36,7 @@
                 <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
                 <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
             </div>
-            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-900 transition-all shadow-lg font-bold text-sm">
-                + Share Secret
-            </a>
+            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl hover:bg-slate-900 transition-all shadow-lg font-bold text-sm">+ Share Secret</a>
         </div>
     </header>
 
@@ -52,7 +50,7 @@
 
         <div id="feed" class="grid grid-cols-1 gap-6 mt-2"></div>
         <div id="skeleton-loader" class="space-y-6 mt-2 hidden">
-            <div class="bg-white p-8 post-card border border-gray-100 skeleton h-48 w-full"></div>
+            <div class="bg-white p-8 post-card border border-gray-100 skeleton h-48 w-full rounded-[28px]"></div>
         </div>
     </main>
 
@@ -65,7 +63,7 @@
             en: { subheading: "Community Feed", share: "+ Share Secret", all: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", time: "ago", justNow: "Just now", meToo: "Me Too" },
             te: { subheading: "కమ్యూనిటీ ఫీడ్", share: "+ రహస్యాన్ని పంచుకోండి", all: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", time: "క్రితం", justNow: "ఇప్పుడే", meToo: "నేను కూడా" },
             hi: { subheading: "सामुदायिक फ़ीड", share: "+ गुप्त साझा करें", all: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", time: "पहले", justNow: "अभी-अभी", meToo: "मैं भी" },
-            ta: { subheading: "சமூக ஊட்டம்", share: "+ రகசியத்தைப் பகிரவும்", all: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", time: "முன்பு", justNow: "ఇப்போது", meToo: "நானும்" },
+            ta: { subheading: "சமூக ஊட்டம்", share: "+ ரகசியத்தைப் பகிரவும்", all: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", time: "முன்பு", justNow: "இப்போது", meToo: "நானும்" },
             kn: { subheading: "ಸಮುದಾಯ ಫೀಡ್", share: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", all: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", time: "ಹಿಂದೆ", justNow: "ಈಗಷ್ಟೇ", meToo: "ನಾನು ಕೂಡ" },
             ml: { subheading: "കമ്മ്യൂണിറ്റി ഫീഡ്", share: "+ രഹസ്യം പങ്കിടുക", all: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", time: "മുമ്പ്", justNow: "ഇപ്പോൾ", meToo: "ഞാനും" }
         };
@@ -117,7 +115,7 @@
                 let hasPosts = false;
                 snapshot.forEach(doc => {
                     const post = doc.data();
-                    if (post.language && post.language !== currentLang) return; // Browser-side filter
+                    if (post.language && post.language !== currentLang) return; 
                     hasPosts = true;
                     feed.insertAdjacentHTML('beforeend', `
                         <div class="bg-white p-8 post-card shadow-sm border border-slate-50 animate-post mb-6">
@@ -138,7 +136,7 @@
                             </div>
                         </div>`);
                 });
-                if (!hasPosts) feed.innerHTML = `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets in this language yet...</div>`;
+                if (!hasPosts) feed.innerHTML = `<div class="p-20 text-center opacity-40 font-bold uppercase tracking-widest text-xs">No secrets in ${translations[currentLang].all} yet...</div>`;
             });
         }
 
