@@ -10,15 +10,16 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Professional Hover Effect */
+        /* Professional Hover & Lift Effect */
         .post-card { 
             border-radius: 28px; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             border: 1px solid #f1f5f9;
+            background: white;
         }
         .post-card:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            transform: translateY(-10px); 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
             border-color: #e2e8f0;
         }
 
@@ -86,7 +87,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
-        // Expanded translations for Menu
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: "కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
@@ -105,7 +105,7 @@
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
             document.getElementById(`lang-${lang}`).classList.add('lang-active');
             
-            // Update UI Labels
+            // Translate UI
             document.getElementById('cat-all').innerText = translations[lang].latest;
             document.getElementById('cat-rel').innerText = translations[lang].rel;
             document.getElementById('cat-fam').innerText = translations[lang].fam;
@@ -137,11 +137,11 @@
                     if (post.language && post.language !== currentLang) return; 
                     
                     feed.insertAdjacentHTML('beforeend', `
-                        <div id="post-${doc.id}" class="bg-white p-8 post-card animate-post mb-6">
+                        <div id="post-${doc.id}" class="p-8 post-card animate-post mb-6">
                             <div class="flex justify-between items-start mb-4">
                                 <div>
-                                    <span class="text-[9px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span>
-                                    <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-tighter inline-block">BY ${post.username || 'ANONYMOUS'}</h4>
+                                    <span class="text-[10px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span>
+                                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ${post.username || 'ANONYMOUS LION'}</h4>
                                 </div>
                                 <button onclick="reportPost('${doc.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                             </div>
