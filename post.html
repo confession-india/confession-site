@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans text-slate-900 flex flex-col">
@@ -26,7 +25,7 @@
                 </a>
                 <span class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Share Your Truth</span>
             </div>
-            <a href="index.html" class="text-slate-400 font-bold text-sm hover:text-red-500 transition-colors uppercase tracking-widest">Cancel</a>
+            <a href="index.html" class="bg-slate-50 text-slate-400 px-4 py-2 rounded-xl font-bold text-[10px] hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-slate-100">Cancel</a>
         </div>
     </header>
 
@@ -70,7 +69,7 @@
                 <div class="relative">
                     <div class="flex justify-between mb-2 px-1">
                         <label class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest">Your Confession</label>
-                        <span id="charCount" class="text-[10px] font-bold text-slate-300">0 / 1000</span>
+                        <span id="charCount" class="text-[10px] font-bold text-slate-300 transition-colors">0 / 1000</span>
                     </div>
                     <textarea id="msgInput" rows="6" maxlength="1000" placeholder="Type your truth anonymously..." class="w-full p-6 bg-slate-50 border-2 border-transparent rounded-[32px] outline-none input-focus-effect leading-relaxed resize-none font-medium text-slate-700 text-lg"></textarea>
                 </div>
@@ -90,7 +89,7 @@
                         <span class="text-sm">⚠️</span>
                         <div>
                             <p class="text-[10px] text-slate-800 font-black uppercase tracking-widest mb-0.5">Safety Filter</p>
-                            <p class="text-[10px] text-slate-500 font-bold leading-tight">Social IDs & Abuse are blocked.</p>
+                            <p id="safetyText" class="text-[10px] text-slate-500 font-bold leading-tight">Social IDs & Abuse are blocked.</p>
                         </div>
                     </div>
                 </div>
@@ -150,6 +149,7 @@
         const catInput = document.getElementById('catInput');
         const redAlert = document.getElementById('redAlertNote');
         const charCount = document.getElementById('charCount');
+        const safetyText = document.getElementById('safetyText');
 
         const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
@@ -173,14 +173,20 @@
 
             const currentText = msgInput.value.toLowerCase();
             const currentUser = userInput.value.toLowerCase();
+            
+            // Safety Check with UI text update
             if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText) || containsBadWords(currentUser)) {
                 redAlert.classList.add('shake-active');
+                safetyText.innerText = "Conflict detected! Remove contact info/abuse.";
+                safetyText.classList.add('text-red-500');
             } else {
                 redAlert.classList.remove('shake-active');
+                safetyText.innerText = "Social IDs & Abuse are blocked.";
+                safetyText.classList.remove('text-red-500');
             }
         }
 
-        [msgInput, userInput, catInput].forEach(el => el.addEventListener('input', updateUI));
+        [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
         catInput.addEventListener('change', updateUI);
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
@@ -201,7 +207,7 @@
 
             try {
                 await db.collection('confessions').add({
-                    username: username,
+                    username: username || "Anonymous",
                     category: catInput.value,
                     content: content,
                     language: userLang,
