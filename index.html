@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
@@ -107,6 +108,16 @@
     </header>
 
     <main class="max-w-4xl mx-auto p-4">
+        <div id="dailyWisdom" class="mb-2 hidden">
+            <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-100 flex flex-col md:flex-row items-center gap-6 border-4 border-indigo-500/30">
+                <div class="bg-white/20 p-4 rounded-2xl text-2xl">🔥</div>
+                <div class="flex-1 text-center md:text-left">
+                    <h3 class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Most Supported Today</h3>
+                    <p id="top-secret-text" class="text-lg font-bold leading-tight italic">"Loading the most relatable secret..."</p>
+                </div>
+            </div>
+        </div>
+
         <div class="flex overflow-x-auto py-6 space-x-3 no-scrollbar items-center">
             <button onclick="filterCat('all', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm cat-active" id="cat-all">Latest</button>
             <button onclick="filterCat('relationship', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-rel">Relationships</button>
@@ -116,6 +127,29 @@
         </div>
         <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
     </main>
+
+    <section class="max-w-4xl mx-auto px-4 mt-10 mb-2">
+        <div class="bg-slate-50 border border-slate-100 rounded-[40px] p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex-1 space-y-2">
+                <h3 class="text-xl font-black text-slate-900">Your privacy is our priority.</h3>
+                <p class="text-sm text-slate-500 font-medium">Confess India is built to be a judgment-free, secure sanctuary.</p>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4">
+                <div class="bg-white px-4 py-3 rounded-2xl border border-slate-200 text-center min-w-[120px]">
+                    <span class="block text-indigo-600 text-lg mb-1">🛡️</span>
+                    <span class="block text-[9px] font-black uppercase text-slate-400">Zero Logs</span>
+                </div>
+                <div class="bg-white px-4 py-3 rounded-2xl border border-slate-200 text-center min-w-[120px]">
+                    <span class="block text-indigo-600 text-lg mb-1">🚫</span>
+                    <span class="block text-[9px] font-black uppercase text-slate-400">No Accounts</span>
+                </div>
+                <div class="bg-white px-4 py-3 rounded-2xl border border-slate-200 text-center min-w-[120px]">
+                    <span class="block text-indigo-600 text-lg mb-1">👥</span>
+                    <span class="block text-[9px] font-black uppercase text-slate-400">Human Mod</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -174,20 +208,17 @@
         let isInitialLoad = true;
         let unsubscribe = null;
 
-        // --- NEW: Scroll Logic ---
+        // Scroll Logic
         const scrollTab = document.getElementById('scrollTab');
         const scrollIcon = document.getElementById('scrollIcon');
         let isAtBottom = false;
 
         window.onscroll = function() {
-            // Show button after scrolling 300px
             if (window.scrollY > 300) {
                 scrollTab.classList.add('visible');
             } else {
                 scrollTab.classList.remove('visible');
             }
-
-            // If user is near the bottom, flip the icon to point UP
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
                 scrollIcon.style.transform = "rotate(180deg)";
                 isAtBottom = true;
@@ -204,7 +235,6 @@
                 document.getElementById('mainFooter').scrollIntoView({ behavior: 'smooth' });
             }
         }
-        // -------------------------
 
         function timeAgo(date) {
             if (!date) return 'Just now';
@@ -220,10 +250,38 @@
             return "Just now";
         }
 
+        // NEW: Function to generate Secret Card Image
+        window.downloadSecret = (id, content) => {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = `
+                <div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;">
+                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 20px; opacity: 0.8;">Confess India</div>
+                    <div style="font-size: 24px; font-weight: 800; line-height: 1.4; font-style: italic;">"${content}"</div>
+                    <div style="position: absolute; bottom: 30px; font-size: 10px; font-weight: 700; opacity: 0.6; text-transform: uppercase;">shared anonymously • confessindia.com</div>
+                </div>
+            `;
+            document.body.appendChild(tempDiv);
+            
+            html2canvas(document.getElementById(`capture-${id}`)).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Confession-${id}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                document.body.removeChild(tempDiv);
+            });
+        };
+
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+            // Update Top Secret Wisdom
+            if (posts.length > 0) {
+                const top = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
+                document.getElementById('dailyWisdom').classList.remove('hidden');
+                document.getElementById('top-secret-text').innerText = `"${top.content}"`;
+            }
 
             posts.forEach(post => {
                 if(post.status === "hidden") return;
@@ -249,9 +307,14 @@
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
-                            <button onclick="openShare()" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all">
-                                <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="downloadSecret('${post.id}', '${post.content.replace(/'/g, "\\'")}')" class="p-2 bg-slate-50 rounded-full hover:bg-green-50 transition-all" title="Download Image Card">
+                                   <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </button>
+                                <button onclick="openShare()" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all">
+                                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>`);
             });
@@ -259,11 +322,9 @@
 
         async function loadPosts(category = 'all') {
             if (unsubscribe) unsubscribe();
-            
             unsubscribe = db.collection('confessions').onSnapshot(snapshot => {
                 let allPosts = [];
                 snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
-
                 let filtered = category === 'all' ? allPosts : allPosts.filter(p => p.category === category.toLowerCase());
                 let finalPosts = filtered.filter(p => (p.language || 'en') === currentLang);
                 if (finalPosts.length === 0) finalPosts = filtered.filter(p => (p.language || 'en') === 'en');
@@ -316,11 +377,9 @@
             btn.classList.remove('animate-pop');
             void btn.offsetWidth; 
             btn.classList.add('animate-pop');
-            
             const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
             const el = document.getElementById(elId);
             if(el) el.innerText = parseInt(el.innerText) + 1;
-            
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
 
