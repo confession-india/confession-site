@@ -94,3 +94,29 @@
 #shareModal.show > div {
     transform: translateY(0);
 }
+
+/* 7. ACTIVE STATES FOR BUTTONS (FIX FOR WHITE TEXT ISSUE) */
+
+/* Category Button Active State */
+.cat-active {
+    background-color: #4f46e5 !important; /* Indigo 600 */
+    color: white !important;
+    border-color: #4f46e5 !important;
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+/* Language Pill Active State */
+.lang-active {
+    background-color: #4f46e5 !important;
+    color: white !important;
+    border-color: #4f46e5 !important;
+}
+
+/* Hide scrollbar but keep functionality */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
