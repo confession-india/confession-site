@@ -50,9 +50,24 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
         }
         .animate-pulse-green { animation: pulse-green 2s infinite; }
+
+        /* Floating Scroll Button Style */
+        #scrollTab {
+            transition: all 0.3s ease;
+            transform: translateY(100px);
+        }
+        #scrollTab.visible {
+            transform: translateY(0);
+        }
     </style>
 </head>
-<body class="bg-[#fdfdff] min-h-screen font-sans">
+<body class="bg-[#fdfdff] min-h-screen font-sans relative">
+
+    <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[100] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all visible">
+        <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+    </button>
 
     <div id="shareModal" onclick="closeShare()">
         <div class="bg-white p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3" onclick="event.stopPropagation()">
@@ -99,10 +114,10 @@
             <button onclick="filterCat('marriage', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-mar">Marriage</button>
             <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-oth">Other</button>
         </div>
-        <div id="feed" class="grid grid-cols-1 gap-6 mt-2"></div>
+        <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
     </main>
 
-    <footer class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
+    <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
             <div class="space-y-4">
                 <h2 class="text-white text-xl font-black">Confess<span class="text-indigo-400">India</span></h2>
@@ -125,9 +140,10 @@
                 <div>
                     <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Connect</h3>
                     <ul class="space-y-3 text-sm font-bold">
-                        <li><a href="mailto:support@confessionindia.in" class="hover:text-white transition-colors">Contact Support</a></li>
-                        <li><a href="mailto:report@confessionindia.in" class="hover:text-white transition-colors">Report Abuse</a></li>
+                        <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
+                        <li><a href="support.html?type=abuse" class="hover:text-white transition-colors">Report Abuse</a></li>
                         <li><a href="#" class="hover:text-white transition-colors opacity-50 cursor-not-allowed">Instagram</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors opacity-50 cursor-not-allowed">X (Twitter)</a></li>
                     </ul>
                 </div>
             </div>
@@ -157,6 +173,38 @@
         let currentCategory = 'all';
         let isInitialLoad = true;
         let unsubscribe = null;
+
+        // --- NEW: Scroll Logic ---
+        const scrollTab = document.getElementById('scrollTab');
+        const scrollIcon = document.getElementById('scrollIcon');
+        let isAtBottom = false;
+
+        window.onscroll = function() {
+            // Show button after scrolling 300px
+            if (window.scrollY > 300) {
+                scrollTab.classList.add('visible');
+            } else {
+                scrollTab.classList.remove('visible');
+            }
+
+            // If user is near the bottom, flip the icon to point UP
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                scrollIcon.style.transform = "rotate(180deg)";
+                isAtBottom = true;
+            } else {
+                scrollIcon.style.transform = "rotate(0deg)";
+                isAtBottom = false;
+            }
+        };
+
+        function handleScrollAction() {
+            if (isAtBottom) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                document.getElementById('mainFooter').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        // -------------------------
 
         function timeAgo(date) {
             if (!date) return 'Just now';
@@ -275,6 +323,13 @@
             
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
+
+        window.reportPost = (id) => {
+            if(confirm("Report this post for moderation?")) {
+                db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) });
+                alert("Thank you. Our moderators will review this post.");
+            }
+        }
 
         function openShare() { document.getElementById('shareModal').classList.add('show'); }
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
