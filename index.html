@@ -126,9 +126,33 @@
             <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-oth">Other</button>
         </div>
         <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
+
+        <section class="mt-20 py-12 border-t border-slate-100">
+            <div class="text-center mb-10">
+                <span class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em]">Privacy First</span>
+                <h2 class="text-2xl font-black text-slate-800 mt-2">Your Identity is Protected</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
+                    <h4 class="font-bold text-slate-800 mb-2">Zero Logs</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours.</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
+                    <h4 class="font-bold text-slate-800 mb-2">No Accounts</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design.</p>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
+                    <h4 class="font-bold text-slate-800 mb-2">Human Moderated</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed">Every report is checked by a person to keep the community safe and kind.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
-    <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
+    <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
             <div class="space-y-4">
                 <h2 class="text-white text-xl font-black">Confess<span class="text-indigo-400">India</span></h2>
@@ -244,7 +268,6 @@
             feed.innerHTML = '';
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
-            // Dynamic logic for Top Secret - Updates when supportCount changes
             if (posts.length > 0) {
                 const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
                 document.getElementById('dailyWisdom').classList.remove('hidden');
