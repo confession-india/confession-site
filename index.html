@@ -226,8 +226,9 @@
                 if(post.status === "hidden") return;
                 const safeContent = post.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 
+                // ADDED HOVER CLASSES HERE: hover:-translate-y-2 hover:shadow-xl hover:border-indigo-100
                 feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm mb-6">
+                    <div id="post-${post.id}" class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-indigo-100">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex flex-col gap-1">
                                 <div class="flex items-center">
@@ -241,10 +242,10 @@
                         <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all origin-center">
                                     <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all">
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all origin-center">
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
@@ -276,8 +277,6 @@
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
-            
-            // Fix: Use the CSS active class for language pills
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
             const el = document.getElementById(`lang-${lang}`);
             if(el) el.classList.add('lang-active');
@@ -294,15 +293,16 @@
 
         function filterCat(cat, btn) {
             currentCategory = cat;
-            
-            // Fix: Use the CSS active class for category buttons
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
             btn.classList.add('cat-active');
-            
             loadPosts(cat);
         }
 
+        // UPDATED INTERACT POP
         window.interact = (e, id, field) => {
+            const btn = e.currentTarget;
+            btn.style.transform = "scale(1.3)";
+            setTimeout(() => btn.style.transform = "scale(1)", 200);
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
 
@@ -316,24 +316,19 @@
         function openShare(text, id) {
             const modal = document.getElementById('shareModal');
             modal.classList.add('show');
-            
             const shareUrl = `${window.location.origin}/index.html`;
             const shareText = `"${text}" \n\n Read more anonymously on Confess India: `;
-
             document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + shareUrl)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
-            
             document.getElementById('copyBtn').onclick = () => {
                 navigator.clipboard.writeText(shareUrl);
                 alert("Link copied!");
             };
-
             document.getElementById('copyTxtBtn').onclick = () => {
                 navigator.clipboard.writeText(`"${text}" - Confess India`);
                 alert("Text copied!");
             };
-
             document.getElementById('igBtn').onclick = () => {
                 closeShare();
                 downloadSecret(id, text);
