@@ -10,6 +10,7 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .input-focus-effect:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .input-focus-error:focus { border-color: #ef4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1); }
         #toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); opacity: 0; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; }
         #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
@@ -18,7 +19,7 @@
 
     <div class="bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800 sticky top-0 z-[60]">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
-            <div class="px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-indigo-600 text-white border border-indigo-600">Support Center</div>
+            <div id="statusBadge" class="px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-indigo-600 text-white border border-indigo-600">Support Center</div>
         </div>
     </div>
 
@@ -36,7 +37,7 @@
                 </a>
                 <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Support & Help</span>
             </div>
-            <a href="index.html" class="text-slate-400 font-bold text-xs hover:text-indigo-600 transition-colors uppercase tracking-widest">Back to Feed</a>
+            <a href="index.html" class="bg-slate-50 text-slate-500 px-4 py-2 rounded-xl font-bold text-xs hover:text-indigo-600 transition-all uppercase tracking-widest border border-slate-100">← Back</a>
         </div>
     </header>
 
@@ -49,17 +50,17 @@
         <div class="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-50 overflow-hidden">
             <form id="supportForm" class="p-8 space-y-6">
                 <div>
-                    <label class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Your Name (Optional)</label>
+                    <label id="labelName" class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Your Name (Optional)</label>
                     <input type="text" id="supName" placeholder="Anonymous Lion / Lioness" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold text-slate-700">
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Your Email (To reply back)</label>
+                    <label id="labelEmail" class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Your Email (To reply back)</label>
                     <input type="email" id="supEmail" placeholder="you@example.com" class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-bold text-slate-700" required>
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Message</label>
+                    <label id="labelMsg" class="block text-[11px] font-black text-indigo-600 uppercase tracking-widest mb-2 ml-1">Message</label>
                     <textarea id="supMsg" rows="5" placeholder="Tell us what's on your mind..." class="w-full p-4 bg-slate-50 border-2 border-transparent rounded-2xl outline-none input-focus-effect font-medium text-slate-700 leading-relaxed resize-none" required></textarea>
                 </div>
 
@@ -83,11 +84,26 @@
         const isAbuseReport = urlParams.get('type') === 'abuse';
         
         if (isAbuseReport) {
+            // Adjust UI for Abuse reporting
             document.getElementById('supportTitle').innerText = "Report Abuse";
             document.getElementById('supportDesc').innerText = "Please provide details about the content or user you are reporting.";
             document.getElementById('supMsg').placeholder = "Explain the issue in detail...";
             document.title = "Report Abuse - Confess India";
             document.getElementById('ui-subheading').innerText = "Abuse Reporting";
+            
+            // Red accent for abuse reports
+            const badge = document.getElementById('statusBadge');
+            badge.classList.replace('bg-indigo-600', 'bg-red-600');
+            badge.classList.replace('border-indigo-600', 'border-red-600');
+            badge.innerText = "Abuse Report";
+            
+            document.getElementById('submitBtn').classList.replace('bg-indigo-600', 'bg-red-600');
+            document.getElementById('submitBtn').classList.replace('hover:bg-indigo-700', 'hover:bg-red-700');
+            
+            // Change labels color to red
+            ['labelName', 'labelEmail', 'labelMsg'].forEach(id => {
+                document.getElementById(id).classList.replace('text-indigo-600', 'text-red-600');
+            });
         }
 
         document.getElementById('supportForm').addEventListener('submit', async (e) => {
