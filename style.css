@@ -62,8 +62,35 @@
     opacity: 1; 
 }
 
-/* 5. Custom Scrollbar (Optional but looks nice) */
+/* 5. Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #f1f1f1; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+/* 6. SHARE MODAL SYSTEM - FIX FOR SCREENSHOT ISSUE */
+#shareModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.7); /* Dark semi-transparent background */
+    backdrop-filter: blur(8px); /* Blurs the background feed */
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    z-index: 10000; /* Stays above everything else */
+    padding: 20px;
+}
+
+#shareModal.show {
+    display: flex; /* Centering behavior when active */
+}
+
+/* Modal Content Box */
+#shareModal > div {
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+#shareModal.show > div {
+    transform: translateY(0);
+}
