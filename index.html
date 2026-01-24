@@ -52,7 +52,6 @@
         }
         .animate-pulse-green { animation: pulse-green 2s infinite; }
 
-        /* Floating Scroll Button Style */
         #scrollTab {
             transition: all 0.3s ease;
             transform: translateY(100px);
@@ -75,10 +74,11 @@
             <h3 class="font-black text-xl text-center mb-6">Share Secret</h3>
             <div class="grid grid-cols-1 gap-3">
                 <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold">WhatsApp</button>
-                <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold">Instagram</button>
+                <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold">Instagram (as Image)</button>
                 <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold">Facebook</button>
                 <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold">X (Twitter)</button>
-                <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold">Copy Link</button>
+                <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 text-indigo-600 py-4 rounded-2xl font-bold">Copy Secret Text</button>
+                <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold">Copy Web Link</button>
             </div>
             <button onclick="closeShare()" class="w-full text-slate-400 font-bold py-2 mt-2">Close</button>
         </div>
@@ -128,29 +128,6 @@
         <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
     </main>
 
-    <section class="max-w-4xl mx-auto px-4 mt-10 mb-2">
-        <div class="bg-slate-50 border border-slate-100 rounded-[40px] p-8 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="flex-1 space-y-2">
-                <h3 class="text-xl font-black text-slate-900">Your privacy is our priority.</h3>
-                <p class="text-sm text-slate-500 font-medium">Confess India is built to be a judgment-free, secure sanctuary.</p>
-            </div>
-            <div class="flex flex-wrap justify-center gap-4">
-                <div class="bg-white px-4 py-3 rounded-2xl border border-slate-200 text-center min-w-[120px]">
-                    <span class="block text-indigo-600 text-lg mb-1">🛡️</span>
-                    <span class="block text-[9px] font-black uppercase text-slate-400">Zero Logs</span>
-                </div>
-                <div class="bg-white px-4 py-3 rounded-2xl border border-slate-200 text-center min-w-[120px]">
-                    <span class="block text-indigo-600 text-lg mb-1">🚫</span>
-                    <span class="block text-[9px] font-black uppercase text-slate-400">No Accounts</span>
-                </div>
-                <div class="bg-white px-4 py-3 rounded-2xl border border-slate-200 text-center min-w-[120px]">
-                    <span class="block text-indigo-600 text-lg mb-1">👥</span>
-                    <span class="block text-[9px] font-black uppercase text-slate-400">Human Mod</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
             <div class="space-y-4">
@@ -176,8 +153,6 @@
                     <ul class="space-y-3 text-sm font-bold">
                         <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
                         <li><a href="support.html?type=abuse" class="hover:text-white transition-colors">Report Abuse</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors opacity-50 cursor-not-allowed">Instagram</a></li>
-                        <li><a href="#" class="hover:text-white transition-colors opacity-50 cursor-not-allowed">X (Twitter)</a></li>
                     </ul>
                 </div>
             </div>
@@ -208,17 +183,14 @@
         let isInitialLoad = true;
         let unsubscribe = null;
 
-        // Scroll Logic
         const scrollTab = document.getElementById('scrollTab');
         const scrollIcon = document.getElementById('scrollIcon');
         let isAtBottom = false;
 
         window.onscroll = function() {
-            if (window.scrollY > 300) {
-                scrollTab.classList.add('visible');
-            } else {
-                scrollTab.classList.remove('visible');
-            }
+            if (window.scrollY > 300) scrollTab.classList.add('visible');
+            else scrollTab.classList.remove('visible');
+            
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
                 scrollIcon.style.transform = "rotate(180deg)";
                 isAtBottom = true;
@@ -229,11 +201,8 @@
         };
 
         function handleScrollAction() {
-            if (isAtBottom) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                document.getElementById('mainFooter').scrollIntoView({ behavior: 'smooth' });
-            }
+            if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
+            else document.getElementById('mainFooter').scrollIntoView({ behavior: 'smooth' });
         }
 
         function timeAgo(date) {
@@ -250,7 +219,6 @@
             return "Just now";
         }
 
-        // NEW: Function to generate Secret Card Image
         window.downloadSecret = (id, content) => {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `
@@ -276,15 +244,17 @@
             feed.innerHTML = '';
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
-            // Update Top Secret Wisdom
+            // Dynamic logic for Top Secret - Updates when supportCount changes
             if (posts.length > 0) {
-                const top = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
+                const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
                 document.getElementById('dailyWisdom').classList.remove('hidden');
-                document.getElementById('top-secret-text').innerText = `"${top.content}"`;
+                document.getElementById('top-secret-text').innerText = `"${topPost.content}"`;
             }
 
             posts.forEach(post => {
                 if(post.status === "hidden") return;
+                const safeContent = post.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                
                 feed.insertAdjacentHTML('beforeend', `
                     <div id="post-${post.id}" class="p-8 post-card animate-post mb-6">
                         <div class="flex justify-between items-start mb-4">
@@ -308,10 +278,10 @@
                                 </button>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="downloadSecret('${post.id}', '${post.content.replace(/'/g, "\\'")}')" class="p-2 bg-slate-50 rounded-full hover:bg-green-50 transition-all" title="Download Image Card">
-                                   <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 rounded-full hover:bg-green-50 transition-all" title="Download Image Card">
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 </button>
-                                <button onclick="openShare()" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all">
+                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all">
                                     <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                                 </button>
                             </div>
@@ -327,22 +297,10 @@
                 snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
                 let filtered = category === 'all' ? allPosts : allPosts.filter(p => p.category === category.toLowerCase());
                 let finalPosts = filtered.filter(p => (p.language || 'en') === currentLang);
-                if (finalPosts.length === 0) finalPosts = filtered.filter(p => (p.language || 'en') === 'en');
+                if (finalPosts.length === 0 && filtered.length > 0) finalPosts = filtered.filter(p => (p.language || 'en') === 'en');
 
-                const currentPostIds = Array.from(document.querySelectorAll('.post-card')).map(el => el.id.replace('post-', '')).sort();
-                const newPostIds = finalPosts.map(p => p.id).sort();
-
-                if (isInitialLoad || JSON.stringify(currentPostIds) !== JSON.stringify(newPostIds)) {
-                    renderPosts(finalPosts);
-                    isInitialLoad = false;
-                } else {
-                    finalPosts.forEach(post => {
-                        const supEl = document.getElementById(`sup-${post.id}`);
-                        const metooEl = document.getElementById(`metoo-${post.id}`);
-                        if(supEl && supEl.innerText != (post.supportCount || 0)) supEl.innerText = post.supportCount || 0;
-                        if(metooEl && metooEl.innerText != (post.meTooCount || 0)) metooEl.innerText = post.meTooCount || 0;
-                    });
-                }
+                renderPosts(finalPosts);
+                isInitialLoad = false;
             });
         }
 
@@ -350,7 +308,8 @@
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            const el = document.getElementById(`lang-${lang}`);
+            if(el) el.classList.add('lang-active');
             
             document.getElementById('cat-all').innerText = translations[lang].latest;
             document.getElementById('cat-rel').innerText = translations[lang].rel;
@@ -360,7 +319,6 @@
             document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
             document.getElementById('ui-subheading').innerText = translations[lang].sub;
 
-            isInitialLoad = true;
             loadPosts(currentCategory);
         }
 
@@ -368,7 +326,6 @@
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
             btn.classList.add('cat-active');
-            isInitialLoad = true;
             loadPosts(cat);
         }
 
@@ -377,9 +334,6 @@
             btn.classList.remove('animate-pop');
             void btn.offsetWidth; 
             btn.classList.add('animate-pop');
-            const elId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
-            const el = document.getElementById(elId);
-            if(el) el.innerText = parseInt(el.innerText) + 1;
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
         };
 
@@ -390,7 +344,31 @@
             }
         }
 
-        function openShare() { document.getElementById('shareModal').classList.add('show'); }
+        function openShare(text, id) {
+            document.getElementById('shareModal').classList.add('show');
+            const shareUrl = window.location.href;
+            const shareText = `"${text}" \n\n Shared anonymously on Confess India. Read more: `;
+
+            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + shareUrl)}`);
+            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
+            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
+            
+            document.getElementById('copyBtn').onclick = () => {
+                navigator.clipboard.writeText(shareUrl);
+                alert("Website link copied!");
+            };
+
+            document.getElementById('copyTxtBtn').onclick = () => {
+                navigator.clipboard.writeText(`"${text}" - Shared on Confess India`);
+                alert("Secret text copied!");
+            };
+
+            document.getElementById('igBtn').onclick = () => {
+                closeShare();
+                downloadSecret(id, text);
+            };
+        }
+
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
 
         setLanguage(currentLang);
