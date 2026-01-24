@@ -20,7 +20,6 @@
         
         .preview-card { transition: all 0.4s ease; border-radius: 28px; }
 
-        /* Matching the pulse from index */
         @keyframes pulse-green {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
@@ -44,7 +43,7 @@
                     <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
                 </a>
             </div>
-            <a href="index.html" class="text-slate-400 font-bold text-sm hover:text-red-500 transition-colors">Cancel</a>
+            <a href="index.html" class="text-slate-400 font-bold text-sm hover:text-red-500 transition-colors uppercase tracking-widest">Cancel</a>
         </div>
     </header>
 
@@ -59,7 +58,7 @@
                             <span id="p-cat" class="text-[10px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">OTHER</span>
                             <h4 id="p-user" class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ANONYMOUS</h4>
                         </div>
-                        <span id="p-lang-tag" class="text-[9px] text-slate-300 font-bold ml-0.5">English Feed</span>
+                        <span id="p-lang-tag" class="text-[9px] text-slate-300 font-bold ml-0.5 uppercase tracking-tighter">English Feed</span>
                     </div>
                 </div>
                 <p id="p-msg" class="text-slate-600 text-lg leading-relaxed font-medium mb-2 italic opacity-60">Your truth starts here...</p>
@@ -94,18 +93,22 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-4 bg-slate-900 rounded-2xl flex items-start gap-3">
-                        <div class="w-2 h-2 bg-green-500 rounded-full mt-1 animate-pulse-green"></div>
+                    <div class="p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex items-start gap-3">
+                        <div class="relative flex items-center justify-center mt-1">
+                            <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse-green"></div>
+                            <div class="absolute w-4 h-4 bg-green-400 rounded-full animate-ping opacity-20"></div>
+                        </div>
                         <div>
-                            <p class="text-[9px] text-white font-black uppercase tracking-widest mb-0.5">Privacy Active</p>
-                            <p class="text-[9px] text-slate-400 font-bold leading-tight">No IP logging. No data tracking.</p>
+                            <p class="text-[10px] text-indigo-900 font-black uppercase tracking-widest mb-0.5">Privacy Shield Active</p>
+                            <p class="text-[10px] text-indigo-600/80 font-bold leading-tight">No IP logging. Pure anonymity.</p>
                         </div>
                     </div>
-                    <div id="redAlertNote" class="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-3 transition-all">
+                    
+                    <div id="redAlertNote" class="p-4 bg-white rounded-2xl border border-slate-100 flex items-start gap-3 transition-all">
                         <span class="text-sm">⚠️</span>
                         <div>
-                            <p class="text-[9px] text-slate-800 font-black uppercase tracking-widest mb-0.5">Smart Filter</p>
-                            <p class="text-[9px] text-slate-500 font-bold leading-tight">Abuse, Phone Numbers, or Social IDs are blocked.</p>
+                            <p class="text-[10px] text-slate-800 font-black uppercase tracking-widest mb-0.5">Smart Filter</p>
+                            <p class="text-[10px] text-slate-500 font-bold leading-tight">Abuse or Social IDs are blocked.</p>
                         </div>
                     </div>
                 </div>
@@ -115,16 +118,22 @@
         </div>
     </main>
 
-    <footer class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
+    <footer class="bg-white border-t border-slate-100 pt-16 pb-12 px-4 mt-20">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-white text-xl font-black mb-4">Confess<span class="text-indigo-400">India</span></h2>
-            <p class="text-xs font-bold uppercase tracking-[0.2em] mb-4">No Cookies • No Emails • Just the Truth</p>
-            <p class="text-[10px] text-slate-500 font-medium">&copy; 2026 Confess India.</p>
+            <h2 class="text-slate-900 text-xl font-black mb-2">Confess<span class="text-indigo-600">India</span></h2>
+            <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] mb-8">The Sanctuary for Secrets</p>
+            
+            <div class="flex flex-wrap justify-center gap-6 md:gap-12 mb-8">
+                <a href="legal.html#mission" class="text-[11px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors">Our Mission</a>
+                <a href="legal.html#privacy" class="text-[11px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors">Privacy Policy</a>
+                <a href="legal.html#rules" class="text-[11px] font-black text-slate-400 hover:text-indigo-600 uppercase tracking-widest transition-colors">Rules</a>
+            </div>
+
+            <p class="text-[10px] text-slate-300 font-medium tracking-tighter uppercase tracking-[0.1em]">© 2026 CONFESS INDIA. MADE FOR THE UNHEARD.</p>
         </div>
     </footer>
 
     <script>
-        // Your Firebase Config
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -137,10 +146,8 @@
         const userInput = document.getElementById('userInput');
         const catInput = document.getElementById('catInput');
         const redAlert = document.getElementById('redAlertNote');
-        const previewBox = document.getElementById('previewContainer');
         const charCount = document.getElementById('charCount');
 
-        // REGEX & SAFETY FILTERS (From your original code)
         const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
         const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde", "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "punda", "baadu", "thevidiya", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
@@ -158,21 +165,15 @@
             
             const len = msgInput.value.length;
             charCount.innerText = `${len} / 1000`;
-            
             if (len >= 950) charCount.classList.add('limit-reached');
             else charCount.classList.remove('limit-reached');
 
-            // Visual feedback on safety filter
             const currentText = msgInput.value.toLowerCase();
             const currentUser = userInput.value.toLowerCase();
-            const isToxic = PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText) || containsBadWords(currentUser);
-
-            if(isToxic) {
+            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText) || containsBadWords(currentUser)) {
                 redAlert.classList.add('shake-active');
-                redAlert.style.backgroundColor = "#fef2f2";
             } else {
                 redAlert.classList.remove('shake-active');
-                redAlert.style.backgroundColor = "#f8fafc";
             }
         }
 
@@ -187,9 +188,8 @@
             if(content.length < 10) return alert("Secret too short!");
 
             const isToxic = containsBadWords(username) || containsBadWords(content) || PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
-
             if (isToxic) {
-                alert("🚫 Your post contains restricted language, numbers, or contact info. Please edit to protect your privacy.");
+                alert("🚫 Restricted language or contact info detected. Please edit to protect anonymity.");
                 return;
             }
 
