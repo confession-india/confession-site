@@ -9,9 +9,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <style>
         body { background-color: #0f172a; }
-        .confession-card { transition: all 0.3s ease; border: 1px solid #1e293b; }
-        .confession-card:hover { border-color: #334155; background-color: #1e293b; }
+        .item-card { transition: all 0.3s ease; border: 1px solid #1e293b; }
+        .item-card:hover { border-color: #334155; background-color: #1e293b; }
         .report-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.05); }
+        .tab-active { background: #6366f1 !important; color: white !important; }
         input, select { transition: all 0.2s; }
         input:focus, select:focus { border-color: #6366f1 !important; outline: none; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
     </style>
@@ -23,45 +24,43 @@
             <div class="max-w-6xl mx-auto p-6 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
                     <h1 class="text-xl font-black text-white tracking-tight">Control<span class="text-indigo-500">Center</span></h1>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Confess India Moderation</p>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Confess India HQ</p>
                 </div>
 
-                <div class="flex flex-wrap gap-3 flex-grow max-w-2xl justify-center">
-                    <input type="text" id="searchInput" placeholder="Search keywords or usernames..." 
-                        class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-medium w-64 text-white placeholder-slate-500">
-                    
-                    <select id="langFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300 cursor-pointer">
-                        <option value="all">All Languages</option>
-                        <option value="en">English</option>
-                        <option value="hi">Hindi</option>
-                        <option value="te">Telugu</option>
-                        <option value="ta">Tamil</option>
-                        <option value="kn">Kannada</option>
-                        <option value="ml">Malayalam</option>
-                    </select>
-
-                    <select id="catFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300 cursor-pointer">
-                        <option value="all">All Categories</option>
-                        <option value="relationship">Relationships</option>
-                        <option value="family">Family</option>
-                        <option value="marriage">Marriage</option>
-                        <option value="other">Other</option>
-                    </select>
+                <div class="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
+                    <button onclick="switchTab('posts')" id="tab-posts" class="px-6 py-2 rounded-xl text-xs font-black transition-all tab-active">CONFESSIONS</button>
+                    <button onclick="switchTab('inbox')" id="tab-inbox" class="px-6 py-2 rounded-xl text-xs font-black transition-all text-slate-400">INBOX</button>
                 </div>
 
                 <div class="flex gap-4">
-                    <div class="bg-slate-800 px-4 py-2 rounded-2xl border border-slate-700 text-center min-w-[80px]">
-                        <p class="text-[9px] text-slate-500 font-black uppercase">Live</p>
-                        <p id="totalCount" class="text-sm font-bold text-indigo-400">0</p>
-                    </div>
-                    <button onclick="window.location.href='index.html'" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-2xl text-xs font-black transition-all">EXIT</button>
+                    <button onclick="window.location.href='index.html'" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-2xl text-xs font-black transition-all border border-slate-700">EXIT HQ</button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-5xl mx-auto p-6 mt-8">
+        <main class="max-w-5xl mx-auto p-6">
+            <div id="filterBar" class="flex flex-wrap gap-3 mb-8 justify-center">
+                <input type="text" id="searchInput" placeholder="Search keywords..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-medium w-64 text-white placeholder-slate-500">
+                <select id="langFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300">
+                    <option value="all">All Languages</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="te">Telugu</option>
+                    <option value="ta">Tamil</option>
+                    <option value="kn">Kannada</option>
+                    <option value="ml">Malayalam</option>
+                </select>
+                <select id="catFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300">
+                    <option value="all">All Categories</option>
+                    <option value="relationship">Relationships</option>
+                    <option value="family">Family</option>
+                    <option value="marriage">Marriage</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
             <div id="feed" class="grid grid-cols-1 gap-4 pb-20">
-                <div class="text-center py-20 text-slate-600 font-bold">Connecting to Database...</div>
+                <div class="text-center py-20 text-slate-600 font-bold">Syncing...</div>
             </div>
         </main>
     </div>
@@ -82,81 +81,92 @@
             firebase.initializeApp(firebaseConfig);
             const db = firebase.firestore();
 
+            let currentView = 'posts'; // 'posts' or 'inbox'
             let allConfessions = [];
+            let allMessages = [];
 
-            // Listen to data
+            // Listen to Confessions
             db.collection('confessions').orderBy('timestamp', 'desc').onSnapshot(snap => {
                 allConfessions = [];
-                snap.forEach(doc => {
-                    allConfessions.push({ id: doc.id, ...doc.data() });
-                });
-                renderFeed();
+                snap.forEach(doc => allConfessions.push({ id: doc.id, ...doc.data() }));
+                if(currentView === 'posts') renderPosts();
             });
 
-            // Filtering Logic
-            const searchInput = document.getElementById('searchInput');
-            const langFilter = document.getElementById('langFilter');
-            const catFilter = document.getElementById('catFilter');
+            // Listen to Support Messages
+            db.collection('support_messages').orderBy('timestamp', 'desc').onSnapshot(snap => {
+                allMessages = [];
+                snap.forEach(doc => allMessages.push({ id: doc.id, ...doc.data() }));
+                if(currentView === 'inbox') renderInbox();
+            });
 
-            function renderFeed() {
+            window.switchTab = (tab) => {
+                currentView = tab;
+                document.getElementById('tab-posts').classList.toggle('tab-active', tab === 'posts');
+                document.getElementById('tab-inbox').classList.toggle('tab-active', tab === 'inbox');
+                document.getElementById('filterBar').classList.toggle('hidden', tab === 'inbox');
+                tab === 'posts' ? renderPosts() : renderInbox();
+            };
+
+            function renderPosts() {
                 const feed = document.getElementById('feed');
-                const term = searchInput.value.toLowerCase();
-                const lang = langFilter.value;
-                const cat = catFilter.value;
+                const term = document.getElementById('searchInput').value.toLowerCase();
+                const lang = document.getElementById('langFilter').value;
+                const cat = document.getElementById('catFilter').value;
 
                 const filtered = allConfessions.filter(p => {
-                    const matchesSearch = p.content.toLowerCase().includes(term) || p.username.toLowerCase().includes(term);
+                    const matchesSearch = p.content.toLowerCase().includes(term) || (p.username || "").toLowerCase().includes(term);
                     const matchesLang = lang === 'all' || p.language === lang;
                     const matchesCat = cat === 'all' || p.category === cat;
                     return matchesSearch && matchesLang && matchesCat;
                 });
 
-                document.getElementById('totalCount').innerText = filtered.length;
-                feed.innerHTML = '';
-
-                if (filtered.length === 0) {
-                    feed.innerHTML = `<div class="text-center py-20 text-slate-500 font-bold uppercase tracking-widest text-xs">No matching secrets found</div>`;
-                    return;
-                }
-
-                filtered.forEach(p => {
-                    const isReported = p.reportCount > 0;
-                    const date = p.timestamp ? new Date(p.timestamp.seconds * 1000).toLocaleString() : 'Just now';
-                    
-                    const div = document.createElement('div');
-                    div.className = `confession-card p-6 rounded-[24px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${isReported ? 'report-warning' : ''}`;
-                    
-                    div.innerHTML = `
+                feed.innerHTML = filtered.map(p => `
+                    <div class="item-card p-6 rounded-[24px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${p.reportCount > 0 ? 'report-warning' : ''}">
                         <div class="flex-grow">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="text-[9px] font-black uppercase tracking-widest ${isReported ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'} px-2 py-1 rounded">
-                                    ${isReported ? '⚠️ REPORTED: ' + p.reportCount : 'Safe'}
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="text-[9px] font-black uppercase tracking-widest ${p.reportCount > 0 ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'} px-2 py-1 rounded">
+                                    ${p.reportCount > 0 ? '⚠️ REPORTED: ' + p.reportCount : 'Safe'}
                                 </span>
-                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">${p.category || 'General'}</span>
-                                <span class="text-[9px] font-bold text-indigo-500 uppercase tracking-widest">${p.language || 'en'}</span>
+                                <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">${p.category || 'Other'}</span>
                             </div>
-                            <h3 class="text-white font-black text-sm uppercase tracking-tight mb-1">${p.username}</h3>
-                            <p class="text-slate-400 leading-relaxed text-sm font-medium">${p.content}</p>
-                            <p class="text-[10px] text-slate-600 font-bold mt-3 uppercase tracking-tighter">${date}</p>
+                            <h3 class="text-white font-black text-sm uppercase mb-1">${p.username || 'Anonymous'}</h3>
+                            <p class="text-slate-400 text-sm font-medium">${p.content}</p>
                         </div>
-                        <div class="flex gap-2 w-full md:w-auto">
-                            <button onclick="del('${p.id}')" class="flex-grow md:flex-grow-0 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 px-6 py-3 rounded-2xl text-[10px] font-black transition-all">
-                                DELETE
-                            </button>
-                        </div>
-                    `;
-                    feed.appendChild(div);
-                });
+                        <button onclick="delPost('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 px-6 py-3 rounded-2xl text-[10px] font-black transition-all">DELETE</button>
+                    </div>
+                `).join('') || '<p class="text-center py-20 text-slate-600">No confessions found.</p>';
             }
 
-            // Listen for input changes
-            [searchInput, langFilter, catFilter].forEach(el => el.addEventListener('input', renderFeed));
-
-            window.del = (id) => { 
-                if(confirm("Are you sure? This cannot be undone.")) {
-                    db.collection('confessions').doc(id).delete();
-                } 
+            function renderInbox() {
+                const feed = document.getElementById('feed');
+                feed.innerHTML = allMessages.map(m => {
+                    const isAbuse = m.type === 'ABUSE_REPORT';
+                    const date = m.timestamp ? new Date(m.timestamp.seconds * 1000).toLocaleString() : 'Recent';
+                    
+                    return `
+                    <div class="item-card p-6 rounded-[24px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${isAbuse ? 'report-warning' : ''}">
+                        <div class="flex-grow">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="text-[9px] font-black uppercase tracking-widest ${isAbuse ? 'bg-orange-600 text-white' : 'bg-indigo-600 text-white'} px-2 py-1 rounded">
+                                    ${m.type || 'MESSAGE'}
+                                </span>
+                                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">${date}</span>
+                            </div>
+                            <h3 class="text-white font-black text-sm mb-1">${m.name} <span class="text-slate-500 ml-2 font-normal">(${m.email})</span></h3>
+                            <p class="text-slate-300 text-sm font-medium bg-slate-900/50 p-4 rounded-xl mt-2 border border-slate-800">${m.message}</p>
+                        </div>
+                        <button onclick="resolveMsg('${m.id}')" class="bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white border border-green-500/20 px-6 py-3 rounded-2xl text-[10px] font-black transition-all">RESOLVE</button>
+                    </div>
+                `}).join('') || '<p class="text-center py-20 text-slate-600">Inbox is empty.</p>';
             }
+
+            window.delPost = (id) => { if(confirm("Delete this confession forever?")) db.collection('confessions').doc(id).delete(); };
+            window.resolveMsg = (id) => { if(confirm("Mark as resolved and delete from inbox?")) db.collection('support_messages').doc(id).delete(); };
+
+            // Real-time filtering for search
+            document.getElementById('searchInput').addEventListener('input', renderPosts);
+            document.getElementById('langFilter').addEventListener('change', renderPosts);
+            document.getElementById('catFilter').addEventListener('change', renderPosts);
         }
     </script>
 </body>
