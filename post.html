@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,11 +9,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Prevents stretching at bottom */
+        /* FIXED: Cleaned up overflow issues */
         html, body {
             max-width: 100%;
             overflow-x: hidden;
-            overscroll-behavior-y: none; 
         }
         #submitBtn:disabled {
             background-color: #94a3b8;
@@ -30,7 +29,7 @@
         </div>
     </div>
 
-    <header class="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+    <header class="sticky top-0 z-[100] bg-white/80 backdrop-blur-xl border-b border-gray-100">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div class="flex flex-col">
                 <a href="index.html" class="hover:opacity-80 transition-opacity">
@@ -169,7 +168,6 @@
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
         const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde", "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "punda", "baadu", "thevidiya", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
 
-        // --- Cooldown Logic ---
         function checkCooldown() {
             const lastPost = localStorage.getItem('lastPostTime');
             if (lastPost) {
@@ -256,9 +254,7 @@
                     status: "public"
                 });
                 
-                // Set the cooldown timestamp
                 localStorage.setItem('lastPostTime', Date.now().toString());
-                
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
