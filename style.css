@@ -123,27 +123,27 @@
 
 /* 9. Cooldown & Structural Fixes */
 
-/* Fixes the "Frozen Scroll" on Laptop/Desktop */
-html {
-    height: -webkit-fill-available;
+/* Hard Reset to fix frozen scrolling */
+html, body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
 }
 
+/* Ensure the background stays consistent */
 body {
-    min-height: 100vh;
-    /* Removed overscroll-behavior-y to restore mouse scrolling */
-    overflow-x: hidden; 
+    display: flex;
+    flex-direction: column;
+    background-color: #fdfdff;
 }
 
-/* Makes the submit button look locked during the 60s cooldown */
+/* Fixes the button appearance during cooldown */
 #submitBtn:disabled {
-    background: #94a3b8 !important; 
+    background: #94a3b8 !important;
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none !important;
     opacity: 0.8;
-}
-
-/* Smooth transition for safety text color alerts */
-#safetyText {
-    transition: color 0.3s ease;
 }
