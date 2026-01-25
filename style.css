@@ -123,28 +123,27 @@
 
 /* 9. Cooldown & Structural Fixes */
 
+/* Fixes the "Frozen Scroll" on Laptop/Desktop */
+html {
+    height: -webkit-fill-available;
+}
+
+body {
+    min-height: 100vh;
+    /* Removed overscroll-behavior-y to restore mouse scrolling */
+    overflow-x: hidden; 
+}
+
 /* Makes the submit button look locked during the 60s cooldown */
 #submitBtn:disabled {
-    background: #94a3b8 !important; /* Muted slate gray */
+    background: #94a3b8 !important; 
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none !important;
     opacity: 0.8;
 }
 
-/* Prevent horizontal scroll and fix the footer stretching issue */
-html, body {
-    max-width: 100%;
-    overflow-x: hidden;
-    overscroll-behavior-y: none; /* Stops the "white bounce" at ends of scroll */
-}
-
 /* Smooth transition for safety text color alerts */
 #safetyText {
     transition: color 0.3s ease;
-}
-
-/* Optimization for mobile touch targets */
-button, a {
-    touch-action: manipulation;
 }
