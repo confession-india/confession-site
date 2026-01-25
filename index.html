@@ -185,7 +185,6 @@
             else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        // Helper: Time Format
         function timeAgo(date) {
             if (!date) return 'Just now';
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
@@ -195,7 +194,6 @@
             return Math.floor(seconds / 60) + "m ago";
         }
 
-        // Image Generation
         window.downloadSecret = (id, content) => {
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = `<div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;"><div style="font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Confess India</div><div style="font-size: 24px; font-weight: 800; font-style: italic;">"${content}"</div><div style="position: absolute; bottom: 30px; font-size: 10px; font-weight: 700; opacity: 0.6;">SHARED ANONYMOUSLY</div></div>`;
@@ -209,7 +207,6 @@
             });
         };
 
-        // Render Feed
         function renderPosts(posts) {
             if (isUserInteracting) return;
             const feed = document.getElementById('feed');
@@ -240,18 +237,20 @@
                         <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" 
+                                    class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all active:scale-125 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400 transition-all ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" 
+                                    class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400 transition-all active:scale-125 ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full">
+                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
                                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 </button>
-                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full">
+                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
                                     <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                                 </button>
                             </div>
@@ -260,7 +259,6 @@
             });
         }
 
-        // Data Management
         async function loadPosts(category = 'all') {
             if (unsubscribe) unsubscribe();
             unsubscribe = db.collection('confessions').onSnapshot(snapshot => {
@@ -296,10 +294,30 @@
 
         window.interact = (e, id, field) => {
             if (localStorage.getItem(`${field}-${id}`)) return;
+            
             isUserInteracting = true;
             localStorage.setItem(`${field}-${id}`, 'true');
-            db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
-            setTimeout(() => { isUserInteracting = false; }, 1000);
+
+            // 1. Instantly Update UI
+            const elementId = (field === 'supportCount') ? `sup-${id}` : `metoo-${id}`;
+            const countSpan = document.getElementById(elementId);
+            if (countSpan) {
+                let current = parseInt(countSpan.innerText) || 0;
+                countSpan.innerText = current + 1;
+            }
+
+            // 2. Visual "Pop" Feedback
+            const btn = e.currentTarget;
+            btn.classList.add('opacity-50', 'scale-110');
+            btn.style.pointerEvents = 'none';
+
+            // 3. Update Database
+            db.collection('confessions').doc(id).update({ 
+                [field]: firebase.firestore.FieldValue.increment(1) 
+            }).catch(err => console.error("Update failed", err));
+
+            // 4. Release lock after delay to allow future background syncs
+            setTimeout(() => { isUserInteracting = false; }, 3000);
         };
 
         window.reportPost = (id) => {
