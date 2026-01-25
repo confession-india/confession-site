@@ -153,15 +153,15 @@ html, body {
 
 /* 11. New Sticky Stacking Classes */
 .sticky-nav-1 {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
 }
 
 .sticky-nav-2 {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 52px; /* Stacks below Language Bar */
-    z-index: 90;
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 51px !important; /* Slightly adjusted for a tighter fit */
+    z-index: 90 !important;
 }
