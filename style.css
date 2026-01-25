@@ -96,7 +96,7 @@
 
 #shareModal.show > div { transform: scale(1); }
 
-/* 7. Active States for Navigation (Works with your old Index) */
+/* 7. Active States for Navigation */
 .cat-active {
     background: #4f46e5 !important;
     color: white !important;
@@ -112,7 +112,19 @@
     font-weight: 800 !important;
 }
 
-/* 8. Extra Scannability Utilities */
+/* 8. Structural Fixes for Sticky Headers */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.page-wrapper {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -121,7 +133,7 @@
     line-height: 1.8;
 }
 
-/* 9. Cooldown & Structural Fixes */
+/* 9. Cooldown & Control Styles */
 #submitBtn:disabled {
     background: #94a3b8 !important;
     cursor: not-allowed;
@@ -134,7 +146,22 @@
     transition: all 0.3s ease;
 }
 
-/* 10. Scroll Button Smoothness (Added for the fix) */
+/* 10. Scroll Button Smoothness */
 #scrollTab {
     transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
+}
+
+/* 11. New Sticky Stacking Classes */
+.sticky-nav-1 {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.sticky-nav-2 {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 52px; /* Stacks below Language Bar */
+    z-index: 90;
 }
