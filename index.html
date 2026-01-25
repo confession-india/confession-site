@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#fdfdff] min-h-screen font-sans">
+<body class="bg-[#fdfdff] dark:bg-[#0f172a] min-h-screen font-sans transition-colors duration-300">
 
     <div class="sticky top-0 z-[100] bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
@@ -23,13 +23,13 @@
         </div>
     </div>
 
-    <header class="sticky top-[52px] z-[90] bg-white/80 backdrop-blur-xl border-b border-gray-100">
+    <header class="sticky top-[52px] z-[90] bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div class="flex flex-col">
                 <a href="index.html" class="hover:opacity-80 transition-opacity">
                     <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
                 </a>
-                <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
+                <span id="ui-subheading" class="text-[10px] text-gray-400 dark:text-slate-500 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
             </div>
             <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl shadow-lg font-bold text-sm transition-all hover:bg-indigo-700">+ Share Secret</a>
         </div>
@@ -43,15 +43,15 @@
         </button>
 
         <div id="shareModal" onclick="closeShare()">
-            <div class="bg-white p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3" onclick="event.stopPropagation()">
-                <h3 class="font-black text-xl text-center mb-6 text-slate-800">Share Secret</h3>
+            <div class="bg-white dark:bg-[#1e293b] p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 border dark:border-slate-700" onclick="event.stopPropagation()">
+                <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
                     <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">WhatsApp</button>
                     <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Instagram (as Image)</button>
                     <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Facebook</button>
                     <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">X (Twitter)</button>
-                    <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 text-indigo-600 py-4 rounded-2xl font-bold">Copy Secret Text</button>
-                    <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold">Copy Web Link</button>
+                    <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 py-4 rounded-2xl font-bold">Copy Secret Text</button>
+                    <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 py-4 rounded-2xl font-bold">Copy Web Link</button>
                 </div>
                 <button onclick="closeShare()" class="w-full text-slate-400 font-bold py-2 mt-2 uppercase text-xs tracking-widest">Close</button>
             </div>
@@ -59,7 +59,7 @@
 
         <main class="max-w-4xl mx-auto p-4">
             <div id="dailyWisdom" class="mb-2 hidden">
-                <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl shadow-indigo-100 flex flex-col md:flex-row items-center gap-6 border-4 border-indigo-500/30">
+                <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl flex flex-col md:flex-row items-center gap-6 border-4 border-indigo-500/30">
                     <div class="bg-white/20 p-4 rounded-2xl text-2xl">🔥</div>
                     <div class="flex-1 text-center md:text-left">
                         <h3 class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Most Supported Today</h3>
@@ -69,41 +69,41 @@
             </div>
 
             <div class="flex overflow-x-auto py-6 space-x-3 no-scrollbar items-center">
-                <button onclick="filterCat('all', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm cat-active" id="cat-all">Latest</button>
-                <button onclick="filterCat('relationship', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-rel">Relationships</button>
-                <button onclick="filterCat('family', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-fam">Family</button>
-                <button onclick="filterCat('marriage', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-mar">Marriage</button>
-                <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2 rounded-2xl font-bold border border-gray-100 transition-all text-sm" id="cat-oth">Other</button>
+                <button onclick="filterCat('all', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm cat-active" id="cat-all">Latest</button>
+                <button onclick="filterCat('relationship', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-rel">Relationships</button>
+                <button onclick="filterCat('family', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-fam">Family</button>
+                <button onclick="filterCat('marriage', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-mar">Marriage</button>
+                <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-oth">Other</button>
             </div>
 
             <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
 
-            <section class="mt-20 py-12 border-t border-slate-100">
+            <section class="mt-20 py-12 border-t border-slate-100 dark:border-slate-800">
                 <div class="text-center mb-10">
                     <span class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em]">Privacy First</span>
-                    <h2 class="text-2xl font-black text-slate-800 mt-2">Your Identity is Protected</h2>
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white mt-2">Your Identity is Protected</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
-                        <h4 class="font-bold text-slate-800 mb-2">Zero Logs</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
+                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Zero Logs</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
-                        <h4 class="font-bold text-slate-800 mb-2">No Accounts</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
+                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">No Accounts</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
-                        <h4 class="font-bold text-slate-800 mb-2">Human Moderated</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
+                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Human Moderated</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
                     </div>
                 </div>
             </section>
         </main>
 
-        <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 overflow-hidden">
+        <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 overflow-hidden border-t border-slate-800">
             <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div class="space-y-4">
                     <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
@@ -229,29 +229,29 @@
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
 
                 feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex flex-col">
                                 <span class="text-[10px] font-black uppercase text-indigo-500 mb-1">${post.category || 'other'}</span>
-                                <span class="text-[9px] text-slate-300 font-bold uppercase tracking-widest">${timeAgo(post.timestamp)}</span>
+                                <span class="text-[9px] text-slate-300 dark:text-slate-500 font-bold uppercase tracking-widest">${timeAgo(post.timestamp)}</span>
                             </div>
-                            <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button>
+                            <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 dark:text-slate-500 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                         </div>
-                        <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
-                        <div class="flex items-center justify-between pt-6 border-t border-slate-50">
+                        <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400 transition-all ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 rounded-full">
+                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full">
                                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 </button>
-                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 rounded-full">
+                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full">
                                     <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                                 </button>
                             </div>
