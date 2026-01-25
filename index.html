@@ -87,17 +87,17 @@
                     <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
                         <h4 class="font-bold text-slate-800 mb-2">Zero Logs</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours.</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
                     </div>
                     <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
                         <h4 class="font-bold text-slate-800 mb-2">No Accounts</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design.</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
                     </div>
                     <div class="bg-white p-6 rounded-3xl border border-slate-50 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
                         <h4 class="font-bold text-slate-800 mb-2">Human Moderated</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">Every report is checked by a person to keep the community safe and kind.</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
                     </div>
                 </div>
             </section>
@@ -107,7 +107,7 @@
             <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div class="space-y-4">
                     <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
-                    <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths without judgment.</p>
+                    <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths without judgment, fear, or recognition.</p>
                     <div class="flex items-center gap-3 bg-slate-800/50 w-fit px-4 py-2 rounded-full border border-slate-700">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
@@ -136,12 +136,15 @@
                 <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built for the brave and the unheard.</p>
             </div>
         </footer>
-    </div> <script>
-        // ... (Same script block as before) ...
+    </div>
+
+    <script>
+        // Firebase Init
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         
+        // Language Library
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
@@ -156,6 +159,7 @@
         let unsubscribe = null;
         let isUserInteracting = false; 
 
+        // Scroll Logic
         const scrollTab = document.getElementById('scrollTab');
         const scrollIcon = document.getElementById('scrollIcon');
         let isAtBottom = false;
@@ -166,9 +170,8 @@
                 scrollTab.classList.add('flex');
             } else {
                 scrollTab.classList.add('hidden');
-                scrollTab.classList.remove('flex');
             }
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
                 scrollIcon.style.transform = "rotate(180deg)";
                 isAtBottom = true;
             } else {
@@ -178,30 +181,24 @@
         };
 
         function handleScrollAction() {
-            if (isAtBottom) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }
+            if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
+            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
+        // Helper: Time Format
         function timeAgo(date) {
             if (!date) return 'Just now';
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + "y ago";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + "d ago";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + "h ago";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + "m ago";
-            return "Just now";
+            if (seconds < 60) return "Just now";
+            const interval = Math.floor(seconds / 3600);
+            if (interval >= 1) return interval + "h ago";
+            return Math.floor(seconds / 60) + "m ago";
         }
 
+        // Image Generation
         window.downloadSecret = (id, content) => {
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;"><div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 20px; opacity: 0.8;">Confess India</div><div style="font-size: 24px; font-weight: 800; line-height: 1.4; font-style: italic;">"${content}"</div><div style="position: absolute; bottom: 30px; font-size: 10px; font-weight: 700; opacity: 0.6; text-transform: uppercase;">shared anonymously • confessindia.in</div></div>`;
+            tempDiv.innerHTML = `<div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;"><div style="font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Confess India</div><div style="font-size: 24px; font-weight: 800; font-style: italic;">"${content}"</div><div style="position: absolute; bottom: 30px; font-size: 10px; font-weight: 700; opacity: 0.6;">SHARED ANONYMOUSLY</div></div>`;
             document.body.appendChild(tempDiv);
             html2canvas(document.getElementById(`capture-${id}`)).then(canvas => {
                 const link = document.createElement('a');
@@ -212,34 +209,65 @@
             });
         };
 
+        // Render Feed
         function renderPosts(posts) {
             if (isUserInteracting) return;
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
             if (posts.length > 0) {
                 const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
                 document.getElementById('dailyWisdom').classList.remove('hidden');
                 document.getElementById('top-secret-text').innerText = `"${topPost.content}"`;
             }
+
             posts.forEach(post => {
                 if(post.status === "hidden") return;
                 const safeContent = post.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 const isHearted = localStorage.getItem(`supportCount-${post.id}`);
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
-                feed.insertAdjacentHTML('beforeend', `<div id="post-${post.id}" class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-indigo-100"><div class="flex justify-between items-start mb-4"><div class="flex flex-col gap-1"><div class="flex items-center"><span class="text-[10px] font-black uppercase bg-indigo-50 px-2 py-1 rounded text-indigo-500 mr-2">${post.category || 'other'}</span><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest inline-block">BY ${post.username || 'ANONYMOUS'}</h4></div><span class="text-[9px] text-slate-300 font-bold ml-0.5">${timeAgo(post.timestamp)}</span></div><button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button></div><p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p><div class="flex items-center justify-between pt-6 border-t border-slate-50"><div class="flex items-center space-x-3"><button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all origin-center active:scale-125 ${isHearted ? 'opacity-50 cursor-not-allowed' : ''}"><span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span></button><button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all origin-center active:scale-125 ${isMeTooed ? 'opacity-50 cursor-not-allowed' : ''}"><span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span></button></div><div class="flex items-center gap-2"><button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 rounded-full hover:bg-green-50 transition-all"><svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></button><button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 rounded-full hover:bg-indigo-50 transition-all"><svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg></button></div></div></div>`);
+
+                feed.insertAdjacentHTML('beforeend', `
+                    <div id="post-${post.id}" class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black uppercase text-indigo-500 mb-1">${post.category || 'other'}</span>
+                                <span class="text-[9px] text-slate-300 font-bold uppercase tracking-widest">${timeAgo(post.timestamp)}</span>
+                            </div>
+                            <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 uppercase hover:text-red-500">${translations[currentLang].report}</button>
+                        </div>
+                        <p class="text-slate-600 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-50">
+                            <div class="flex items-center space-x-3">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 rounded-full text-pink-600 transition-all ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
+                                    <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
+                                </button>
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 rounded-full text-indigo-600 transition-all ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
+                                    <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 rounded-full">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </button>
+                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 rounded-full">
+                                    <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>`);
             });
         }
 
+        // Data Management
         async function loadPosts(category = 'all') {
             if (unsubscribe) unsubscribe();
             unsubscribe = db.collection('confessions').onSnapshot(snapshot => {
                 let allPosts = [];
                 snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
                 let filtered = category === 'all' ? allPosts : allPosts.filter(p => p.category === category.toLowerCase());
-                let finalPosts = filtered.filter(p => (p.language || 'en') === currentLang);
-                if (finalPosts.length === 0 && filtered.length > 0) finalPosts = filtered.filter(p => (p.language || 'en') === 'en');
-                renderPosts(finalPosts);
+                renderPosts(filtered.filter(p => (p.language || 'en') === currentLang));
             });
         }
 
@@ -247,8 +275,8 @@
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            const el = document.getElementById(`lang-${lang}`);
-            if(el) el.classList.add('lang-active');
+            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            
             document.getElementById('cat-all').innerText = translations[lang].latest;
             document.getElementById('cat-rel').innerText = translations[lang].rel;
             document.getElementById('cat-fam').innerText = translations[lang].fam;
@@ -267,43 +295,30 @@
         }
 
         window.interact = (e, id, field) => {
-            const storageKey = `${field}-${id}`;
-            if (localStorage.getItem(storageKey)) return; 
-            const btn = e.currentTarget;
-            isUserInteracting = true; 
-            btn.style.transform = "scale(1.4)";
-            setTimeout(() => { 
-                btn.style.transform = "scale(1)"; 
-                setTimeout(() => { isUserInteracting = false; }, 2000);
-            }, 200);
-            const countSpan = (field === 'supportCount') ? document.getElementById(`sup-${id}`) : document.getElementById(`metoo-${id}`);
-            if (countSpan) countSpan.innerText = parseInt(countSpan.innerText) + 1;
-            localStorage.setItem(storageKey, 'true');
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            if (localStorage.getItem(`${field}-${id}`)) return;
+            isUserInteracting = true;
+            localStorage.setItem(`${field}-${id}`, 'true');
             db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+            setTimeout(() => { isUserInteracting = false; }, 1000);
         };
 
         window.reportPost = (id) => {
-            if(confirm("Report this post for moderation?")) {
+            if(confirm("Report this post?")) {
                 db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) });
-                alert("Thank you. Our moderators will review this post.");
+                alert("Moderators notified.");
             }
-        }
+        };
 
         function openShare(text, id) {
-            const modal = document.getElementById('shareModal');
-            modal.classList.add('show');
-            const shareUrl = `${window.location.origin}/index.html`;
-            const shareText = `"${text}" \n\n Read more anonymously on Confess India: `;
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + shareUrl)}`);
-            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
-            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Link copied!"); };
-            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(`"${text}" - Confess India`); alert("Text copied!"); };
-            document.getElementById('igBtn').onclick = () => { closeShare(); downloadSecret(id, text); };
+            document.getElementById('shareModal').classList.add('show');
+            const shareUrl = window.location.href;
+            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + shareUrl)}`);
+            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Copied!"); };
+            document.getElementById('igBtn').onclick = () => downloadSecret(id, text);
         }
 
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
+
         setLanguage(currentLang);
     </script>
 </body>
