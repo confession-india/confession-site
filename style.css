@@ -74,7 +74,7 @@
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #fdfdff; }
 ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
 
-/* 6. Share Modal System - FIXED */
+/* 6. Share Modal System */
 #shareModal {
     position: fixed;
     inset: 0;
@@ -96,7 +96,7 @@
 
 #shareModal.show > div { transform: scale(1); }
 
-/* 7. Active States for Navigation - ADDED !IMPORTANT */
+/* 7. Active States for Navigation (Works with your old Index) */
 .cat-active {
     background: #4f46e5 !important;
     color: white !important;
@@ -132,4 +132,9 @@
 
 #safetyText {
     transition: all 0.3s ease;
+}
+
+/* 10. Scroll Button Smoothness (Added for the fix) */
+#scrollTab {
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
 }
