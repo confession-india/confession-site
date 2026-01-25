@@ -123,27 +123,22 @@
 
 /* 9. Cooldown & Structural Fixes */
 
-/* Hard Reset to fix frozen scrolling */
-html, body {
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    -webkit-overflow-scrolling: touch; /* Smooth scroll for iOS */
-}
-
-/* Ensure the background stays consistent */
-body {
-    display: flex;
-    flex-direction: column;
-    background-color: #fdfdff;
-}
-
-/* Fixes the button appearance during cooldown */
+/* Fixed the scroll block */
 #submitBtn:disabled {
     background: #94a3b8 !important;
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none !important;
     opacity: 0.8;
+}
+
+/* Character count warning */
+.limit-reached {
+    color: #ef4444 !important;
+    animation: pulse-red 0.5s infinite;
+}
+
+/* Ensure smooth safety text */
+#safetyText {
+    transition: all 0.3s ease;
 }
