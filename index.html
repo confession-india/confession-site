@@ -10,11 +10,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Fixes the "stretching" bounce effect at the bottom */
+        /* Fixes the "stretching" bounce effect while allowing scrolling */
         html, body {
             max-width: 100%;
             overflow-x: hidden;
-            overscroll-behavior-y: none; 
+            /* overscroll-behavior-y removed to fix scroll issue */
         }
     </style>
 </head>
@@ -146,7 +146,6 @@
     </footer>
 
     <script>
-        // Firebase Configuration
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -170,7 +169,6 @@
         let isAtBottom = false;
 
         window.onscroll = function() {
-            // Show/Hide button logic
             if (window.scrollY > 300) {
                 scrollTab.classList.remove('hidden');
                 scrollTab.classList.add('flex');
@@ -179,7 +177,6 @@
                 scrollTab.classList.remove('flex');
             }
             
-            // Toggle arrow direction logic
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
                 scrollIcon.style.transform = "rotate(180deg)";
                 isAtBottom = true;
