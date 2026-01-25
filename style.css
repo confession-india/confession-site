@@ -112,27 +112,25 @@
     font-weight: 800 !important;
 }
 
-/* 8. Structural Fixes for Sticky Headers */
+/* 8. Structural Fixes */
 html, body {
     margin: 0;
     padding: 0;
     width: 100%;
+    /* Ensure no overflow is set here */
 }
 
+/* Remove 'overflow-x: hidden' from the wrapper if it exists */
 .page-wrapper {
-    overflow-x: hidden;
     width: 100%;
     position: relative;
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-.legal-section p {
-    color: #475569;
-    line-height: 1.8;
+/* Add this new utility for the body content ONLY */
+.content-overflow-fix {
+    overflow-x: hidden;
+    width: 100%;
 }
-
 /* 9. Cooldown & Control Styles */
 #submitBtn:disabled {
     background: #94a3b8 !important;
