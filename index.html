@@ -12,6 +12,29 @@
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans">
 
+    <div class="sticky top-0 z-[100] bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800">
+        <div class="max-w-4xl mx-auto px-4 flex gap-2">
+            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-en">English</button>
+            <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-te">తెలుగు</button>
+            <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ta">தமிழ்</button>
+            <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-kn">ಕನ್ನಡ</button>
+            <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ml">മലയാളം</button>
+            <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-hi">हिंदी</button>
+        </div>
+    </div>
+
+    <header class="sticky top-[52px] z-[90] bg-white/80 backdrop-blur-xl border-b border-gray-100">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <div class="flex flex-col">
+                <a href="index.html" class="hover:opacity-80 transition-opacity">
+                    <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
+                </a>
+                <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
+            </div>
+            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl shadow-lg font-bold text-sm transition-all hover:bg-indigo-700">+ Share Secret</a>
+        </div>
+    </header>
+
     <div class="page-wrapper">
         <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[110] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
             <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,29 +56,6 @@
                 <button onclick="closeShare()" class="w-full text-slate-400 font-bold py-2 mt-2 uppercase text-xs tracking-widest">Close</button>
             </div>
         </div>
-
-        <div class="sticky-nav-1 bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800">
-            <div class="max-w-4xl mx-auto px-4 flex gap-2">
-                <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-en">English</button>
-                <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-te">తెలుగు</button>
-                <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ta">தமிழ்</button>
-                <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-kn">ಕನ್ನಡ</button>
-                <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ml">മലയാളം</button>
-                <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-hi">हिंदी</button>
-            </div>
-        </div>
-
-        <header class="sticky-nav-2 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-            <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
-                <div class="flex flex-col">
-                    <a href="index.html" class="hover:opacity-80 transition-opacity">
-                        <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
-                    </a>
-                    <span id="ui-subheading" class="text-[10px] text-gray-400 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
-                </div>
-                <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl shadow-lg font-bold text-sm transition-all hover:bg-indigo-700">+ Share Secret</a>
-            </div>
-        </header>
 
         <main class="max-w-4xl mx-auto p-4">
             <div id="dailyWisdom" class="mb-2 hidden">
