@@ -8,6 +8,19 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Prevents stretching at bottom */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            overscroll-behavior-y: none; 
+        }
+        #submitBtn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+    </style>
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans text-slate-900 flex flex-col">
 
@@ -99,7 +112,7 @@
         </div>
     </main>
 
-    <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20">
+    <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-20 relative z-10 overflow-hidden">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
             <div class="space-y-4 text-left">
                 <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
@@ -150,10 +163,37 @@
         const redAlert = document.getElementById('redAlertNote');
         const charCount = document.getElementById('charCount');
         const safetyText = document.getElementById('safetyText');
+        const submitBtn = document.getElementById('submitBtn');
 
         const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
         const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
         const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde", "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "punda", "baadu", "thevidiya", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
+
+        // --- Cooldown Logic ---
+        function checkCooldown() {
+            const lastPost = localStorage.getItem('lastPostTime');
+            if (lastPost) {
+                const now = Date.now();
+                const diff = (now - parseInt(lastPost)) / 1000;
+                if (diff < 60) {
+                    const timeLeft = Math.ceil(60 - diff);
+                    submitBtn.disabled = true;
+                    submitBtn.innerText = `Wait ${timeLeft}s...`;
+                    const timer = setInterval(() => {
+                        const currentNow = Date.now();
+                        const currentDiff = (currentNow - parseInt(lastPost)) / 1000;
+                        if (currentDiff >= 60) {
+                            clearInterval(timer);
+                            submitBtn.disabled = false;
+                            submitBtn.innerText = "Post Anonymously";
+                        } else {
+                            submitBtn.innerText = `Wait ${Math.ceil(60 - currentDiff)}s...`;
+                        }
+                    }, 1000);
+                }
+            }
+        }
+        checkCooldown();
 
         function containsBadWords(text) {
             if(!text) return false;
@@ -174,7 +214,6 @@
             const currentText = msgInput.value.toLowerCase();
             const currentUser = userInput.value.toLowerCase();
             
-            // Safety Check with UI text update
             if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText) || containsBadWords(currentUser)) {
                 redAlert.classList.add('shake-active');
                 safetyText.innerText = "Conflict detected! Remove contact info/abuse.";
@@ -202,8 +241,8 @@
                 return;
             }
 
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true; btn.innerText = "Securing...";
+            submitBtn.disabled = true; 
+            submitBtn.innerText = "Securing...";
 
             try {
                 await db.collection('confessions').add({
@@ -216,10 +255,15 @@
                     meTooCount: 0,
                     status: "public"
                 });
+                
+                // Set the cooldown timestamp
+                localStorage.setItem('lastPostTime', Date.now().toString());
+                
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
-                btn.disabled = false; btn.innerText = "Post Anonymously";
+                submitBtn.disabled = false; 
+                submitBtn.innerText = "Post Anonymously";
                 alert("Connection failed.");
             }
         });
