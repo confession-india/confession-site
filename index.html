@@ -9,59 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* CRITICAL UI FIXES - Ensures components look right even if external CSS fails */
-        html, body {
-            width: 100%;
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* 1. Category Button Active State */
-        .cat-active {
-            background-color: #4f46e5 !important; /* Indigo-600 */
-            color: white !important;
-            border-color: #4338ca !important;
-            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
-        }
-
-        /* 2. Language Pill Active State */
-        .lang-active {
-            background-color: #4f46e5 !important;
-            color: white !important;
-            border-color: #6366f1 !important;
-            font-weight: 800;
-        }
-
-        /* 3. Modal Overlay Visibility */
-        #shareModal {
-            position: fixed;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(8px);
-            z-index: 10000;
-            display: none; /* Hidden by default */
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        #shareModal.show {
-            display: flex; /* Shown when class added */
-        }
-
-        /* 4. Scroll Utilities */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-        .animate-pulse-green { animation: pulse-green 2s infinite; }
-    </style>
 </head>
 <body class="bg-[#fdfdff] min-h-screen font-sans flex flex-col">
 
@@ -91,6 +38,7 @@
             <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-te">తెలుగు</button>
             <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ta">தமிழ்</button>
             <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-kn">ಕನ್ನಡ</button>
+            <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ml">മലയാളം</button>
         </div>
     </div>
 
@@ -122,6 +70,7 @@
             <button onclick="filterCat('relationship', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2.5 rounded-2xl font-bold border border-gray-100 shadow-sm transition-all text-sm" id="cat-rel">Relationships</button>
             <button onclick="filterCat('family', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2.5 rounded-2xl font-bold border border-gray-100 shadow-sm transition-all text-sm" id="cat-fam">Family</button>
             <button onclick="filterCat('marriage', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2.5 rounded-2xl font-bold border border-gray-100 shadow-sm transition-all text-sm" id="cat-mar">Marriage</button>
+            <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white text-gray-500 px-6 py-2.5 rounded-2xl font-bold border border-gray-100 shadow-sm transition-all text-sm" id="cat-oth">Other</button>
         </div>
 
         <div id="feed" class="grid grid-cols-1 gap-6 min-h-[400px]"></div>
@@ -132,39 +81,44 @@
                 <h2 class="text-2xl font-black text-slate-800 mt-2">Your Identity is Protected</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center md:text-left">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl mx-auto md:mx-0">🛡️</div>
                     <h4 class="font-bold text-slate-800 mb-2">Zero Logs</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed">No IP tracking. No metadata storage. Complete privacy.</p>
+                    <p class="text-sm text-slate-500">Your secrets stay yours. No IP tracking.</p>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center md:text-left">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl mx-auto md:mx-0">👻</div>
                     <h4 class="font-bold text-slate-800 mb-2">No Accounts</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed">No emails or passwords. Just post and stay anonymous.</p>
+                    <p class="text-sm text-slate-500">No data leaks. Complete anonymity.</p>
                 </div>
-                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm text-center md:text-left">
+                    <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4 text-xl mx-auto md:mx-0">👀</div>
                     <h4 class="font-bold text-slate-800 mb-2">Moderated</h4>
-                    <p class="text-sm text-slate-500 leading-relaxed">Keeping the platform safe from hate and spam.</p>
+                    <p class="text-sm text-slate-500">A safe space for everyone.</p>
                 </div>
             </div>
         </section>
     </main>
 
     <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 py-16 px-4 mt-auto">
-        <div class="max-w-4xl mx-auto text-center">
+        <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
             <h2 class="text-white text-xl font-black italic mb-4">Confess<span class="text-indigo-400">India</span></h2>
-            <p class="text-sm max-w-md mx-auto mb-8">The safest digital space for Indians worldwide to share truths without judgment.</p>
-            <div class="flex justify-center gap-6 text-xs font-bold uppercase tracking-widest">
+            <p class="text-sm max-w-md mb-8">The safest digital space for Indians worldwide to share truths without judgment.</p>
+            <div class="flex gap-6 text-xs font-bold uppercase tracking-widest mb-10">
                 <a href="legal.html" class="hover:text-white">Privacy</a>
                 <a href="legal.html" class="hover:text-white">Rules</a>
                 <a href="support.html" class="hover:text-white">Support</a>
             </div>
-            <p class="text-[10px] mt-12 opacity-40 italic">© 2026 Confess India. Built for the unheard.</p>
+            <div class="flex items-center gap-3 bg-slate-800/50 px-4 py-2 rounded-full border border-slate-700 mb-8">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
+            </div>
+            <p class="text-[10px] opacity-40 italic">© 2026 Confess India. Built for the brave.</p>
         </div>
     </footer>
 
     <script>
+        // Use your Firebase Config
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -174,7 +128,8 @@
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" }
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
@@ -217,7 +172,6 @@
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
-            
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
             if (posts.length > 0) {
@@ -229,7 +183,6 @@
             posts.forEach(post => {
                 const isHearted = localStorage.getItem(`supportCount-${post.id}`);
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
-                
                 feed.insertAdjacentHTML('beforeend', `
                     <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                         <div class="flex justify-between items-start mb-4">
@@ -274,12 +227,16 @@
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            const el = document.getElementById(`lang-${lang}`);
+            if(el) el.classList.add('lang-active');
             
-            // Update UI Texts
             document.getElementById('ui-subheading').innerText = translations[lang].sub;
             document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
             document.getElementById('cat-all').innerText = translations[lang].latest;
+            document.getElementById('cat-rel').innerText = translations[lang].rel;
+            document.getElementById('cat-fam').innerText = translations[lang].fam;
+            document.getElementById('cat-mar').innerText = translations[lang].mar;
+            document.getElementById('cat-oth').innerText = translations[lang].oth;
             
             loadPosts(currentCategory);
         }
