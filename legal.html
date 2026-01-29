@@ -119,9 +119,26 @@
             </div>
         </div>
         <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center space-y-4">
+            <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest mb-2">
+                <span>📍 HYD: <span id="hyd-time">--:--</span></span>
+                <span class="text-red-600">|</span>
+                <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
+            </div>
             <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">No Cookies • No Emails • Just the Truth</p>
             <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built for the brave and the unheard.</p>
         </div>
     </footer>
+
+    <script>
+        function updateClocks() {
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            try {
+                document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...options, timeZone: 'Asia/Kolkata' }).format(new Date());
+                document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
+            } catch (e) {}
+        }
+        setInterval(updateClocks, 60000);
+        updateClocks();
+    </script>
 </body>
 </html>
