@@ -101,26 +101,29 @@ html, body {
     width: 100%;
 }
 
-/* 8. AUTOMATIC DARK MODE OVERRIDES */
+/* 8. LONDON-HYDERABAD REFINED DARK MODE */
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #0f172a !important; /* Dark Navy Background */
-        color: #f1f5f9 !important; /* Light Text */
+        /* London Night Slate Gray Background */
+        background-color: #0b1120 !important; 
+        color: #f1f5f9 !important;
     }
 
     header {
-        background-color: rgba(15, 23, 42, 0.8) !important;
-        border-color: #1e293b !important;
+        background-color: rgba(11, 17, 32, 0.9) !important;
+        /* London Post-Box Red subtle accent */
+        border-bottom: 2px solid rgba(220, 38, 38, 0.3) !important;
+        backdrop-filter: blur(12px);
     }
 
-    /* Cards and Form Inputs */
-    .bg-white, #previewContainer, #postForm, .preview-card {
+    /* Cards, Feed items, and Container elements */
+    .bg-white, #previewContainer, #postForm, .preview-card, [id^="post-"] {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
         border-color: #334155 !important;
     }
 
-    /* Text adjustments */
+    /* Text adjustments for legibility */
     .text-slate-600, .text-slate-700, p#p-msg {
         color: #cbd5e1 !important;
     }
@@ -129,20 +132,20 @@ html, body {
         color: #94a3b8 !important;
     }
 
-    /* Input fields */
-    input, textarea, select, .bg-slate-50 {
-        background-color: #0f172a !important;
+    /* Input fields and background slates */
+    input, textarea, select, .bg-slate-50, .bg-slate-100 {
+        background-color: #0b1120 !important;
         color: white !important;
         border-color: #334155 !important;
     }
 
     /* Shake effect in dark mode */
     .shake-active {
-        background-color: #450a0a !important; /* Dark Red background */
+        background-color: #450a0a !important; 
         border-color: #ef4444 !important;
     }
 
     /* Scrollbar in dark mode */
-    ::-webkit-scrollbar-track { background: #0f172a; }
-    ::-webkit-scrollbar-thumb { background: #334155; border: 2px solid #0f172a; }
+    ::-webkit-scrollbar-track { background: #0b1120; }
+    ::-webkit-scrollbar-thumb { background: #334155; border: 2px solid #0b1120; }
 }
