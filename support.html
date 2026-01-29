@@ -159,7 +159,8 @@
             btn.innerText = "Sending...";
 
             try {
-                await db.collection('support_messages').add({
+                // Ensure the collection name matches your Admin Panel query
+                const docRef = await db.collection('support_messages').add({
                     name: name,
                     email: email,
                     message: msg,
@@ -168,12 +169,14 @@
                     status: 'unread'
                 });
 
+                console.log("Success! Document ID:", docRef.id);
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2500);
             } catch (err) {
+                console.error("Firestore Error:", err);
                 btn.disabled = false;
                 btn.innerText = "Try Again";
-                alert("Error sending message. Please try again later.");
+                alert("Error: " + err.message);
             }
         });
     </script>
