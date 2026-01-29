@@ -99,6 +99,11 @@
             </div>
         </div>
         <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center space-y-4">
+            <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest mb-2">
+                <span>📍 HYD: <span id="hyd-time">--:--</span></span>
+                <span class="text-red-600">|</span>
+                <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
+            </div>
             <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Response time: Usually within 24 hours</p>
             <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built for the brave and the unheard.</p>
         </div>
@@ -108,6 +113,16 @@
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+
+        function updateClocks() {
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            try {
+                document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...options, timeZone: 'Asia/Kolkata' }).format(new Date());
+                document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
+            } catch (e) {}
+        }
+        setInterval(updateClocks, 60000);
+        updateClocks();
 
         const urlParams = new URLSearchParams(window.location.search);
         const isAbuseReport = urlParams.get('type') === 'abuse';
@@ -129,7 +144,6 @@
             
             ['labelName', 'labelEmail', 'labelMsg'].forEach(id => {
                 document.getElementById(id).classList.replace('text-indigo-600', 'text-red-600');
-                // Added for dark mode support in abuse view
                 document.getElementById(id).classList.replace('dark:text-indigo-400', 'dark:text-red-400');
             });
         }
