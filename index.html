@@ -7,14 +7,25 @@
     <meta name="google-site-verification" content="E0eroPpuSrFX_H8NK5GV0vtHNz5S-xScaEDuM25Zth4" />
 
     <title>Confess India | Share Your Truth Anonymously</title>
-    <meta name="description" content="The safest digital sanctuary for Indians to share secrets and confessions without judgment. 100% anonymous, no tracking, no names.">
+    
+    <meta name="description" content="Confess India: The safest digital sanctuary to share secrets. భారతీయుల కోసం అజ్ఞాత రహస్యాల వేదిక. भारतीयों के लिए गुप्त रहस्य साझा करने का मंच। Support for Telugu, Hindi, Tamil & more.">
+    <meta name="keywords" content="anonymous confessions india, share secrets online, telugu confessions, hindi confessions, anonymous chat india">
     <link rel="canonical" href="https://confessionindia.in/" />
+    
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:locale:alternate" content="hi_IN">
+    <meta property="og:locale:alternate" content="te_IN">
+    <meta property="og:locale:alternate" content="ta_IN">
+    <meta name="content-language" content="en, hi, te, ta, kn, ml">
+    <meta name="theme-color" content="#0f172a">
 
     <link rel="icon" href="https://fav.farm/🤫">
 
     <script>
         if (localStorage.getItem('userLang') === null) { localStorage.setItem('userLang', 'en'); }
         if (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme')) {
+            document.documentElement.classList.add('dark');
+        } else if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.classList.add('dark');
         }
     </script>
@@ -162,7 +173,7 @@
         // Language Library
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "విವಾహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
