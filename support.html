@@ -177,9 +177,22 @@
                     status: 'unread'
                 });
 
+                // --- GA4 Event Tracking ---
+                gtag('event', 'support_form_submission', {
+                    'message_type': isAbuseReport ? 'Abuse Report' : 'General Support',
+                    'submission_status': 'success'
+                });
+
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2500);
             } catch (err) {
+                // --- GA4 Event Tracking (Failure) ---
+                gtag('event', 'support_form_submission', {
+                    'message_type': isAbuseReport ? 'Abuse Report' : 'General Support',
+                    'submission_status': 'error',
+                    'error_message': err.message
+                });
+
                 btn.disabled = false;
                 btn.innerText = "Try Again";
                 alert("Error: " + err.message);
