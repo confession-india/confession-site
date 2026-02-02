@@ -1,37 +1,32 @@
-# Confession India | Release the Weight 🕊️
+# Hi, I'm Sanjeev Raju | MSc Advanced Computer Science 🎓
 
-**Confession India** is a digital sanctuary for the unspoken. Born out of the quiet desperation felt in shared flats in London, the high-pressure cabins of Gachibowli, and the lonely student rooms of the North of England.
+I’ve recently moved back home after 6 years in England. [cite_start]I spent that time finishing my Master’s at **Hertfordshire University** [cite: 3] [cite_start]previously worked in **Milton Keynes** across Healthcare and Fintech. I've seen firsthand how massive datasets can actually help people when the tech is done properly.
 
-[Explore the Feed: confessionindia.in](https://confessionindia.in)
+### 🕊️ My Project: [Confess India](https://confessionindia.in)
+**"Release the weight. You've carried it long enough."**
 
----
+I started this because I noticed how heavy everything has been feeling lately. I wanted to build a bit of a "digital sanctuary"—a proper place for anyone, whether they're in a rainy UK suburb or right here in India, to offload their burdens without any judgment.
 
-## ☕ The Backstory
-Having lived in the UK for five years navigating a Master’s in Advanced Computer Science and the relentless pace of the British tech industry I realised something profound: **The more connected we are, the more isolated our secrets become.** Whether it's an NRI in a rainy suburb of Manchester hiding their struggle from parents in Hyderabad, or a developer in Bengaluru facing the "bench" in silence, we all carry a weight. This platform is a "digital pub corner" a place to speak your truth and leave it there.
-
-## 🏛️ Integrity & Engineering
-Coming from an Advanced CS background, the "soul" of this site is backed by a rigid technical skeleton. We haven't just built a wall; we’ve built a fortress:
-
-* **Hardened Firestore Security:** Our rules are fine tuned to ensure that while the heart is open, the database is locked. No one can vandalise, edit, or "wipe" the collective history of these confessions.
-* **Domain-Locked API:** The backend is strictly tethered to our domain. It’s a closed-circuit for empathy, preventing any external hijacking or resource abuse.
-* **Multilingual Fluidity:** A bespoke implementation that handles the raw, organic flow of **Telugu, Hindi, Tamil, Kannada, and Malayalam**, because pain doesn't always speak English.
-* **Anonymity by Design:** No cookies, no tracking, no "Big Brother." Just a clean slate for a heavy heart.
-
-## 🌍 The Global Diaspora
-This isn't just a "local" site. It’s a bridge between the roots and the branches. 
-* **The NRI Reality:** We capture the authentic "Tenglish" and "Hinglish" nuances of the UK, USA, and Australian diaspora. 
-* **150+ Voices:** The platform is already live with over 150 organic confessions, reflecting the genuine diversity of Indian emotions globally.
+* **The Tech:** It’s properly sorted. Built on a serverless (Firebase) architecture that’s hardened and secure.
+* **Privacy:** No tracking, no cookies, and no "Big Brother" sign-ups. Just absolute anonymity.
+* **Impact:** It’s already live with over 150 organic voices from the global Indian diaspora.
 
 ---
 
-## 🛠️ Technical Specs
-* **Engine:** Modern JavaScript (ES6+) & HTML5/CSS3.
-* **Persistence:** Firebase Cloud Firestore (Optimised for real-time interaction).
-* **Security Architecture:** Google Cloud API Restriction & Granular Document-Level Security.
+### 🎓 MSc Research (The "Science" Bit)
+**Peer-to-Peer Default Loan Prediction**
+I dove deep into P2P lending data, analyzing nearly 200,000 records to predict loan defaults. I compared models like **Random Forest and SVM**, using **AUROC ratings** to find the most reliable ways for investors to make decisions without the guesswork.
 
 ---
 
-## 🤝 A Note from the Founder
-This project is a blend of British engineering discipline and Indian emotional depth. If you’ve ever felt like you’re living a double life between your LinkedIn profile and your real self—this space is for you.
+### 🛠️ What I bring to the table
+* [cite_start]**Healthcare Data:** Spent my time in the UK reducing hospital readmissions by 15%, saving £200,000 a year. [cite_start]I ensured everything stayed strictly **GDPR and NHS compliant**.
+* [cite_start]**Fintech Risk:** I helped boost compliance from 85% to 99% to meet **RBI standards**  [cite_start]and dug through 100,000+ transactions to identify revenue-boosting trends.
+* [cite_start]**The Stack:** I'm handy with **Power BI, Tableau, AWS (Sagemaker/S3), and Azure (Databricks)**.
 
-*"Release the weight. You've carried it long enough."*
+---
+
+### 📬 Let's have a chat
+If you fancy a chat about data integrity, serverless security, or even just what life is like in the UK after 6 years—feel free to reach out.
+
+[LinkedIn](PASTE_YOUR_LINK_HERE) | [Email](mailto:sanjeevraju716@gmail.com) | [Website](https://confessionindia.in)
