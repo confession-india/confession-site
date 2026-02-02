@@ -186,7 +186,6 @@
         const safetyText = document.getElementById('safetyText');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Dual Clock Function
         function updateClocks() {
             const options = { hour: '2-digit', minute: '2-digit', hour12: true };
             try {
@@ -259,11 +258,18 @@
             e.preventDefault();
             const content = msgInput.value.trim();
             const username = userInput.value.trim();
+            const category = catInput.value;
 
             if(content.length < 10) return alert("Secret too short!");
 
             const isToxic = containsBadWords(username) || containsBadWords(content) || PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
+            
             if (isToxic) {
+                // --- GA4 Track Validation Block ---
+                gtag('event', 'confession_blocked', {
+                    'reason': 'safety_filter',
+                    'category': category
+                });
                 alert("🚫 Restricted language or contact info detected.");
                 return;
             }
@@ -274,7 +280,7 @@
             try {
                 await db.collection('confessions').add({
                     username: username || "Anonymous",
-                    category: catInput.value,
+                    category: category,
                     content: content,
                     language: userLang,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
@@ -283,10 +289,21 @@
                     status: "public"
                 });
                 
+                // --- GA4 Track Success ---
+                gtag('event', 'confession_shared', {
+                    'category': category,
+                    'language': userLang
+                });
+
                 localStorage.setItem('lastPostTime', Date.now().toString());
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
+                // --- GA4 Track Error ---
+                gtag('event', 'confession_failed', {
+                    'error': err.message
+                });
+
                 submitBtn.disabled = false; 
                 submitBtn.innerText = "Post Anonymously";
                 alert("Connection failed.");
