@@ -42,9 +42,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300 relative overflow-x-hidden">
-    
-    <div id="mouse-glow"></div>
+<body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
+    <div id="mouse-glow" class="mouse-glow"></div>
     
     <div class="sticky top-0 z-[100] bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
@@ -57,7 +56,7 @@
         </div>
     </div>
 
-    <header class="sticky top-[52px] z-[90] bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl border-b border-gray-100">
+    <header class="sticky top-[52px] z-[90] bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl border-b border-gray-100 dark:border-red-900/30">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div class="flex flex-col">
                 <a href="index.html" class="hover:opacity-80 transition-opacity">
@@ -69,14 +68,14 @@
         </div>
     </header>
 
-    <div class="page-wrapper relative z-10">
+    <div class="page-wrapper">
         <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[110] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
             <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
             </svg>
         </button>
 
-        <div id="shareModal" onclick="closeShare()">
+        <div id="shareModal" onclick="closeShare()" class="fixed inset-0 z-[150] bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
             <div class="bg-white dark:bg-[#1e293b] p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 border dark:border-slate-700" onclick="event.stopPropagation()">
                 <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
@@ -122,17 +121,17 @@
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
                         <h4 class="font-bold text-slate-800 dark:text-white mb-2">Zero Logs</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours.</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
                     </div>
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
                         <h4 class="font-bold text-slate-800 dark:text-white mb-2">No Accounts</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design.</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
                     </div>
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
-                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Moderated</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked to keep the community safe and kind.</p>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Human Moderated</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
                     </div>
                 </div>
             </section>
@@ -142,7 +141,7 @@
             <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
                 <div class="space-y-4">
                     <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
-                    <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths.</p>
+                    <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths without judgment, fear, or recognition.</p>
                     <div class="flex items-center gap-3 bg-slate-800/50 w-fit px-4 py-2 rounded-full border border-slate-700">
                         <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
                         <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
@@ -173,19 +172,20 @@
                     <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
                 </div>
                 <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">No Cookies • No Emails • Just the Truth</p>
-                <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India.</p>
+                <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built with Integrity from HYD to LDN.</p>
             </div>
         </footer>
     </div>
 
     <script>
-        // MOUSE TRACKER
+        // --- MOUSE GLOW LOGIC ---
         const glow = document.getElementById('mouse-glow');
         window.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
+        // --- PREVIOUS FIREBASE & UI LOGIC ---
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
@@ -196,7 +196,7 @@
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ" },
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದాయ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ" },
             ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക" }
         };
 
@@ -205,18 +205,19 @@
         let unsubscribe = null;
         let isUserInteracting = false; 
 
+        const scrollTab = document.getElementById('scrollTab');
+        const scrollIcon = document.getElementById('scrollIcon');
+        let isAtBottom = false;
+
+        window.onscroll = function() {
+            if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); scrollTab.classList.add('flex'); } else { scrollTab.classList.add('hidden'); }
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) { scrollIcon.style.transform = "rotate(180deg)"; isAtBottom = true; } else { scrollIcon.style.transform = "rotate(0deg)"; isAtBottom = false; }
+        };
+
         function handleScrollAction() {
-            const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
             if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
             else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
-
-        window.onscroll = function() {
-            const scrollTab = document.getElementById('scrollTab');
-            const scrollIcon = document.getElementById('scrollIcon');
-            if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); scrollTab.classList.add('flex'); } else { scrollTab.classList.add('hidden'); }
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) { scrollIcon.style.transform = "rotate(180deg)"; } else { scrollIcon.style.transform = "rotate(0deg)"; }
-        };
 
         function updateClocks() {
             const options = { hour: '2-digit', minute: '2-digit', hour12: true };
@@ -253,12 +254,22 @@
             }
         }
 
+        function openShare(id) {
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function closeShare() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        // Rest of your functions (renderPosts, loadPosts, setLanguage, filterCat, interact, etc.) remain identical...
         function renderPosts(posts) {
             if (isUserInteracting) return;
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
+            // Banner Logic
             if (posts.length > 0) {
                 const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
                 const bannerDiv = document.getElementById('dailyWisdom');
@@ -268,6 +279,7 @@
                 bannerDiv.classList.remove('hidden');
                 const isBannerLong = topPost.content.length > 200;
                 const bannerShort = topPost.content.substring(0, 200);
+
                 bannerText.innerText = isBannerLong ? `"${bannerShort}..."` : `"${topPost.content}"`;
                 
                 if(isBannerLong) {
@@ -285,7 +297,9 @@
                             bannerBtn.setAttribute('data-state', 'short');
                         }
                     };
-                } else { bannerBtn.classList.add('hidden'); }
+                } else {
+                    bannerBtn.classList.add('hidden');
+                }
             }
 
             posts.forEach(post => {
@@ -293,37 +307,45 @@
                 const safeContent = encodeURIComponent(post.content);
                 const isHearted = localStorage.getItem(`supportCount-${post.id}`);
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
+                const authorName = post.username || "Anonymous";
                 const isLong = post.content.length > 300;
                 const shortText = isLong ? post.content.substring(0, 300) : post.content;
+                const displayContent = isLong ? `"${shortText}..."` : `"${post.content}"`;
 
                 feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300">
+                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex flex-col">
                                 <span class="text-[10px] font-black uppercase text-indigo-500 mb-1">${post.category || 'other'}</span>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-[9px] text-slate-400 dark:text-slate-300 font-black uppercase tracking-widest">${post.username || "Anonymous"}</span>
+                                    <span class="text-[9px] text-slate-400 dark:text-slate-300 font-black uppercase tracking-widest">${authorName}</span>
+                                    <span class="text-[15px] text-slate-300 leading-none">·</span>
                                     <span class="text-[9px] text-slate-300 dark:text-slate-500 font-bold uppercase tracking-widest">${timeAgo(post.timestamp)}</span>
                                 </div>
                             </div>
                             <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 dark:text-slate-500 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                         </div>
                         <p id="text-${post.id}" data-full="${safeContent}" data-short="${encodeURIComponent(shortText)}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words">
-                            "${isLong ? shortText + '...' : post.content}"
+                            ${displayContent}
                         </p>
                         ${isLong ? `<button id="btn-${post.id}" data-state="short" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-8 block">${translations[currentLang].readMore}</button>` : '<div class="mb-8"></div>'}
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex items-center space-x-3">
-                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all active:scale-125 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400 transition-all ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400 transition-all active:scale-125 ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
                                     <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
                                 </button>
                             </div>
-                            <button onclick="openShare('${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full">
-                                <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
-                            </button>
+                            <div class="flex items-center gap-2">
+                                <button onclick="downloadSecret('${post.id}', decodeURIComponent('${safeContent}'))" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                </button>
+                                <button onclick="openShare('${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
+                                    <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>`);
             });
@@ -353,22 +375,10 @@
             loadPosts(currentCategory);
         }
 
-        function filterCat(cat, btn) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active')); btn.classList.add('cat-active'); loadPosts(cat); }
-
-        window.interact = (e, id, field) => {
-            if (localStorage.getItem(`${field}-${id}`)) return;
-            isUserInteracting = true; localStorage.setItem(`${field}-${id}`, 'true');
-            db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
-            setTimeout(() => { isUserInteracting = false; }, 3000);
-        };
-
-        window.reportPost = (id) => { if(confirm("Report this post?")) { db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) }); alert("Moderators notified."); } };
-
-        function openShare(id) { document.getElementById('shareModal').classList.add('show'); }
-        function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
-
-        // Start
+        // Initialize
+        loadPosts();
         setLanguage(currentLang);
+
     </script>
 </body>
 </html>
