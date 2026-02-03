@@ -7,20 +7,45 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    
     <style>
         body { background-color: #0b0f1a; }
+        .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .item-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #1e293b; }
         .item-card:hover { border-color: #4f46e5; background-color: #1e293b; transform: translateY(-2px); }
         .report-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.08); box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
         .tab-active { background: #6366f1 !important; color: white !important; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
         .stat-card { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; }
+        input:focus { border-color: #6366f1 !important; outline: none; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
     </style>
 </head>
 <body class="text-slate-200 min-h-screen font-sans">
 
-    <div id="loadingScreen" class="flex flex-col items-center justify-center min-h-screen">
-        <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mb-4"></div>
-        <p class="text-slate-500 font-bold uppercase tracking-widest text-xs">Authenticating HQ Access...</p>
+    <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0b0f1a] p-4">
+        <div class="glass-card w-full max-w-md p-8 rounded-[40px] text-center">
+            <div class="mb-8">
+                <div class="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
+                    <span class="text-2xl">🔐</span>
+                </div>
+                <h2 class="text-2xl font-black text-white">HQ <span class="text-indigo-500">Access</span></h2>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Confess India Administration</p>
+            </div>
+
+            <div class="space-y-4">
+                <input type="email" id="loginEmail" placeholder="Admin Email" 
+                    class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all">
+                <input type="password" id="loginPassword" placeholder="Secret Key" 
+                    class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all">
+                
+                <button onclick="signIn()" id="loginBtn" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98]">
+                    INITIALIZE ACCESS
+                </button>
+            </div>
+            
+            <p id="errorMsg" class="text-red-500 text-xs font-bold mt-4 hidden"></p>
+        </div>
     </div>
 
     <div id="adminUI" class="hidden">
@@ -28,7 +53,7 @@
             <div class="max-w-6xl mx-auto p-6 flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
                     <h1 class="text-xl font-black text-white tracking-tight">Control<span class="text-indigo-500">Center</span></h1>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Confess India HQ</p>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Live Session Active</p>
                 </div>
 
                 <div class="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
@@ -37,7 +62,8 @@
                 </div>
 
                 <div class="flex gap-4">
-                    <button onclick="window.location.href='index.html'" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-2xl text-xs font-black transition-all border border-slate-700">EXIT HQ</button>
+                    <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2 rounded-2xl text-[10px] font-black transition-all border border-red-500/20">LOGOUT</button>
+                    <button onclick="window.location.href='index.html'" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-2xl text-[10px] font-black transition-all border border-slate-700">EXIT</button>
                 </div>
             </div>
         </header>
@@ -63,67 +89,79 @@
             </div>
 
             <div id="filterBar" class="flex flex-wrap gap-3 mb-8 justify-center">
-                <input type="text" id="searchInput" placeholder="Search keywords..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-medium w-64 text-white">
-                <select id="langFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300">
-                    <option value="all">All Languages</option>
-                    <option value="en">English</option>
-                    <option value="hi">Hindi</option>
-                </select>
-                <select id="catFilter" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300">
-                    <option value="all">All Categories</option>
-                    <option value="relationship">Relationships</option>
-                    <option value="family">Family</option>
-                </select>
+                <input type="text" id="searchInput" placeholder="Search secrets..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-medium w-64 text-white">
             </div>
 
             <div id="feed" class="grid grid-cols-1 gap-4 pb-20">
-                <div class="text-center py-20 text-slate-600 font-bold italic tracking-widest">CONNECTING...</div>
+                <div class="text-center py-20 text-slate-600 font-bold italic tracking-widest uppercase text-xs">Awaiting Authentication...</div>
             </div>
         </main>
     </div>
 
     <script>
-        // AUTHENTICATION LOGIC
-        const PIN = "2122";
-        
-        // Use a timeout to ensure the browser has time to render the loading screen before the prompt blocks the thread
-        setTimeout(() => {
-            const auth = prompt("Admin PIN:");
-            if(auth === PIN) { 
-                document.getElementById('loadingScreen').classList.add('hidden');
-                document.getElementById('adminUI').classList.remove('hidden'); 
-                start(); 
-            } else { 
-                alert("Unauthorized Access.");
-                window.location.href="index.html"; 
-            }
-        }, 500);
+        const firebaseConfig = { 
+            apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", 
+            authDomain: "confession-india.firebaseapp.com", 
+            projectId: "confession-india", 
+            storageBucket: "confession-india.firebasestorage.app", 
+            messagingSenderId: "345080016810", 
+            appId: "1:345080016810:web:3032f570077ea8d6dd45d3" 
+        };
 
-        function start() {
-            const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
-            
-            // Check if Firebase is already initialized
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const MASTER_EMAIL = "sanjeevraju716@gmail.com";
+
+        // Listen for Auth changes
+        auth.onAuthStateChanged(user => {
+            if (user && user.email === MASTER_EMAIL) {
+                document.getElementById('authOverlay').classList.add('hidden');
+                document.getElementById('adminUI').classList.remove('hidden');
+                startHQ();
+            } else {
+                document.getElementById('authOverlay').classList.remove('hidden');
+                document.getElementById('adminUI').classList.add('hidden');
             }
-            
-            const db = firebase.firestore();
+        });
+
+        // Sign In Function
+        async function signIn() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('errorMsg');
+
+            btn.innerText = "VERIFYING...";
+            btn.disabled = true;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+            } catch (error) {
+                err.innerText = "ACCESS DENIED: INVALID CREDENTIALS";
+                err.classList.remove('hidden');
+                btn.innerText = "INITIALIZE ACCESS";
+                btn.disabled = false;
+            }
+        }
+
+        function logout() {
+            auth.signOut().then(() => location.reload());
+        }
+
+        function startHQ() {
             let currentView = 'posts';
             let allConfessions = [];
             let allMessages = [];
 
-            // Listen to Confessions
+            // Listeners
             db.collection('confessions').orderBy('timestamp', 'desc').onSnapshot(snap => {
                 allConfessions = [];
                 snap.forEach(doc => allConfessions.push({ id: doc.id, ...doc.data() }));
                 updateStats();
                 if(currentView === 'posts') renderPosts();
-            }, (error) => {
-                console.error("Firestore Error:", error);
-                alert("Security Block: Check your Firebase Rules!");
             });
 
-            // Listen to Support
             db.collection('support_messages').orderBy('timestamp', 'desc').onSnapshot(snap => {
                 allMessages = [];
                 snap.forEach(doc => allMessages.push({ id: doc.id, ...doc.data() }));
@@ -156,13 +194,16 @@
                         <div class="flex-grow">
                             <div class="flex items-center gap-3 mb-3">
                                 <span class="text-[9px] font-black uppercase tracking-widest ${p.reportCount > 0 ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'} px-2.5 py-1 rounded-full">
-                                    ${p.reportCount > 0 ? '🚩 ' + p.reportCount + ' REPORTS' : '✓ Safe'}
+                                    ${p.reportCount > 0 ? '🚩 ' + p.reportCount + ' REPORTS' : '✓ Safe Content'}
                                 </span>
+                                <span class="text-[9px] text-slate-500 font-bold">${p.category || 'General'}</span>
                             </div>
                             <h3 class="text-white font-black text-sm uppercase mb-1">${p.username || 'Anonymous'}</h3>
                             <p class="text-slate-400 text-sm font-medium leading-relaxed">${p.content}</p>
                         </div>
-                        <button onclick="delPost('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 px-6 py-3 rounded-2xl text-[10px] font-black transition-all">DELETE</button>
+                        <div class="flex gap-2">
+                            <button onclick="delPost('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">DELETE</button>
+                        </div>
                     </div>
                 `).join('');
             }
@@ -173,16 +214,15 @@
                     <div class="item-card p-6 rounded-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${m.type === 'ABUSE_REPORT' ? 'report-warning' : ''}">
                         <div class="flex-grow w-full">
                             <h3 class="text-white font-black text-sm mb-1">${m.name} <span class="text-slate-500 ml-2 font-normal text-xs">— ${m.email}</span></h3>
-                            <p class="text-slate-300 text-sm mt-2">${m.message}</p>
+                            <p class="text-slate-300 text-sm mt-2 font-medium">${m.message}</p>
                         </div>
-                        <button onclick="resolveMsg('${m.id}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white border border-emerald-500/20 px-6 py-3 rounded-2xl text-[10px] font-black transition-all">RESOLVE</button>
+                        <button onclick="resolveMsg('${m.id}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">RESOLVE</button>
                     </div>
                 `).join('');
             }
 
-            window.delPost = (id) => { if(confirm("Delete forever?")) db.collection('confessions').doc(id).delete(); };
-            window.resolveMsg = (id) => { if(confirm("Mark resolved?")) db.collection('support_messages').doc(id).delete(); };
-
+            window.delPost = (id) => { if(confirm("Delete this confession? This cannot be undone.")) db.collection('confessions').doc(id).delete(); };
+            window.resolveMsg = (id) => { if(confirm("Mark this message as resolved?")) db.collection('support_messages').doc(id).delete(); };
             document.getElementById('searchInput').addEventListener('input', renderPosts);
         }
     </script>
