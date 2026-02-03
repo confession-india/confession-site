@@ -34,7 +34,23 @@
     background-color: #fef2f2 !important; 
 }
 
-/* 3. Form & Interaction Styles */
+/* 3. Mouse Glow Effect */
+#mouse-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.12) 0%, rgba(168, 85, 247, 0.04) 40%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 1; /* Sits behind content, above background */
+    transition: opacity 0.3s ease;
+    filter: blur(40px);
+}
+
+/* 4. Form & Interaction Styles */
 .input-focus-effect {
     transition: all 0.2s ease;
 }
@@ -52,7 +68,7 @@
     background: white;
 }
 
-/* 4. Notification Components (Toast) */
+/* 5. Notification Components (Toast) */
 #toast { 
     position: fixed; 
     bottom: 40px; 
@@ -68,13 +84,13 @@
     opacity: 1; 
 }
 
-/* 5. Custom Scrollbar */
+/* 6. Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #fdfdff; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #fdfdff; }
 ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
 
-/* 6. Share Modal System */
+/* 7. Share Modal System */
 #shareModal {
     position: fixed;
     inset: 0;
@@ -88,7 +104,7 @@
 }
 #shareModal.show { display: flex; }
 
-/* 7. Navigation & Structural */
+/* 8. Navigation & Structural */
 .cat-active, .lang-active {
     background: #4f46e5 !important;
     color: white !important;
@@ -101,7 +117,7 @@ html, body {
     width: 100%;
 }
 
-/* 8. LONDON-HYDERABAD REFINED DARK MODE */
+/* 9. LONDON-HYDERABAD REFINED DARK MODE */
 @media (prefers-color-scheme: dark) {
     body {
         /* London Night Slate Gray Background */
@@ -111,13 +127,18 @@ html, body {
 
     header {
         background-color: rgba(11, 17, 32, 0.9) !important;
-        /* London Post-Box Red subtle accent */
-        border-bottom: 2px solid rgba(220, 38, 38, 0.3) !important;
+        /* London Post-Box Red accent applied globally */
+        border-bottom: 2px solid rgba(220, 38, 38, 0.4) !important;
         backdrop-filter: blur(12px);
     }
 
+    /* Dark Mode Glow - Softened for the London Night theme */
+    #mouse-glow {
+        background: radial-gradient(circle, rgba(129, 140, 248, 0.08) 0%, rgba(192, 132, 252, 0.02) 50%, transparent 80%);
+    }
+
     /* Cards, Feed items, and Container elements */
-    .bg-white, #previewContainer, #postForm, .preview-card, [id^="post-"] {
+    .bg-white, #previewContainer, #postForm, .preview-card, [id^="post-"], .bg-slate-900 {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
         border-color: #334155 !important;
