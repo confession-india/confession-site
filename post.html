@@ -17,15 +17,33 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        #submitBtn:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none !important; }
-        .animate-pulse-green { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
         
+        #submitBtn:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .animate-pulse-green {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+
         #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 2000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #toast.show { top: 20px; }
     </style>
 </head>
-<body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300 flex flex-col min-h-screen">
+<body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
 
     <div id="toast">
         <div class="bg-indigo-600 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-3">
@@ -33,9 +51,7 @@
         </div>
     </div>
 
-    <div class="w-full bg-slate-900 py-1 border-b border-slate-800"></div>
-
-    <header class="sticky top-0 z-[100] bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl border-b border-gray-100 dark:border-red-900/30">
+    <header class="sticky top-0 z-[1000] w-full bg-white/90 dark:bg-[#0b1120]/95 backdrop-blur-xl border-b border-gray-100 dark:border-slate-800">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
             <div class="flex flex-col">
                 <a href="index.html" class="hover:opacity-80 transition-opacity">
@@ -43,32 +59,29 @@
                 </a>
                 <span class="text-[10px] text-gray-400 dark:text-slate-500 font-bold tracking-widest uppercase mt-1 ml-0.5">Share Your Truth</span>
             </div>
-            <a href="index.html" class="bg-slate-50 dark:bg-slate-800 text-slate-500 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all hover:bg-red-50 hover:text-red-500 border border-slate-100 dark:border-slate-700 uppercase text-[10px] tracking-widest">Cancel</a>
+            <a href="index.html" class="bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl font-bold text-[10px] hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-slate-100 dark:border-slate-700">Cancel</a>
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-6 py-10 flex-grow w-full">
-        
+    <main class="max-w-2xl mx-auto px-6 py-10 pb-24 flex-grow w-full">
         <div class="mb-10">
             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 mb-2 block">Live Preview</label>
-            <div id="previewContainer" class="p-8 bg-white dark:bg-[#1e293b] shadow-sm rounded-[32px] border border-slate-100 dark:border-slate-800 transition-all">
+            <div id="previewContainer" class="p-8 bg-white dark:bg-slate-900/50 shadow-sm rounded-3xl border border-slate-100 dark:border-slate-800">
                 <div class="flex justify-between items-start mb-4">
-                    <div class="flex flex-col">
-                        <span id="p-cat" class="text-[10px] font-black uppercase text-indigo-500 mb-1">OTHER</span>
-                        <div class="flex items-center gap-2">
-                            <span id="p-user" class="text-[9px] text-slate-400 dark:text-slate-300 font-black uppercase tracking-widest">BY ANONYMOUS</span>
-                            <span class="text-[15px] text-slate-300 leading-none">·</span>
-                            <span id="p-lang-tag" class="text-[9px] text-slate-300 dark:text-slate-500 font-bold uppercase tracking-widest">English Feed</span>
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center">
+                            <span id="p-cat" class="text-[10px] font-black uppercase bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-indigo-500 mr-2">OTHER</span>
+                            <h4 id="p-user" class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest inline-block">BY ANONYMOUS</h4>
                         </div>
+                        <span id="p-lang-tag" class="text-[9px] text-slate-300 dark:text-slate-600 font-bold ml-0.5 uppercase tracking-tighter">English Feed</span>
                     </div>
                 </div>
                 <p id="p-msg" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 italic opacity-60">"Your truth starts here..."</p>
             </div>
         </div>
 
-        <div class="bg-white dark:bg-[#1e293b] rounded-[32px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-50 dark:border-slate-800 overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-[40px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-50 dark:border-slate-800 overflow-hidden">
             <form id="postForm" class="p-8 space-y-8">
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 ml-1">Pen Name</label>
@@ -120,30 +133,39 @@
             <div class="space-y-4">
                 <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
                 <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths.</p>
+                <div class="flex items-center gap-3 bg-slate-800/50 w-fit px-4 py-2 rounded-full border border-slate-700">
+                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
+                </div>
             </div>
+
             <div class="grid grid-cols-2 gap-8 md:col-span-2">
                 <div>
                     <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Platform</h3>
                     <ul class="space-y-3 text-sm font-bold">
                         <li><a href="legal.html#mission" class="hover:text-white transition-colors">Our Mission</a></li>
                         <li><a href="legal.html#privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="legal.html#rules" class="hover:text-white transition-colors">Community Rules</a></li>
                     </ul>
                 </div>
                 <div>
                     <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Connect</h3>
                     <ul class="space-y-3 text-sm font-bold">
                         <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
+                        <li><a href="support.html?type=abuse" class="hover:text-red-400 transition-colors text-red-500/80">Report Abuse</a></li>
                     </ul>
                 </div>
             </div>
         </div>
+
         <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center space-y-4">
-            <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest">
+            <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest mb-2">
                 <span>📍 HYD: <span id="hyd-time">--:--</span></span>
                 <span class="text-red-600">|</span>
                 <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
             </div>
-            <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India.</p>
+            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">No Cookies • No Emails • Just the Truth</p>
+            <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built for the brave and the unheard.</p>
         </div>
     </footer>
 
@@ -164,18 +186,6 @@
         const safetyText = document.getElementById('safetyText');
         const submitBtn = document.getElementById('submitBtn');
 
-        // Safety Assets
-        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
-        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:|snap:|snapchat:)\s?[A-Za-z0-9._]+/i;
-        const BAD_WORDS = [
-            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy", "slut", "whore",
-            "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "gandu", "chutiya", "randi", "saala", "kamine", "lavde", "bhadwa", "harami", "loduchand",
-            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "lanjakodaka", "modda", "naayala", "neeyamma",
-            "punda", "baadu", "thevidiya", "thayoli", "kunna", "pooru", "gommala", "omala", "otha", "moodu",
-            "bolimaga", "sule", "nanmaga", "huchu", "gaanchali", "sulemaga",
-            "fundi", "onnantha", "thayoli", "pandi", "koppa", "pula", "monesh", "nayintemon"
-        ];
-
         function updateClocks() {
             const options = { hour: '2-digit', minute: '2-digit', hour12: true };
             try {
@@ -185,14 +195,18 @@
         }
         setInterval(updateClocks, 60000); updateClocks();
 
-        function containsBadWords(text) {
-            if(!text) return false;
-            const cleanText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
-            return BAD_WORDS.some(word => {
-                const cleanWord = word.toLowerCase().replace(/[^a-z0-9]/g, '');
-                return cleanText.includes(cleanWord);
-            });
-        }
+        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
+        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:|snap:|snapchat:)\s?[A-Za-z0-9._]+/i;
+        
+        // Comprehensive multi-language bad words list
+        const BAD_WORDS = [
+            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy", "slut", "whore",
+            "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "gandu", "chutiya", "randi", "saala", "kamine", "lavde", "bhadwa", "harami", "loduchand",
+            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "lanjakodaka", "modda", "naayala", "neeyamma",
+            "punda", "baadu", "thevidiya", "thayoli", "kunna", "pooru", "gommala", "omala", "otha", "moodu",
+            "bolimaga", "sule", "nanmaga", "huchu", "gaanchali", "sulemaga",
+            "fundi", "onnantha", "thayoli", "pandi", "koppa", "pula", "monesh", "nayintemon"
+        ];
 
         function checkCooldown() {
             const lastPost = localStorage.getItem('lastPostTime');
@@ -204,13 +218,24 @@
                         const currentDiff = (Date.now() - parseInt(lastPost)) / 1000;
                         if (currentDiff >= 60) {
                             clearInterval(timer);
-                            updateUI(); // Reset UI state
+                            updateUI();
                         } else {
                             submitBtn.innerText = `Wait ${Math.ceil(60 - currentDiff)}s...`;
                         }
                     }, 1000);
                 }
             }
+        }
+        checkCooldown();
+
+        function containsBadWords(text) {
+            if(!text) return false;
+            // Cleans "b.a.d.w.o.r.d" to "badword" for checking
+            const cleanText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return BAD_WORDS.some(word => {
+                const cleanWord = word.toLowerCase().replace(/[^a-z0-9]/g, '');
+                return cleanText.includes(cleanWord);
+            });
         }
 
         function updateUI() {
@@ -220,23 +245,22 @@
             document.getElementById('p-msg').innerText = content ? `"${content}"` : "Your truth starts here...";
             document.getElementById('p-user').innerText = "BY " + (user.toUpperCase() || "ANONYMOUS");
             document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
+            
             charCount.innerText = `${content.length} / 2000`;
 
             const hasContact = PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
             const hasBad = containsBadWords(content) || containsBadWords(user);
             
             if(hasContact || hasBad) {
-                safetyText.innerText = hasBad ? "Restricted language detected!" : "Contact info (Phone/Social) detected!";
+                safetyText.innerText = hasBad ? "Conflict detected! Remove abuse." : "Conflict detected! Remove contact info.";
                 safetyText.classList.add('text-red-500');
                 redAlert.classList.add('border-red-200', 'bg-red-50', 'dark:bg-red-900/10');
                 submitBtn.disabled = true;
-                submitBtn.innerText = "Post Anonymously";
             } else {
                 safetyText.innerText = "Social IDs & Abuse are blocked.";
                 safetyText.classList.remove('text-red-500');
                 redAlert.classList.remove('border-red-200', 'bg-red-50', 'dark:bg-red-900/10');
                 
-                // Re-enable only if not in cooldown
                 const lastPost = localStorage.getItem('lastPostTime');
                 if (!lastPost || (Date.now() - parseInt(lastPost)) / 1000 >= 60) {
                     submitBtn.disabled = false;
@@ -247,7 +271,6 @@
 
         [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
         catInput.addEventListener('change', updateUI);
-        checkCooldown();
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -256,8 +279,10 @@
             const category = catInput.value;
 
             if(content.length < 10) return alert("Secret too short!");
-            
-            submitBtn.disabled = true; submitBtn.innerText = "Securing...";
+            if(content.length > 2000) return alert("Keep it under 2000 characters!");
+
+            submitBtn.disabled = true; 
+            submitBtn.innerText = "Securing...";
 
             try {
                 await db.collection('confessions').add({
@@ -273,7 +298,8 @@
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
-                submitBtn.disabled = false; submitBtn.innerText = "Post Anonymously";
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Post Anonymously";
                 alert("Connection failed.");
             }
         });
