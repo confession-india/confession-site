@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT5SF025XK"></script>
     <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-LT5SF025XK');
-</script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-LT5SF025XK');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="E0eroPpuSrFX_H8NK5GV0vtHNz5S-xScaEDuM25Zth4" />
 
@@ -93,9 +93,10 @@
             <div id="dailyWisdom" class="mb-2 hidden">
                 <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl flex flex-col md:flex-row items-center gap-6 border-4 border-indigo-500/30">
                     <div class="bg-white/20 p-4 rounded-2xl text-2xl">🔥</div>
-                    <div class="flex-1 text-center md:text-left">
+                    <div class="flex-1 text-center md:text-left overflow-hidden">
                         <h3 class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Most Supported Today</h3>
-                        <p id="top-secret-text" class="text-lg font-bold leading-tight italic">"Loading the most relatable secret..."</p>
+                        <p id="top-secret-text" class="text-lg font-bold leading-tight italic break-words">"Loading the most relatable secret..."</p>
+                        <button id="banner-read-more" class="hidden text-[10px] font-black uppercase tracking-widest mt-2 opacity-70 hover:opacity-100"></button>
                     </div>
                 </div>
             </div>
@@ -182,12 +183,12 @@
         const SITE_URL = "https://confessionindia.in";
         
         const translations = {
-            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
-            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
-            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சమூக ஊட்டம்" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
+            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి" },
+            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க" },
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ" },
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
@@ -232,12 +233,12 @@
             const btn = document.getElementById(`btn-${id}`);
             const fullText = decodeURIComponent(content.getAttribute('data-full'));
             const shortText = decodeURIComponent(content.getAttribute('data-short'));
-            if (btn.innerText === "Read More") {
+            if (btn.innerText === translations[currentLang].readMore) {
                 content.innerText = `"${fullText}"`;
-                btn.innerText = "Read Less";
+                btn.innerText = translations[currentLang].readLess;
             } else {
                 content.innerText = `"${shortText}..."`;
-                btn.innerText = "Read More";
+                btn.innerText = translations[currentLang].readMore;
             }
         }
 
@@ -245,7 +246,6 @@
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'absolute';
             tempDiv.style.left = '-9999px';
-            // Adjusted padding and font size for extremely long 2000 char posts
             tempDiv.innerHTML = `
                 <div id="capture-${id}" style="width: 500px; min-height: 500px; height: auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 40px; text-align: center; font-family: sans-serif; box-sizing: border-box;">
                     <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; opacity: 0.9;">Confess India</div>
@@ -268,10 +268,35 @@
             feed.innerHTML = '';
             posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
+            // Banner Read More Logic
             if (posts.length > 0) {
                 const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
-                document.getElementById('dailyWisdom').classList.remove('hidden');
-                document.getElementById('top-secret-text').innerText = `"${topPost.content.substring(0, 150)}${topPost.content.length > 150 ? '...' : ''}"`;
+                const bannerDiv = document.getElementById('dailyWisdom');
+                const bannerText = document.getElementById('top-secret-text');
+                const bannerBtn = document.getElementById('banner-read-more');
+                
+                bannerDiv.classList.remove('hidden');
+                
+                const isBannerLong = topPost.content.length > 200;
+                const bannerShort = topPost.content.substring(0, 200);
+
+                bannerText.innerText = isBannerLong ? `"${bannerShort}..."` : `"${topPost.content}"`;
+                
+                if(isBannerLong) {
+                    bannerBtn.classList.remove('hidden');
+                    bannerBtn.innerText = translations[currentLang].readMore;
+                    bannerBtn.onclick = () => {
+                        if(bannerBtn.innerText === translations[currentLang].readMore) {
+                            bannerText.innerText = `"${topPost.content}"`;
+                            bannerBtn.innerText = translations[currentLang].readLess;
+                        } else {
+                            bannerText.innerText = `"${bannerShort}..."`;
+                            bannerBtn.innerText = translations[currentLang].readMore;
+                        }
+                    };
+                } else {
+                    bannerBtn.classList.add('hidden');
+                }
             }
 
             posts.forEach(post => {
@@ -297,10 +322,10 @@
                             </div>
                             <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 dark:text-slate-500 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                         </div>
-                        <p id="text-${post.id}" data-full="${safeContent}" data-short="${encodeURIComponent(shortText)}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2">
+                        <p id="text-${post.id}" data-full="${safeContent}" data-short="${encodeURIComponent(shortText)}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words">
                             ${displayContent}
                         </p>
-                        ${isLong ? `<button id="btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-8 block">Read More</button>` : '<div class="mb-8"></div>'}
+                        ${isLong ? `<button id="btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-8 block">${translations[currentLang].readMore}</button>` : '<div class="mb-8"></div>'}
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex items-center space-x-3">
                                 <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all active:scale-125 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
@@ -362,7 +387,6 @@
 
         window.reportPost = (id) => { if(confirm("Report this post?")) { db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) }); alert("Moderators notified."); } };
 
-        // IMPROVED: openShare now pulls content from the DOM using ID to handle massive text
         function openShare(id) {
             document.getElementById('shareModal').classList.add('show');
             const fullText = decodeURIComponent(document.getElementById(`text-${id}`).getAttribute('data-full'));
