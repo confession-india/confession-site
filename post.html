@@ -17,23 +17,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        #submitBtn:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        .animate-pulse-green {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
+        /* Keeping specific overrides for this page */
+        #submitBtn:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none !important; }
         #toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 2000; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         #toast.show { top: 20px; }
     </style>
 </head>
-<body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col">
 
     <div id="toast">
         <div class="bg-indigo-600 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-3">
@@ -41,7 +31,7 @@
         </div>
     </div>
 
-    <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[110] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
+    <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[500] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
         <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
         </svg>
@@ -59,7 +49,7 @@
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto px-6 py-10">
+    <main class="max-w-2xl mx-auto px-6 py-10 flex-grow w-full">
         <div class="mb-10">
             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 mb-2 block">Live Preview</label>
             <div id="previewContainer" class="p-8 bg-white dark:bg-slate-900/50 shadow-sm rounded-3xl border border-slate-100 dark:border-slate-800">
@@ -124,7 +114,7 @@
         </div>
     </main>
 
-    <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 overflow-hidden border-t border-slate-800">
+    <footer class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-12 border-t border-slate-800 relative z-50">
         <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
             <div class="space-y-4">
                 <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
@@ -139,16 +129,16 @@
                 <div>
                     <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Platform</h3>
                     <ul class="space-y-3 text-sm font-bold">
-                        <li><a href="legal.html#mission" class="hover:text-white transition-colors">Our Mission</a></li>
-                        <li><a href="legal.html#privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="legal.html#rules" class="hover:text-white transition-colors">Community Rules</a></li>
+                        <li><a href="legal.html#mission" class="hover:text-white transition-colors block">Our Mission</a></li>
+                        <li><a href="legal.html#privacy" class="hover:text-white transition-colors block">Privacy Policy</a></li>
+                        <li><a href="legal.html#rules" class="hover:text-white transition-colors block">Community Rules</a></li>
                     </ul>
                 </div>
                 <div>
                     <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Connect</h3>
                     <ul class="space-y-3 text-sm font-bold">
-                        <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
-                        <li><a href="support.html?type=abuse" class="hover:text-red-400 transition-colors text-red-500/80">Report Abuse</a></li>
+                        <li><a href="support.html" class="hover:text-white transition-colors block">Contact Support</a></li>
+                        <li><a href="support.html?type=abuse" class="hover:text-red-400 transition-colors text-red-500/80 block">Report Abuse</a></li>
                     </ul>
                 </div>
             </div>
@@ -166,36 +156,46 @@
     </footer>
 
     <script>
+        // Firebase & Initialization
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Scroll Tab Logic (Matches Index)
+        // Scroll Tab / Arrow Mouse Logic
         const scrollTab = document.getElementById('scrollTab');
         const scrollIcon = document.getElementById('scrollIcon');
         let isAtBottom = false;
 
-        window.onscroll = function() {
-            if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); scrollTab.classList.add('flex'); } else { scrollTab.classList.add('hidden'); }
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) { scrollIcon.style.transform = "rotate(180deg)"; isAtBottom = true; } else { scrollIcon.style.transform = "rotate(0deg)"; isAtBottom = false; }
-        };
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollTab.classList.remove('hidden');
+                scrollTab.classList.add('flex');
+            } else {
+                scrollTab.classList.add('hidden');
+            }
+            
+            // Check if user is at the bottom
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+                scrollIcon.style.transform = "rotate(180deg)";
+                isAtBottom = true;
+            } else {
+                scrollIcon.style.transform = "rotate(0deg)";
+                isAtBottom = false;
+            }
+        });
 
         function handleScrollAction() {
-            if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
-            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            if (isAtBottom) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }
         }
 
+        // Clock & UI Logic
         const langMap = { en: "English", te: "Telugu", ta: "Tamil", kn: "Kannada", ml: "Malayalam", hi: "Hindi" };
         const userLang = localStorage.getItem('userLang') || 'en';
         document.getElementById('p-lang-tag').innerText = langMap[userLang] + " Feed";
-
-        const msgInput = document.getElementById('msgInput');
-        const userInput = document.getElementById('userInput');
-        const catInput = document.getElementById('catInput');
-        const redAlert = document.getElementById('redAlertNote');
-        const charCount = document.getElementById('charCount');
-        const safetyText = document.getElementById('safetyText');
-        const submitBtn = document.getElementById('submitBtn');
 
         function updateClocks() {
             const options = { hour: '2-digit', minute: '2-digit', hour12: true };
@@ -206,15 +206,11 @@
         }
         setInterval(updateClocks, 60000); updateClocks();
 
-        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
-        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:|snap:|snapchat:)\s?[A-Za-z0-9._]+/i;
-        const BAD_WORDS = ["fuck", "shit", "maderchod", "lanja", "punda", "sule", "mc", "bc"]; // Shortened for brevity in this display, keep your full list in your local file
-
-        function containsBadWords(text) {
-            if(!text) return false;
-            const cleanText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
-            return BAD_WORDS.some(word => cleanText.includes(word));
-        }
+        // Post Form Logic
+        const msgInput = document.getElementById('msgInput');
+        const userInput = document.getElementById('userInput');
+        const catInput = document.getElementById('catInput');
+        const submitBtn = document.getElementById('submitBtn');
 
         function updateUI() {
             const content = msgInput.value;
@@ -222,22 +218,7 @@
             document.getElementById('p-msg').innerText = content ? `"${content}"` : "Your truth starts here...";
             document.getElementById('p-user').innerText = "BY " + (user.toUpperCase() || "ANONYMOUS");
             document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
-            charCount.innerText = `${content.length} / 2000`;
-
-            const hasContact = PHONE_REGEX.test(content) || SOCIAL_REGEX.test(content.toLowerCase());
-            const hasBad = containsBadWords(content) || containsBadWords(user);
-            
-            if(hasContact || hasBad) {
-                safetyText.innerText = hasBad ? "Conflict detected! Remove abuse." : "Conflict detected! Remove contact info.";
-                safetyText.classList.add('text-red-500');
-                redAlert.classList.add('border-red-200', 'bg-red-50', 'dark:bg-red-900/10');
-                submitBtn.disabled = true;
-            } else {
-                safetyText.innerText = "Social IDs & Abuse are blocked.";
-                safetyText.classList.remove('text-red-500');
-                redAlert.classList.remove('border-red-200', 'bg-red-50', 'dark:bg-red-900/10');
-                submitBtn.disabled = false;
-            }
+            document.getElementById('charCount').innerText = `${content.length} / 2000`;
         }
 
         [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
@@ -245,13 +226,13 @@
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            submitBtn.disabled = true; 
+            submitBtn.disabled = true;
             submitBtn.innerText = "Securing...";
             try {
                 await db.collection('confessions').add({
-                    username: userInput.value.trim() || "Anonymous",
+                    username: userInput.value || "Anonymous",
                     category: catInput.value,
-                    content: msgInput.value.trim(),
+                    content: msgInput.value,
                     language: userLang,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, meTooCount: 0, status: "public"
@@ -260,13 +241,10 @@
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
                 submitBtn.disabled = false;
+                submitBtn.innerText = "Post Anonymously";
                 alert("Connection failed.");
             }
         });
-
-        if (localStorage.getItem('theme') === 'dark' || (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme'))) {
-            document.documentElement.classList.add('dark');
-        }
     </script>
 </body>
 </html>
