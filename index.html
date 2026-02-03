@@ -182,6 +182,7 @@
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const SITE_URL = "https://confessionindia.in";
         
         // Language Library
         const translations = {
@@ -244,9 +245,24 @@
             return Math.floor(seconds / 60) + "m ago";
         }
 
+        // NEW: Toggle Read More
+        function toggleReadMore(id) {
+            const content = document.getElementById(`text-${id}`);
+            const btn = document.getElementById(`btn-${id}`);
+            const fullText = content.getAttribute('data-full');
+            const shortText = content.getAttribute('data-short');
+            if (btn.innerText === "Read More") {
+                content.innerText = `"${fullText}"`;
+                btn.innerText = "Read Less";
+            } else {
+                content.innerText = `"${shortText}..."`;
+                btn.innerText = "Read More";
+            }
+        }
+
         window.downloadSecret = (id, content) => {
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;"><div style="font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Confess India</div><div style="font-size: 24px; font-weight: 800; font-style: italic;">"${content}"</div><div style="position: absolute; bottom: 30px; font-size: 10px; font-weight: 700; opacity: 0.6;">SHARED ANONYMOUSLY</div></div>`;
+            tempDiv.innerHTML = `<div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;"><div style="font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Confess India</div><div style="font-size: 24px; font-weight: 800; font-style: italic;">"${content}"</div><div style="position: absolute; bottom: 30px; font-size: 12px; font-weight: 700; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div></div>`;
             document.body.appendChild(tempDiv);
             html2canvas(document.getElementById(`capture-${id}`)).then(canvas => {
                 const link = document.createElement('a');
@@ -274,9 +290,12 @@
                 const safeContent = post.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
                 const isHearted = localStorage.getItem(`supportCount-${post.id}`);
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
-                
-                // FIXED: Now correctly displays the username
                 const authorName = post.username || "Anonymous";
+
+                // NEW: Read More Logic
+                const isLong = post.content.length > 300;
+                const shortText = isLong ? post.content.substring(0, 300) : post.content;
+                const displayContent = isLong ? `"${shortText}..."` : `"${post.content}"`;
 
                 feed.insertAdjacentHTML('beforeend', `
                     <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
@@ -291,7 +310,10 @@
                             </div>
                             <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 dark:text-slate-500 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                         </div>
-                        <p class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-8">"${post.content}"</p>
+                        <p id="text-${post.id}" data-full="${safeContent}" data-short="${shortText.replace(/'/g, "\\'").replace(/"/g, '&quot;')}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2">
+                            ${displayContent}
+                        </p>
+                        ${isLong ? `<button id="btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-8 block">Read More</button>` : '<div class="mb-8"></div>'}
                         <div class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex items-center space-x-3">
                                 <button onclick="interact(event, '${post.id}', 'supportCount')" 
@@ -355,7 +377,6 @@
             isUserInteracting = true;
             localStorage.setItem(`${field}-${id}`, 'true');
 
-            // Track engagement in GA4
             gtag('event', 'confession_supported', {
                 'event_category': 'engagement',
                 'event_label': field,
@@ -389,12 +410,25 @@
 
         function openShare(text, id) {
             document.getElementById('shareModal').classList.add('show');
-            const shareUrl = window.location.href;
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + shareUrl)}`);
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Copied!"); };
+            // NEW: Combined full message with Website URL
+            const fullMessage = `${text}\n\nRead more secrets at: ${SITE_URL}\nSent via Confess India 🤫`;
+            
+            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`);
+            document.getElementById('xBtn').onclick = () => window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(fullMessage)}`);
+            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`);
+            
+            // Fixed Copy Secret Text
+            document.getElementById('copyTxtBtn').onclick = () => { 
+                navigator.clipboard.writeText(fullMessage); 
+                alert("Secret text and website link copied!"); 
+            };
+            
+            document.getElementById('copyBtn').onclick = () => { 
+                navigator.clipboard.writeText(SITE_URL); 
+                alert("Website link copied!"); 
+            };
+            
             document.getElementById('igBtn').onclick = () => downloadSecret(id, text);
-            document.getElementById('xBtn').onclick = () => window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text + " " + shareUrl)}`);
-            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
         }
 
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
