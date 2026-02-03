@@ -7,11 +7,9 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-LT5SF025XK');
 </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <meta name="google-site-verification" content="E0eroPpuSrFX_H8NK5GV0vtHNz5S-xScaEDuM25Zth4" />
 
     <title>Confess India | Share Your Truth Anonymously</title>
@@ -81,7 +79,7 @@
                 <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
                     <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">WhatsApp</button>
-                    <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Instagram (as Image)</button>
+                    <button id="igBtn" class="flex items-center justify-center gap-3 bg-indigo-600 text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Download Image</button>
                     <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Facebook</button>
                     <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">X (Twitter)</button>
                     <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 py-4 rounded-2xl font-bold">Copy Secret Text</button>
@@ -189,7 +187,7 @@
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड" },
-            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சమூக ஊட்டம்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್" },
             ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്" }
         };
@@ -245,12 +243,11 @@
             return Math.floor(seconds / 60) + "m ago";
         }
 
-        // NEW: Toggle Read More
         function toggleReadMore(id) {
             const content = document.getElementById(`text-${id}`);
             const btn = document.getElementById(`btn-${id}`);
-            const fullText = content.getAttribute('data-full');
-            const shortText = content.getAttribute('data-short');
+            const fullText = decodeURIComponent(content.getAttribute('data-full'));
+            const shortText = decodeURIComponent(content.getAttribute('data-short'));
             if (btn.innerText === "Read More") {
                 content.innerText = `"${fullText}"`;
                 btn.innerText = "Read Less";
@@ -260,14 +257,24 @@
             }
         }
 
+        // IMPROVED: Download Secret with dynamic height for 2000 chars
         window.downloadSecret = (id, content) => {
             const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = `<div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; font-family: sans-serif; position: relative;"><div style="font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 20px; opacity: 0.8;">Confess India</div><div style="font-size: 24px; font-weight: 800; font-style: italic;">"${content}"</div><div style="position: absolute; bottom: 30px; font-size: 12px; font-weight: 700; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div></div>`;
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            // Using height:auto and min-height:500px to handle long texts
+            tempDiv.innerHTML = `
+                <div id="capture-${id}" style="width: 500px; min-height: 500px; height: auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 40px; text-align: center; font-family: sans-serif; box-sizing: border-box;">
+                    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 30px; letter-spacing: 2px; opacity: 0.9;">Confess India</div>
+                    <div style="font-size: 20px; font-weight: 700; font-style: italic; line-height: 1.6; word-wrap: break-word; width: 100%;">"${content}"</div>
+                    <div style="margin-top: 50px; font-size: 14px; font-weight: 800; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div>
+                </div>`;
             document.body.appendChild(tempDiv);
-            html2canvas(document.getElementById(`capture-${id}`)).then(canvas => {
+            
+            html2canvas(document.getElementById(`capture-${id}`), { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Confession-${id}.png`;
-                link.href = canvas.toDataURL();
+                link.href = canvas.toDataURL('image/png');
                 link.click();
                 document.body.removeChild(tempDiv);
             });
@@ -282,17 +289,17 @@
             if (posts.length > 0) {
                 const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
                 document.getElementById('dailyWisdom').classList.remove('hidden');
-                document.getElementById('top-secret-text').innerText = `"${topPost.content}"`;
+                document.getElementById('top-secret-text').innerText = `"${topPost.content.substring(0, 150)}${topPost.content.length > 150 ? '...' : ''}"`;
             }
 
             posts.forEach(post => {
                 if(post.status === "hidden") return;
-                const safeContent = post.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                
+                const safeContent = encodeURIComponent(post.content);
                 const isHearted = localStorage.getItem(`supportCount-${post.id}`);
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
                 const authorName = post.username || "Anonymous";
 
-                // NEW: Read More Logic
                 const isLong = post.content.length > 300;
                 const shortText = isLong ? post.content.substring(0, 300) : post.content;
                 const displayContent = isLong ? `"${shortText}..."` : `"${post.content}"`;
@@ -310,7 +317,7 @@
                             </div>
                             <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 dark:text-slate-500 uppercase hover:text-red-500">${translations[currentLang].report}</button>
                         </div>
-                        <p id="text-${post.id}" data-full="${safeContent}" data-short="${shortText.replace(/'/g, "\\'").replace(/"/g, '&quot;')}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2">
+                        <p id="text-${post.id}" data-full="${safeContent}" data-short="${encodeURIComponent(shortText)}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2">
                             ${displayContent}
                         </p>
                         ${isLong ? `<button id="btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-8 block">Read More</button>` : '<div class="mb-8"></div>'}
@@ -326,10 +333,10 @@
                                 </button>
                             </div>
                             <div class="flex items-center gap-2">
-                                <button onclick="downloadSecret('${post.id}', '${safeContent}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
+                                <button onclick="downloadSecret('${post.id}', decodeURIComponent('${safeContent}'))" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
                                     <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                                 </button>
-                                <button onclick="openShare('${safeContent}', '${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
+                                <button onclick="openShare(decodeURIComponent('${safeContent}'), '${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
                                     <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                                 </button>
                             </div>
@@ -373,15 +380,9 @@
 
         window.interact = (e, id, field) => {
             if (localStorage.getItem(`${field}-${id}`)) return;
-            
             isUserInteracting = true;
             localStorage.setItem(`${field}-${id}`, 'true');
-
-            gtag('event', 'confession_supported', {
-                'event_category': 'engagement',
-                'event_label': field,
-                'confession_id': id
-            });
+            gtag('event', 'confession_supported', { 'event_category': 'engagement', 'event_label': field, 'confession_id': id });
 
             const elementId = (field === 'supportCount') ? `sup-${id}` : `metoo-${id}`;
             const countSpan = document.getElementById(elementId);
@@ -410,16 +411,16 @@
 
         function openShare(text, id) {
             document.getElementById('shareModal').classList.add('show');
-            // NEW: Combined full message with Website URL
-            const fullMessage = `${text}\n\nRead more secrets at: ${SITE_URL}\nSent via Confess India 🤫`;
+            // IMPROVED: Preview for long posts to avoid breaking WhatsApp/X URLs
+            const previewText = text.length > 300 ? text.substring(0, 300) + "..." : text;
+            const fullMessage = `${previewText}\n\nRead more at: ${SITE_URL}`;
             
             document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(fullMessage)}`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`);
             
-            // Fixed Copy Secret Text
             document.getElementById('copyTxtBtn').onclick = () => { 
-                navigator.clipboard.writeText(fullMessage); 
+                navigator.clipboard.writeText(`${text}\n\nSource: ${SITE_URL}`); 
                 alert("Secret text and website link copied!"); 
             };
             
