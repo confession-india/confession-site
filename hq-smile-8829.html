@@ -10,14 +10,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
     
     <style>
-        body { background-color: #0b0f1a; }
+        body { background-color: #0b0f1a; scroll-behavior: smooth; }
         .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .item-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #1e293b; }
         .item-card:hover { border-color: #4f46e5; background-color: #1e293b; transform: translateY(-2px); }
         .report-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.08); box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
         .tab-active { background: #6366f1 !important; color: white !important; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
         .stat-card { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; }
-        input:focus { border-color: #6366f1 !important; outline: none; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        input:focus, select:focus { border-color: #6366f1 !important; outline: none; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        .scroll-btn { transition: all 0.2s; opacity: 0.8; }
+        .scroll-btn:hover { opacity: 1; transform: scale(1.1); }
     </style>
 </head>
 <body class="text-slate-200 min-h-screen font-sans">
@@ -31,19 +33,11 @@
                 <h2 class="text-2xl font-black text-white">HQ <span class="text-indigo-500">Access</span></h2>
                 <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Confess India Administration</p>
             </div>
-
             <div class="space-y-4">
-                <input type="email" id="loginEmail" placeholder="Admin Email" 
-                    class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all">
-                <input type="password" id="loginPassword" placeholder="Secret Key" 
-                    class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all">
-                
-                <button onclick="signIn()" id="loginBtn" 
-                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98]">
-                    INITIALIZE ACCESS
-                </button>
+                <input type="email" id="loginEmail" placeholder="Admin Email" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all text-white">
+                <input type="password" id="loginPassword" placeholder="Secret Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all text-white">
+                <button onclick="signIn()" id="loginBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98]">INITIALIZE ACCESS</button>
             </div>
-            
             <p id="errorMsg" class="text-red-500 text-xs font-bold mt-4 hidden"></p>
         </div>
     </div>
@@ -55,12 +49,10 @@
                     <h1 class="text-xl font-black text-white tracking-tight">Control<span class="text-indigo-500">Center</span></h1>
                     <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Live Session Active</p>
                 </div>
-
                 <div class="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
                     <button onclick="switchTab('posts')" id="tab-posts" class="px-6 py-2 rounded-xl text-xs font-black transition-all tab-active">CONFESSIONS</button>
                     <button onclick="switchTab('inbox')" id="tab-inbox" class="px-6 py-2 rounded-xl text-xs font-black transition-all text-slate-400">INBOX</button>
                 </div>
-
                 <div class="flex gap-4">
                     <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2 rounded-2xl text-[10px] font-black transition-all border border-red-500/20">LOGOUT</button>
                     <button onclick="window.location.href='index.html'" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-2xl text-[10px] font-black transition-all border border-slate-700">EXIT</button>
@@ -89,13 +81,30 @@
             </div>
 
             <div id="filterBar" class="flex flex-wrap gap-3 mb-8 justify-center">
-                <input type="text" id="searchInput" placeholder="Search secrets..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-medium w-64 text-white">
+                <input type="text" id="searchInput" oninput="renderPosts()" placeholder="Search keywords..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-medium w-64 text-white">
+                
+                <select id="langFilter" onchange="renderPosts()" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300">
+                    <option value="all">All Languages</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="te">Telugu</option>
+                    <option value="ta">Tamil</option>
+                </select>
             </div>
 
             <div id="feed" class="grid grid-cols-1 gap-4 pb-20">
-                <div class="text-center py-20 text-slate-600 font-bold italic tracking-widest uppercase text-xs">Awaiting Authentication...</div>
+                <div class="text-center py-20 text-slate-600 font-bold italic tracking-widest uppercase text-xs">Connecting to Database...</div>
             </div>
         </main>
+    </div>
+
+    <div class="fixed bottom-6 right-6 flex flex-col gap-2 z-[60]">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="scroll-btn p-3 bg-indigo-600 text-white rounded-full shadow-2xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"/></svg>
+        </button>
+        <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="scroll-btn p-3 bg-indigo-600 text-white rounded-full shadow-2xl">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"/></svg>
+        </button>
     </div>
 
     <script>
@@ -113,7 +122,6 @@
         const auth = firebase.auth();
         const MASTER_EMAIL = "sanjeevraju716@gmail.com";
 
-        // Listen for Auth changes
         auth.onAuthStateChanged(user => {
             if (user && user.email === MASTER_EMAIL) {
                 document.getElementById('authOverlay').classList.add('hidden');
@@ -125,36 +133,25 @@
             }
         });
 
-        // Sign In Function
         async function signIn() {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPassword').value;
             const btn = document.getElementById('loginBtn');
             const err = document.getElementById('errorMsg');
-
-            btn.innerText = "VERIFYING...";
-            btn.disabled = true;
-
-            try {
-                await auth.signInWithEmailAndPassword(email, pass);
-            } catch (error) {
+            btn.innerText = "VERIFYING..."; btn.disabled = true;
+            try { await auth.signInWithEmailAndPassword(email, pass); } catch (error) {
                 err.innerText = "ACCESS DENIED: INVALID CREDENTIALS";
-                err.classList.remove('hidden');
-                btn.innerText = "INITIALIZE ACCESS";
-                btn.disabled = false;
+                err.classList.remove('hidden'); btn.innerText = "INITIALIZE ACCESS"; btn.disabled = false;
             }
         }
 
-        function logout() {
-            auth.signOut().then(() => location.reload());
-        }
+        function logout() { auth.signOut().then(() => location.reload()); }
 
         function startHQ() {
             let currentView = 'posts';
             let allConfessions = [];
             let allMessages = [];
 
-            // Listeners
             db.collection('confessions').orderBy('timestamp', 'desc').onSnapshot(snap => {
                 allConfessions = [];
                 snap.forEach(doc => allConfessions.push({ id: doc.id, ...doc.data() }));
@@ -184,10 +181,16 @@
                 tab === 'posts' ? renderPosts() : renderInbox();
             };
 
-            function renderPosts() {
+            window.renderPosts = function() {
                 const feed = document.getElementById('feed');
                 const term = document.getElementById('searchInput').value.toLowerCase();
-                const filtered = allConfessions.filter(p => (p.content || "").toLowerCase().includes(term));
+                const lang = document.getElementById('langFilter').value;
+                
+                let filtered = allConfessions.filter(p => {
+                    const matchesSearch = (p.content || "").toLowerCase().includes(term);
+                    const matchesLang = lang === 'all' || (p.language === lang);
+                    return matchesSearch && matchesLang;
+                });
 
                 feed.innerHTML = filtered.map(p => `
                     <div class="item-card p-6 rounded-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${p.reportCount > 0 ? 'report-warning' : ''}">
@@ -196,34 +199,42 @@
                                 <span class="text-[9px] font-black uppercase tracking-widest ${p.reportCount > 0 ? 'bg-red-500 text-white' : 'bg-slate-700 text-slate-300'} px-2.5 py-1 rounded-full">
                                     ${p.reportCount > 0 ? '🚩 ' + p.reportCount + ' REPORTS' : '✓ Safe Content'}
                                 </span>
-                                <span class="text-[9px] text-slate-500 font-bold">${p.category || 'General'}</span>
+                                <span class="text-[9px] text-indigo-400 font-bold uppercase tracking-widest">${p.language || 'en'}</span>
                             </div>
                             <h3 class="text-white font-black text-sm uppercase mb-1">${p.username || 'Anonymous'}</h3>
                             <p class="text-slate-400 text-sm font-medium leading-relaxed">${p.content}</p>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="delPost('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">DELETE</button>
-                        </div>
+                        <button onclick="delPost('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">DELETE</button>
                     </div>
                 `).join('');
             }
 
-            function renderInbox() {
+            window.renderInbox = function() {
                 const feed = document.getElementById('feed');
-                feed.innerHTML = allMessages.map(m => `
-                    <div class="item-card p-6 rounded-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${m.type === 'ABUSE_REPORT' ? 'report-warning' : ''}">
-                        <div class="flex-grow w-full">
-                            <h3 class="text-white font-black text-sm mb-1">${m.name} <span class="text-slate-500 ml-2 font-normal text-xs">— ${m.email}</span></h3>
-                            <p class="text-slate-300 text-sm mt-2 font-medium">${m.message}</p>
+                feed.innerHTML = allMessages.map(m => {
+                    const isAbuse = m.type === 'ABUSE_REPORT';
+                    const subject = isAbuse ? "Confess India - Abuse Report Update" : "Confess India - Support Response";
+                    const body = isAbuse 
+                        ? `Hi ${m.name},%0D%0A%0D%0AWe have reviewed your report regarding content on our platform. Action has been taken based on our safety guidelines.%0D%0A%0D%0ARegards,%0D%0AConfess India Admin`
+                        : `Hi ${m.name},%0D%0A%0D%0AThank you for reaching out. Regarding your message: "${m.message}"... %0D%0A%0D%0A(Type your response here)%0D%0A%0D%0ARegards,%0D%0AConfess India Admin`;
+
+                    return `
+                        <div class="item-card p-6 rounded-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${isAbuse ? 'report-warning' : ''}">
+                            <div class="flex-grow w-full">
+                                <h3 class="text-white font-black text-sm mb-1">${m.name} <span class="text-slate-500 ml-2 font-normal text-xs">— ${m.email}</span></h3>
+                                <p class="text-slate-300 text-sm mt-2 font-medium">${m.message}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="mailto:${m.email}?subject=${subject}&body=${body}" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">REPLY</a>
+                                <button onclick="resolveMsg('${m.id}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">RESOLVE</button>
+                            </div>
                         </div>
-                        <button onclick="resolveMsg('${m.id}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">RESOLVE</button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
-            window.delPost = (id) => { if(confirm("Delete this confession? This cannot be undone.")) db.collection('confessions').doc(id).delete(); };
-            window.resolveMsg = (id) => { if(confirm("Mark this message as resolved?")) db.collection('support_messages').doc(id).delete(); };
-            document.getElementById('searchInput').addEventListener('input', renderPosts);
+            window.delPost = (id) => { if(confirm("Delete forever?")) db.collection('confessions').doc(id).delete(); };
+            window.resolveMsg = (id) => { if(confirm("Mark as resolved?")) db.collection('support_messages').doc(id).delete(); };
         }
     </script>
 </body>
