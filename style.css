@@ -1,70 +1,135 @@
-/* Confess India - Refined Design System 2026 */
+/* Confess India - Ultimate Unified Design System 
+   Theme: London-Hyderabad Hybrid (Indigo/Red/Deep Slate)
+*/
 
-/* 1. Core Fixes for New Features */
-.line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;  
-    overflow: hidden;
+/* 1. ANIMATIONS & MICRO-INTERACTIONS */
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* 2. Active States for Tabs & Language */
-.cat-active, .lang-active {
-    background-color: #4f46e5 !important;
-    color: white !important;
-    border-color: #4f46e5 !important;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
 }
 
-/* 3. Mouse Glow Effect (Refined for London-Hyd Theme) */
+@keyframes slideUp {
+    from { transform: translate(-50%, 20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+.animate-pulse-green { animation: pulse-green 2s infinite; }
+
+.shake-active { 
+    animation: shake 0.3s ease-in-out; 
+    border-color: #ef4444 !important; 
+    background-color: #fef2f2 !important; 
+}
+
+/* 2. CORE LAYOUT & MOUSE GLOW */
+html { scroll-behavior: smooth; }
+
 #mouse-glow {
     position: fixed;
     top: 0; left: 0;
-    width: 450px; height: 450px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.03) 40%, transparent 70%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.03) 50%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    z-index: 1;
-    filter: blur(40px);
+    z-index: 0; 
+    filter: blur(50px);
+    transition: opacity 0.5s ease;
 }
 
-/* 4. Custom Scrollbar */
+/* 3. COMPONENT STYLING */
+.confession-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.confession-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.cat-active, .lang-active {
+    background: #4f46e5 !important;
+    color: white !important;
+    border-color: #4f46e5 !important;
+    transform: scale(1.05);
+}
+
+/* 4. NOTIFICATIONS (TOAST) */
+#toast { 
+    position: fixed; 
+    bottom: 30px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 9999;
+    display: none;
+}
+
+#toast.show { 
+    display: block;
+    animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+/* 5. SHARE MODAL & BLUR */
+#shareModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px) saturate(180%);
+    z-index: 10000;
+    display: none;
+}
+#shareModal.show { display: flex; }
+
+.share-pill {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    transition: all 0.3s ease;
+}
+.share-pill:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+}
+
+/* 6. CUSTOM SCROLLBAR (Professional Slim) */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
 
+/* 7. REFINED DARK MODE */
+.dark body { 
+    background-color: #0b1120 !important; 
+    color: #f1f5f9 !important; 
+}
+
+.dark header {
+    background-color: rgba(11, 17, 32, 0.8) !important;
+    border-bottom: 1px solid rgba(220, 38, 38, 0.3) !important; /* London Red Tint */
+    backdrop-filter: blur(12px);
+}
+
+.dark .bg-white {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+.dark input, .dark textarea {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: white !important;
+}
+
 .dark ::-webkit-scrollbar-thumb { background: #334155; }
 .dark ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
 
-/* 5. Animations */
-@keyframes pulse-soft {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-.animate-pulse { animation: pulse-soft 2s infinite; }
-
-/* 6. Form/Input Polish (For Post.html) */
-.input-focus-effect { transition: all 0.2s ease; }
-.input-focus-effect:focus { 
-    border-color: #6366f1; 
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); 
-}
-
-/* 7. Refined Dark Mode Overrides */
-/* Note: We use Tailwind's 'dark:' class, but these ensure 100% coverage */
-.dark body { background-color: #0b1120; color: #f1f5f9; }
-
-.dark .bg-white { 
-    background-color: #1e293b !important; 
-    border-color: #334155 !important; 
-}
-
-/* 8. Instagram Card Preview Styling */
-#capture-preview {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
+/* 8. UTILS */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
