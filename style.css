@@ -127,18 +127,19 @@ html { scroll-behavior: smooth; }
 .global-header {
     background-color: transparent !important;
     position: relative;
-    border-bottom: none !important; /* Remove the old glitchy border */
+    border-bottom: none !important;
+    overflow: visible !important;
 }
 
-/* This creates a rock-solid line that won't disappear */
+/* Red Line Fix - Ensuring no gaps at the junction */
 .global-header::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    bottom: -1px; /* Sits slightly lower to bridge the gap between header and main */
     left: 0;
     right: 0;
-    height: 1.5px; /* Slightly thicker for visibility */
-    background: #ef4444 !important; /* Solid London Red */
+    height: 1.5px;
+    background: #ef4444 !important; /* London Red */
     z-index: 100;
 }
 
@@ -146,11 +147,10 @@ html { scroll-behavior: smooth; }
     background-color: #0b1120 !important;
 }
 
-
 /* 10. PREVIEW BOX DARK FIX */
 .dark #previewContainer {
     background-color: #1e293b !important;
-    border: 1px solid rgba(239, 68, 68, 0.4) !important; /* Subtle Red Border */
+    border: 1px solid rgba(239, 68, 68, 0.4) !important;
     color: #f1f5f9 !important;
 }
 
@@ -159,23 +159,17 @@ html { scroll-behavior: smooth; }
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Combined & Enhanced Glow Logic */
+/* The logic you mentioned - multi-layered glow */
 #submitBtn.glow-red {
-    background-color: #ef4444 !important; /* London Red */
+    background-color: #ef4444 !important;
     border: 1px solid #ef4444 !important;
     color: white !important;
-    /* This creates the 'Radiant' effect seen in premium apps */
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4), 
-                0 0 40px rgba(239, 68, 68, 0.2) !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), 
+                0 0 30px rgba(239, 68, 68, 0.3) !important;
     transform: translateY(-2px);
 }
 
 /* Force the form to show the glow instead of cutting it off */
 #postForm {
     overflow: visible !important;
-}
-
-/* Dark Mode specific adjustment for the button */
-.dark #submitBtn.glow-red {
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.6) !important;
 }
