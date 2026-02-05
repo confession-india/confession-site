@@ -123,18 +123,29 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER - RED LINE FIX */
+/* 9. GLOBAL BRANDED HEADER - FORCED RED LINE */
 .global-header {
-    background-color: rgba(255, 255, 255, 0.9) !important;
-    border-bottom: 1px solid #f3f4f6 !important;
+    background-color: transparent !important;
+    position: relative;
+    border-bottom: none !important; /* Remove the old glitchy border */
+}
+
+/* This creates a rock-solid line that won't disappear */
+.global-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px; /* Slightly thicker for visibility */
+    background: #ef4444 !important; /* Solid London Red */
+    z-index: 100;
 }
 
 .dark .global-header {
     background-color: #0b1120 !important;
-    /* Kill the white line by making this red line very solid */
-    border-bottom: 1px solid #ef4444 !important; 
-    box-shadow: none !important;
 }
+
 
 /* 10. PREVIEW BOX DARK FIX - NO WHITE BLOCKS ALLOWED */
 .dark #previewContainer {
@@ -150,4 +161,18 @@ html { scroll-behavior: smooth; }
 .dark #submitBtn.glow-red {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.5) !important;
     border: 1px solid #ef4444 !important;
+}
+
+
+/* 11. BUTTON GLOW ENHANCEMENT */
+#submitBtn.glow-red {
+    background-color: #ef4444 !important; /* Turn button red when active */
+    box-shadow: 0 0 25px 5px rgba(239, 68, 68, 0.6) !important;
+    border-color: #ef4444 !important;
+    transform: translateY(-2px);
+}
+
+/* Ensure the form doesn't clip the button's glow */
+#postForm {
+    overflow: visible !important;
 }
