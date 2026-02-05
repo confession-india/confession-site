@@ -28,7 +28,7 @@
     background-color: #fef2f2 !important; 
 }
 
-/* 2. CORE LAYOUT & MOUSE GLOW */
+/* 2. CORE LAYOUT & MOUSE GLOW - Fixed Z-index */
 html { scroll-behavior: smooth; }
 
 #mouse-glow {
@@ -40,7 +40,7 @@ html { scroll-behavior: smooth; }
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    z-index: 0; 
+    z-index: -1; /* Moved to -1 so it never blocks clicks */
     filter: blur(50px);
     transition: opacity 0.5s ease;
 }
@@ -123,28 +123,29 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER - FORCED RED LINE */
+/* 9. GLOBAL BRANDED HEADER - RED LINE & BLUR FIX */
 .global-header {
-    background-color: transparent !important;
+    /* Removed transparent !important to allow backdrop-blur to work */
     position: relative;
     border-bottom: none !important;
     overflow: visible !important;
 }
 
-/* Red Line Fix - Ensuring no gaps at the junction */
+/* Red Line Fix - London Tube Aesthetic */
 .global-header::after {
     content: "";
     position: absolute;
-    bottom: -1px; /* Sits slightly lower to bridge the gap between header and main */
+    bottom: 0;
     left: 0;
     right: 0;
-    height: 1.5px;
+    height: 2px; /* Thicker for better branding */
     background: #ef4444 !important; /* London Red */
     z-index: 100;
 }
 
+/* Dark mode header background */
 .dark .global-header {
-    background-color: #0b1120 !important;
+    background-color: rgba(11, 17, 32, 0.9) !important;
 }
 
 /* 10. PREVIEW BOX DARK FIX */
