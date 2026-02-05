@@ -28,11 +28,6 @@
     <link rel="icon" href="https://fav.farm/🤫">
 
     <style>
-        #mouse-glow {
-            position: fixed; width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
-            top: 0; left: 0; pointer-events: none; z-index: 1; transition: transform 0.1s ease-out;
-        }
         #shareModal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
@@ -66,9 +61,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
-    <div id="mouse-glow"></div>
 
     <div class="sticky top-0 z-[100] bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800">
         <div class="max-w-4xl mx-auto px-4 flex gap-2">
@@ -93,7 +88,7 @@
         </div>
     </header>
 
-    <div class="page-wrapper relative z-10">
+    <div class="page-wrapper">
         <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[110] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
             <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
@@ -146,7 +141,7 @@
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
                         <h4 class="font-bold text-slate-800 dark:text-white mb-2">Zero Logs</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced.</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
                     </div>
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
@@ -155,8 +150,8 @@
                     </div>
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
-                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Auto-Moderated</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Crowdsourced reporting automatically hides harmful content to keep the community safe.</p>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Human Moderated</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
                     </div>
                 </div>
             </section>
@@ -207,19 +202,13 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const SITE_URL = "https://confessionindia.in";
-
-        // MOUSE GLOW TRACKER
-        const glow = document.getElementById('mouse-glow');
-        window.addEventListener('mousemove', (e) => {
-            glow.style.transform = `translate(${e.clientX - 300}px, ${e.clientY - 300}px)`;
-        });
         
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less", shareTruth: "Share Truth" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి", shareTruth: "షేర్ చేయండి" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
             ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದాయ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
             ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ఫీడ్", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
         };
 
@@ -263,6 +252,7 @@
             const btn = document.getElementById(`btn-${id}`);
             const fullText = decodeURIComponent(content.getAttribute('data-full'));
             const shortText = decodeURIComponent(content.getAttribute('data-short'));
+            
             if (btn.getAttribute('data-state') === "short") {
                 content.innerText = `"${fullText}"`;
                 btn.innerText = translations[currentLang].readLess;
@@ -274,23 +264,18 @@
             }
         }
 
-        // IMAGE STRETCHER (Dynamic Scaling)
         window.downloadSecret = (id, content) => {
-            const charCount = content.length;
-            // Dynamic scale: the more chars, the smaller the font to ensure it fits the square
-            let fontSize = charCount < 100 ? '26px' : charCount < 250 ? '20px' : charCount < 500 ? '16px' : '13px';
-            
             const tempDiv = document.createElement('div');
             tempDiv.style.position = 'absolute';
             tempDiv.style.left = '-9999px';
             tempDiv.innerHTML = `
-                <div id="capture-${id}" style="width: 500px; height: 500px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px; text-align: center; font-family: sans-serif; box-sizing: border-box; position: relative;">
-                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 3px; opacity: 0.8;">Confess India</div>
-                    <div style="font-size: ${fontSize}; font-weight: 700; font-style: italic; line-height: 1.6; word-wrap: break-word; width: 100%; max-height: 340px; overflow: hidden;">"${content}"</div>
-                    <div style="position: absolute; bottom: 50px; width: 100%; text-align: center; font-size: 14px; font-weight: 800; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div>
+                <div id="capture-${id}" style="width: 500px; min-height: 500px; height: auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 40px; text-align: center; font-family: sans-serif; box-sizing: border-box;">
+                    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; opacity: 0.9;">Confess India</div>
+                    <div style="font-size: 18px; font-weight: 700; font-style: italic; line-height: 1.5; word-wrap: break-word; width: 100%;">"${content}"</div>
+                    <div style="margin-top: 40px; font-size: 14px; font-weight: 800; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div>
                 </div>`;
             document.body.appendChild(tempDiv);
-            html2canvas(document.getElementById(`capture-${id}`), { scale: 3 }).then(canvas => {
+            html2canvas(document.getElementById(`capture-${id}`), { scale: 2 }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Confession-${id}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -303,6 +288,7 @@
             if (isUserInteracting) return;
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
+            
             const activePosts = posts.filter(p => p.status !== "hidden");
             activePosts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
@@ -311,10 +297,12 @@
                 const bannerDiv = document.getElementById('dailyWisdom');
                 const bannerText = document.getElementById('top-secret-text');
                 const bannerBtn = document.getElementById('banner-read-more');
+                
                 bannerDiv.classList.remove('hidden');
                 const isBannerLong = topPost.content.length > 200;
                 const bannerShort = topPost.content.substring(0, 200);
                 bannerText.innerText = isBannerLong ? `"${bannerShort}..."` : `"${topPost.content}"`;
+                
                 if(isBannerLong) {
                     bannerBtn.classList.remove('hidden');
                     bannerBtn.innerText = translations[currentLang].readMore;
@@ -359,6 +347,7 @@
                             ${displayContent}
                         </p>
                         ${isLong ? `<button id="btn-${post.id}" data-state="short" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-6 block">${translations[currentLang].readMore}</button>` : '<div class="mb-6"></div>'}
+                        
                         <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex gap-2">
                                 <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 dark:text-pink-400 transition-all active:scale-95 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
@@ -368,6 +357,7 @@
                                     <span class="text-sm">🫂</span> <span class="text-xs font-black" id="metoo-${post.id}">${post.meTooCount || 0}</span>
                                 </button>
                             </div>
+                            
                             <button onclick="openShare('${post.id}')" class="share-pill flex items-center justify-center gap-2 py-3 rounded-2xl text-white shadow-lg active:scale-95 transition-all">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
                                 <span class="text-[11px] font-black uppercase tracking-widest">${translations[currentLang].shareTruth}</span>
@@ -422,9 +412,9 @@
                 if (!sfDoc.exists) return;
                 const newCount = (sfDoc.data()[field] || 0) + 1;
                 transaction.update(docRef, { [field]: newCount });
-                const countSpan = document.getElementById(field === 'supportCount' ? `sup-${id}` : `metoo-${id}`);
-                if (countSpan) countSpan.innerText = newCount;
-            }).finally(() => { isUserInteracting = false; });
+                const labelId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
+                document.getElementById(labelId).innerText = newCount;
+            }).then(() => { isUserInteracting = false; }).catch(() => { isUserInteracting = false; });
         };
 
         window.openShare = (id) => {
@@ -432,31 +422,21 @@
             const modal = document.getElementById('shareModal');
             const link = `${SITE_URL}/index.html?id=${id}`;
             modal.classList.add('show');
-            document.getElementById('waBtn').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n\n" + link)}`);
-            document.getElementById('igBtn').onclick = () => downloadSecret(id, text);
+            document.getElementById('waBtn').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n\nRead more: " + link)}`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`);
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(link); alert("Link copied!"); };
-            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(text); alert("Text copied!"); };
+            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(link); alert("Link Copied!"); };
+            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(text); alert("Secret Text Copied!"); };
+            document.getElementById('igBtn').onclick = () => downloadSecret(id, text);
         };
 
         window.closeShare = () => document.getElementById('shareModal').classList.remove('show');
 
-        // AUTO-BAN FEATURE (Threshold: 10 reports)
         window.reportPost = (id) => {
-            if (!confirm("Report this post?")) return;
-            const docRef = db.collection('confessions').doc(id);
-            db.runTransaction(async (transaction) => {
-                const sfDoc = await transaction.get(docRef);
-                if (!sfDoc.exists) return;
-                const newReportCount = (sfDoc.data().reportCount || 0) + 1;
-                let updateData = { reportCount: newReportCount };
-                if (newReportCount >= 10) { updateData.status = 'hidden'; }
-                transaction.update(docRef, updateData);
-            }).then(() => {
-                alert("Post reported.");
-                document.getElementById(`post-${id}`).style.display = 'none';
-            });
+            if (confirm("Report this post?")) {
+                db.collection('reports').add({ postId: id, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                alert("Thank you. Our moderators will review this.");
+            }
         };
 
         setLanguage(currentLang);
