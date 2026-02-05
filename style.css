@@ -45,14 +45,15 @@ html { scroll-behavior: smooth; }
     transition: opacity 0.5s ease;
 }
 
-/* 3. COMPONENT STYLING */
+/* 3. COMPONENT STYLING (The Pop-up Effect) */
 .confession-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Added bounce */
 }
 
 .confession-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-8px) scale(1.01); /* Card pops up and slightly grows */
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 10;
 }
 
 .cat-active, .lang-active {
@@ -97,7 +98,7 @@ html { scroll-behavior: smooth; }
     box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
 }
 
-/* 6. CUSTOM SCROLLBAR (Professional Slim) */
+/* 6. CUSTOM SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -107,12 +108,6 @@ html { scroll-behavior: smooth; }
 .dark body { 
     background-color: #0b1120 !important; 
     color: #f1f5f9 !important; 
-}
-
-.dark header {
-    background-color: rgba(11, 17, 32, 0.8) !important;
-    border-bottom: 1px solid rgba(220, 38, 38, 0.3) !important; /* London Red Tint */
-    backdrop-filter: blur(12px);
 }
 
 .dark .bg-white {
@@ -133,3 +128,14 @@ html { scroll-behavior: smooth; }
 /* 8. UTILS */
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 9. GLOBAL BRANDED HEADER (The Red Line) */
+.global-header {
+    border-bottom: 1.5px solid rgba(220, 38, 38, 0.2) !important; /* Branded Red Line */
+    backdrop-filter: blur(12px);
+}
+
+.dark .global-header {
+    background-color: rgba(11, 17, 32, 0.8) !important;
+    border-bottom: 1.5px solid rgba(239, 68, 68, 0.3) !important; /* Glowy Red for Dark Mode */
+}
