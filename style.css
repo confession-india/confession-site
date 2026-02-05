@@ -45,7 +45,7 @@
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    z-index: 1; /* Sits behind content, above background */
+    z-index: 1; 
     transition: opacity 0.3s ease;
     filter: blur(40px);
 }
@@ -90,7 +90,7 @@
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; border: 2px solid #fdfdff; }
 ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
 
-/* 7. Share Modal System */
+/* 7. Share Modal & Button System */
 #shareModal {
     position: fixed;
     inset: 0;
@@ -103,6 +103,20 @@
     padding: 20px;
 }
 #shareModal.show { display: flex; }
+
+/* The NEW Primary Share Button Styling */
+.share-pill {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: white !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.share-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.5);
+}
+.share-pill:active {
+    transform: scale(0.95);
+}
 
 /* 8. Navigation & Structural */
 .cat-active, .lang-active {
@@ -117,34 +131,32 @@ html, body {
     width: 100%;
 }
 
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* 9. LONDON-HYDERABAD REFINED DARK MODE */
 @media (prefers-color-scheme: dark) {
     body {
-        /* London Night Slate Gray Background */
         background-color: #0b1120 !important; 
         color: #f1f5f9 !important;
     }
 
     header {
         background-color: rgba(11, 17, 32, 0.9) !important;
-        /* London Post-Box Red accent applied globally */
         border-bottom: 2px solid rgba(220, 38, 38, 0.4) !important;
         backdrop-filter: blur(12px);
     }
 
-    /* Dark Mode Glow - Softened for the London Night theme */
     #mouse-glow {
         background: radial-gradient(circle, rgba(129, 140, 248, 0.08) 0%, rgba(192, 132, 252, 0.02) 50%, transparent 80%);
     }
 
-    /* Cards, Feed items, and Container elements */
     .bg-white, #previewContainer, #postForm, .preview-card, [id^="post-"], .bg-slate-900 {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
         border-color: #334155 !important;
     }
 
-    /* Text adjustments for legibility */
     .text-slate-600, .text-slate-700, p#p-msg {
         color: #cbd5e1 !important;
     }
@@ -153,20 +165,22 @@ html, body {
         color: #94a3b8 !important;
     }
 
-    /* Input fields and background slates */
     input, textarea, select, .bg-slate-50, .bg-slate-100 {
         background-color: #0b1120 !important;
         color: white !important;
         border-color: #334155 !important;
     }
 
-    /* Shake effect in dark mode */
+    /* Ensure Share Pill stays vibrant in Dark Mode */
+    .share-pill {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
     .shake-active {
         background-color: #450a0a !important; 
         border-color: #ef4444 !important;
     }
 
-    /* Scrollbar in dark mode */
     ::-webkit-scrollbar-track { background: #0b1120; }
     ::-webkit-scrollbar-thumb { background: #334155; border: 2px solid #0b1120; }
 }
