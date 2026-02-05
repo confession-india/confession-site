@@ -104,7 +104,6 @@
 }
 #shareModal.show { display: flex; }
 
-/* The NEW Primary Share Button Styling */
 .share-pill {
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
     color: white !important;
@@ -151,7 +150,7 @@ html, body {
         background: radial-gradient(circle, rgba(129, 140, 248, 0.08) 0%, rgba(192, 132, 252, 0.02) 50%, transparent 80%);
     }
 
-    .bg-white, #previewContainer, #postForm, .preview-card, [id^="post-"], .bg-slate-900 {
+    .bg-white, #previewContainer, #postForm, .preview-card, [id^="post-"], .bg-slate-900, .bg-white.dark\:bg-slate-800 {
         background-color: #1e293b !important;
         color: #f1f5f9 !important;
         border-color: #334155 !important;
@@ -161,26 +160,29 @@ html, body {
         color: #cbd5e1 !important;
     }
 
-    .text-slate-400, .text-slate-500 {
-        color: #94a3b8 !important;
-    }
-
-    input, textarea, select, .bg-slate-50, .bg-slate-100 {
+    input, textarea, select {
         background-color: #0b1120 !important;
         color: white !important;
         border-color: #334155 !important;
     }
 
-    /* Ensure Share Pill stays vibrant in Dark Mode */
-    .share-pill {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .shake-active {
-        background-color: #450a0a !important; 
-        border-color: #ef4444 !important;
-    }
-
     ::-webkit-scrollbar-track { background: #0b1120; }
     ::-webkit-scrollbar-thumb { background: #334155; border: 2px solid #0b1120; }
+}
+
+/* 10. PROFESSIONAL POLISH ADDITIONS (FOR 541-LINE HTML) */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .4; }
+}
+
+/* Mobile share modal tweaks */
+@media (max-width: 640px) {
+    #shareModal > div {
+        width: 90%;
+        padding: 1.5rem;
+    }
 }
