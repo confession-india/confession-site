@@ -129,16 +129,12 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER (Dark Mode Only) */
+/* 9. GLOBAL BRANDED HEADER (Dark Mode Only Fix) */
 .global-header {
-    /* Standard light mode: clean gray border or none */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important; 
-    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #f3f4f6 !important; /* Matches border-gray-100 */
 }
 
-/* This is the magic part for your mobile/dark mode fix */
 .dark .global-header {
-    background-color: rgba(11, 17, 32, 0.8) !important;
-    /* The red line only shows up here */
-    border-bottom: 1px solid rgba(239, 68, 68, 0.4) !important; 
+    /* Your exact logic: border-red-900 at 30% opacity */
+    border-bottom: 1px solid rgba(127, 29, 29, 0.3) !important; 
 }
