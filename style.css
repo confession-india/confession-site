@@ -129,15 +129,23 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER (Final Fix) */
+/* 9. GLOBAL BRANDED HEADER - Final Hybrid Fix */
 .global-header {
-    border-bottom: 1px solid #f3f4f6 !important; /* Standard gray line for light mode */
-    background-color: rgba(255, 255, 255, 0.8) !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .dark .global-header {
-    /* Kill the white background and force the deep navy */
-    background-color: #0b1120 !important; 
-    /* Your red line logic - increased opacity slightly to 0.4 for better visibility */
-    border-bottom: 1px solid rgba(239, 68, 68, 0.4) !important; 
+    /* Force deep navy background to prevent the "white" look in your screenshot */
+    background-color: rgba(11, 17, 32, 0.9) !important;
+    /* Your signature London Red Line */
+    border-bottom: 1px solid rgba(220, 38, 38, 0.4) !important; 
+}
+
+/* Fix for the "Cancel" button visibility in dark mode */
+.dark .global-header a[href="index.html"]:last-child {
+    background-color: #1e293b !important;
+    color: #94a3b8 !important;
+    border-color: #334155 !important;
 }
