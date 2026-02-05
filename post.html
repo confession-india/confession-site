@@ -227,18 +227,22 @@
             return BAD_WORDS.some(word => normalizedText.includes(word.replace(/[^a-z0-9]/g, '')));
         }
 
-        function updateUI() {
-            document.getElementById('p-msg').innerText = msgInput.value ? `"${msgInput.value}"` : "Your truth starts here...";
-            document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
-            document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
-            charCount.innerText = `${msgInput.value.length} / 2000`;
+        function updateUI(){
+    document.getElementById('p-msg').innerText = msgInput.value ? `"${msgInput.value}"` : "Your truth starts here...";
+    document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
+    document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
+    charCount.innerText = `${msgInput.value.length} / 2000`;
 
-            // Interactive Button Glow
-            if(msgInput.value.length > 0) {
-                submitBtn.classList.add('glow-red');
-            } else {
-                submitBtn.classList.remove('glow-red');
-            }
+    // FORCED RED GLOW TRIGGER
+    if(msgInput.value.trim().length >= 10) {
+        submitBtn.classList.add('glow-red');
+        submitBtn.innerText = "Post Anonymously";
+    } else {
+        submitBtn.classList.remove('glow-red');
+        submitBtn.innerText = "Post Anonymously";
+    }
+    
+    // Safety filter logic...
 
             const currentText = msgInput.value.toLowerCase();
             if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText)) {
