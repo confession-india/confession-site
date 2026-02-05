@@ -129,12 +129,15 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER (Dark Mode Only Fix) */
+/* 9. GLOBAL BRANDED HEADER (Final Fix) */
 .global-header {
-    border-bottom: 1px solid #f3f4f6 !important; /* Matches border-gray-100 */
+    border-bottom: 1px solid #f3f4f6 !important; /* Standard gray line for light mode */
+    background-color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .dark .global-header {
-    /* Your exact logic: border-red-900 at 30% opacity */
-    border-bottom: 1px solid rgba(127, 29, 29, 0.3) !important; 
+    /* Kill the white background and force the deep navy */
+    background-color: #0b1120 !important; 
+    /* Your red line logic - increased opacity slightly to 0.4 for better visibility */
+    border-bottom: 1px solid rgba(239, 68, 68, 0.4) !important; 
 }
