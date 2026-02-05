@@ -129,20 +129,21 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER - FORCE FIX */
+/* 9. GLOBAL BRANDED HEADER - FORCE DARK MODE */
 .global-header {
     background-color: rgba(255, 255, 255, 0.9) !important;
     border-bottom: 1px solid #f3f4f6 !important;
 }
 
-/* This is the critical part to fix your screenshot issue */
+/* Fix for the white bar in Dark Mode */
 .dark .global-header {
-    background-color: #0b1120 !important; /* Forces the deep navy background */
-    border-bottom: 1px solid rgba(220, 38, 38, 0.5) !important; /* Your London Red Line */
+    background-color: #0b1120 !important; /* Forces the deep navy */
+    border-bottom: 1px solid rgba(220, 38, 38, 0.4) !important; /* THE LONDON RED LINE */
 }
 
-/* Ensure the text inside the header remains visible */
-.dark .global-header h1 {
-    background-clip: text;
-    -webkit-background-clip: text;
+/* This fixes the "Cancel" button visibility in dark mode seen in your screenshot */
+.dark .global-header a[href="index.html"]:last-child {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
 }
