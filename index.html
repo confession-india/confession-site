@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
@@ -27,6 +26,28 @@
     <meta name="theme-color" content="#0f172a">
 
     <link rel="icon" href="https://fav.farm/🤫">
+
+    <style>
+        #shareModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+        }
+        #shareModal.show { display: flex; }
+        .lang-active { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
+        .cat-active { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse-green { animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        /* New Share Button Styling */
+        .share-pill {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            transition: all 0.3s ease;
+        }
+        .share-pill:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    </style>
 
     <script>
         if (localStorage.getItem('userLang') === null) { localStorage.setItem('userLang', 'en'); }
@@ -184,12 +205,12 @@
         const SITE_URL = "https://confessionindia.in";
         
         const translations = {
-            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి" },
-            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें" },
-            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക" }
+            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less", shareTruth: "Share Truth" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి", shareTruth: "షేర్ చేయండి" },
+            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
@@ -197,17 +218,15 @@
         let unsubscribe = null;
         let isUserInteracting = false; 
 
-        const scrollTab = document.getElementById('scrollTab');
-        const scrollIcon = document.getElementById('scrollIcon');
-        let isAtBottom = false;
-
         window.onscroll = function() {
+            const scrollTab = document.getElementById('scrollTab');
+            const scrollIcon = document.getElementById('scrollIcon');
             if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); scrollTab.classList.add('flex'); } else { scrollTab.classList.add('hidden'); }
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) { scrollIcon.style.transform = "rotate(180deg)"; isAtBottom = true; } else { scrollIcon.style.transform = "rotate(0deg)"; isAtBottom = false; }
         };
 
         function handleScrollAction() {
-            if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) window.scrollTo({ top: 0, behavior: 'smooth' });
             else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
@@ -235,7 +254,6 @@
             const fullText = decodeURIComponent(content.getAttribute('data-full'));
             const shortText = decodeURIComponent(content.getAttribute('data-short'));
             
-            // Fixed logic using data-state instead of innerText
             if (btn.getAttribute('data-state') === "short") {
                 content.innerText = `"${fullText}"`;
                 btn.innerText = translations[currentLang].readLess;
@@ -271,11 +289,14 @@
             if (isUserInteracting) return;
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
-            posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            
+            // Auto-Ban Filter: Only show posts where status is NOT 'hidden'
+            const activePosts = posts.filter(p => p.status !== "hidden");
+            activePosts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
             // Banner Logic
-            if (posts.length > 0) {
-                const topPost = [...posts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
+            if (activePosts.length > 0) {
+                const topPost = [...activePosts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
                 const bannerDiv = document.getElementById('dailyWisdom');
                 const bannerText = document.getElementById('top-secret-text');
                 const bannerBtn = document.getElementById('banner-read-more');
@@ -283,7 +304,6 @@
                 bannerDiv.classList.remove('hidden');
                 const isBannerLong = topPost.content.length > 200;
                 const bannerShort = topPost.content.substring(0, 200);
-
                 bannerText.innerText = isBannerLong ? `"${bannerShort}..."` : `"${topPost.content}"`;
                 
                 if(isBannerLong) {
@@ -301,13 +321,10 @@
                             bannerBtn.setAttribute('data-state', 'short');
                         }
                     };
-                } else {
-                    bannerBtn.classList.add('hidden');
                 }
             }
 
-            posts.forEach(post => {
-                if(post.status === "hidden") return;
+            activePosts.forEach(post => {
                 const safeContent = encodeURIComponent(post.content);
                 const isHearted = localStorage.getItem(`supportCount-${post.id}`);
                 const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
@@ -317,7 +334,7 @@
                 const displayContent = isLong ? `"${shortText}..."` : `"${post.content}"`;
 
                 feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300">
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex flex-col">
                                 <span class="text-[10px] font-black uppercase text-indigo-500 mb-1">${post.category || 'other'}</span>
@@ -332,24 +349,22 @@
                         <p id="text-${post.id}" data-full="${safeContent}" data-short="${encodeURIComponent(shortText)}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words">
                             ${displayContent}
                         </p>
-                        ${isLong ? `<button id="btn-${post.id}" data-state="short" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-8 block">${translations[currentLang].readMore}</button>` : '<div class="mb-8"></div>'}
-                        <div class="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-slate-800">
-                            <div class="flex items-center space-x-3">
-                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex items-center gap-2 px-4 py-2 bg-pink-50 dark:bg-pink-900/20 rounded-full text-pink-600 dark:text-pink-400 transition-all active:scale-125 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
-                                    <span class="text-xs">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
+                        ${isLong ? `<button id="btn-${post.id}" data-state="short" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-6 block">${translations[currentLang].readMore}</button>` : '<div class="mb-6"></div>'}
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+                            <div class="flex gap-2">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 dark:text-pink-400 transition-all active:scale-95 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
+                                    <span class="text-sm">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
                                 </button>
-                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-full text-indigo-600 dark:text-indigo-400 transition-all active:scale-125 ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
-                                    <span class="text-xs">🫂</span> <span class="text-xs font-black">${translations[currentLang].meToo} (<span id="metoo-${post.id}">${post.meTooCount || 0}</span>)</span>
-                                </button>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button onclick="downloadSecret('${post.id}', decodeURIComponent('${safeContent}'))" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
-                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                                </button>
-                                <button onclick="openShare('${post.id}')" class="p-2 bg-slate-50 dark:bg-slate-800 rounded-full active:scale-90 transition-all">
-                                    <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 dark:text-indigo-400 transition-all active:scale-95 ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
+                                    <span class="text-sm">🫂</span> <span class="text-xs font-black" id="metoo-${post.id}">${post.meTooCount || 0}</span>
                                 </button>
                             </div>
+                            
+                            <button onclick="openShare('${post.id}')" class="share-pill flex items-center justify-center gap-2 py-3 rounded-2xl text-white shadow-lg active:scale-95 transition-all">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                <span class="text-[11px] font-black uppercase tracking-widest">${translations[currentLang].shareTruth}</span>
+                            </button>
                         </div>
                     </div>`);
             });
@@ -368,7 +383,9 @@
         function setLanguage(lang) {
             currentLang = lang; localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            const activePill = document.getElementById(`lang-${lang}`);
+            if(activePill) activePill.classList.add('lang-active');
+            
             document.getElementById('cat-all').innerText = translations[lang].latest;
             document.getElementById('cat-rel').innerText = translations[lang].rel;
             document.getElementById('cat-fam').innerText = translations[lang].fam;
@@ -379,7 +396,12 @@
             loadPosts(currentCategory);
         }
 
-        function filterCat(cat, btn) { currentCategory = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active')); btn.classList.add('cat-active'); loadPosts(cat); }
+        function filterCat(cat, btn) { 
+            currentCategory = cat; 
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active')); 
+            btn.classList.add('cat-active'); 
+            loadPosts(cat); 
+        }
 
         window.interact = (e, id, field) => {
             if (localStorage.getItem(`${field}-${id}`)) return;
@@ -392,23 +414,30 @@
             setTimeout(() => { isUserInteracting = false; }, 3000);
         };
 
-        window.reportPost = (id) => { if(confirm("Report this post?")) { db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) }); alert("Moderators notified."); } };
+        window.reportPost = (id) => { 
+            if(confirm("Report this post?")) { 
+                db.collection('confessions').doc(id).update({ reportCount: firebase.firestore.FieldValue.increment(1) }); 
+                alert("Moderators notified."); 
+            } 
+        };
 
         function openShare(id) {
-            document.getElementById('shareModal').classList.add('show');
+            const modal = document.getElementById('shareModal');
+            modal.classList.add('show');
             const fullText = decodeURIComponent(document.getElementById(`text-${id}`).getAttribute('data-full'));
-            const previewText = fullText.length > 300 ? fullText.substring(0, 300) + "..." : fullText;
-            const fullMessage = `${previewText}\n\nRead more at: ${SITE_URL}`;
-            
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`);
-            document.getElementById('xBtn').onclick = () => window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(fullMessage)}`);
-            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(SITE_URL)}`);
-            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(`${fullText}\n\nSource: ${SITE_URL}`); alert("Secret text and website link copied!"); };
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(SITE_URL); alert("Website link copied!"); };
+            const link = `${SITE_URL}/secret.html?id=${id}`;
+
+            document.getElementById('waBtn').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(fullText + "\n\nRead more at: " + link)}`);
+            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
+            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(fullText)}&url=${encodeURIComponent(link)}`);
+            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(fullText); alert("Text copied!"); };
+            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(link); alert("Link copied!"); };
             document.getElementById('igBtn').onclick = () => downloadSecret(id, fullText);
         }
 
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
+
+        // Initialize language UI on load
         setLanguage(currentLang);
     </script>
 </body>
