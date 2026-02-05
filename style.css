@@ -47,11 +47,11 @@ html { scroll-behavior: smooth; }
 
 /* 3. COMPONENT STYLING (The Pop-up Effect) */
 .confession-card {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Added bounce */
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .confession-card:hover {
-    transform: translateY(-8px) scale(1.01); /* Card pops up and slightly grows */
+    transform: translateY(-8px) scale(1.01);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     z-index: 10;
 }
@@ -129,21 +129,31 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER - FORCE DARK MODE */
+/* 9. GLOBAL BRANDED HEADER - LONDON RED LINE FIXED */
 .global-header {
     background-color: rgba(255, 255, 255, 0.9) !important;
     border-bottom: 1px solid #f3f4f6 !important;
 }
 
-/* Fix for the white bar in Dark Mode */
 .dark .global-header {
-    background-color: #0b1120 !important; /* Forces the deep navy */
-    border-bottom: 1px solid rgba(220, 38, 38, 0.4) !important; /* THE LONDON RED LINE */
+    background-color: #0b1120 !important;
+    /* Force high-visibility Red Line to kill the white line glitch */
+    border-bottom: 1px solid rgba(239, 68, 68, 0.6) !important; 
 }
 
-/* This fixes the "Cancel" button visibility in dark mode seen in your screenshot */
 .dark .global-header a[href="index.html"]:last-child {
     background-color: #1e293b !important;
     border-color: #334155 !important;
     color: #94a3b8 !important;
+}
+
+/* 10. SYNCED LIVE PREVIEW & INTERACTIVE GLOW */
+.dark #previewContainer {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+#submitBtn {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
