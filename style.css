@@ -28,20 +28,20 @@
     background-color: #fef2f2 !important; 
 }
 
-/* 2. CORE LAYOUT & MOUSE GLOW - Fixed Z-index */
+/* 2. CORE LAYOUT & MOUSE GLOW */
 html { scroll-behavior: smooth; }
 
 #mouse-glow {
     position: fixed;
     top: 0; left: 0;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.03) 50%, transparent 70%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(168, 85, 247, 0.02) 50%, transparent 70%);
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    z-index: -1; /* Moved to -1 so it never blocks clicks */
-    filter: blur(50px);
+    z-index: -1; 
+    filter: blur(60px);
     transition: opacity 0.5s ease;
 }
 
@@ -85,9 +85,12 @@ html { scroll-behavior: smooth; }
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(12px) saturate(180%);
     z-index: 10000;
-    display: none;
+    display: flex; /* Changed from none to allow JS control */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
-#shareModal.show { display: flex; }
+#shareModal.show { opacity: 1; pointer-events: auto; }
 
 .share-pill {
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -110,7 +113,7 @@ html { scroll-behavior: smooth; }
     color: #f1f5f9 !important; 
 }
 
-.dark input, .dark textarea {
+.dark input, .dark textarea, .dark select {
     background-color: #0f172a !important;
     border-color: #334155 !important;
     color: white !important;
@@ -123,27 +126,24 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER - RED LINE & BLUR FIX */
+/* 9. GLOBAL BRANDED HEADER */
 .global-header {
-    /* Removed transparent !important to allow backdrop-blur to work */
     position: relative;
     border-bottom: none !important;
     overflow: visible !important;
 }
 
-/* Red Line Fix - London Tube Aesthetic */
 .global-header::after {
     content: "";
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 2px; /* Thicker for better branding */
+    height: 2px;
     background: #ef4444 !important; /* London Red */
     z-index: 100;
 }
 
-/* Dark mode header background */
 .dark .global-header {
     background-color: rgba(11, 17, 32, 0.9) !important;
 }
@@ -160,17 +160,15 @@ html { scroll-behavior: smooth; }
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* The logic you mentioned - multi-layered glow */
 #submitBtn.glow-red {
     background-color: #ef4444 !important;
     border: 1px solid #ef4444 !important;
     color: white !important;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), 
-                0 0 30px rgba(239, 68, 68, 0.3) !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 
+                0 0 40px rgba(239, 68, 68, 0.2) !important;
     transform: translateY(-2px);
 }
 
-/* Force the form to show the glow instead of cutting it off */
 #postForm {
     overflow: visible !important;
 }
