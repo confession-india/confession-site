@@ -1,282 +1,66 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT5SF025XK"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-LT5SF025XK');
-    </script>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Share Your Secret - Confess India</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post - Confess India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        #submitBtn:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .animate-pulse-green {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-    </style>
 </head>
-<body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<body class="bg-[#fdfdff]">
+    <div id="mouse-glow"></div>
+    <div class="max-w-2xl mx-auto px-6 py-12">
+        <header class="flex justify-between items-center mb-12">
+            <a href="index.html" class="text-slate-400 font-black text-[10px] uppercase tracking-widest">← Back</a>
+            <h1 class="text-xl font-black italic">Confess India</h1>
+        </header>
 
-    <div id="toast">
-        <div class="bg-indigo-600 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-3">
-            <span>✨</span> Secret Sent Anonymously
+        <div class="bg-white p-8 rounded-[40px] shadow-2xl border border-slate-50 mb-10">
+            <p class="text-[10px] font-black uppercase text-indigo-600 tracking-widest mb-4">Live Preview</p>
+            <div id="previewCard" class="bg-slate-50 p-8 rounded-3xl min-h-[200px] flex items-center justify-center text-center">
+                <p id="previewText" class="text-slate-400 italic">"Your truth starts here..."</p>
+            </div>
         </div>
+
+        <form id="postForm" class="space-y-6">
+            <textarea id="confessionText" required maxlength="2000" rows="6" placeholder="Type your truth anonymously..." class="w-full p-8 bg-white rounded-[30px] border border-slate-100 shadow-sm outline-none focus:border-indigo-500 transition-all font-medium text-lg"></textarea>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <input type="text" id="username" placeholder="Pen Name (e.g. Silent Lion)" class="p-4 bg-white rounded-2xl border border-slate-100 outline-none font-bold text-sm">
+                <select id="category" class="p-4 bg-white rounded-2xl border border-slate-100 font-bold text-sm">
+                    <option>Other</option><option>Crush</option><option>Regret</option><option>Work</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="w-full bg-indigo-600 text-white py-6 rounded-[30px] font-black text-xl shadow-xl hover:bg-indigo-700 transition-all">Submit Secret</button>
+        </form>
     </div>
 
-    <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[500] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
-        <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-    </button>
-
-   <header class="sticky top-0 z-[90] bg-white dark:bg-[#0b1120] backdrop-blur-xl global-header" style="background-color: inherit !important;">
-    <div class="max-w-4xl mx-auto p-4 flex justify-between items-center w-full">
-        <div class="flex flex-col">
-            <a href="index.html" class="hover:opacity-80 transition-opacity">
-                <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess<span class="italic">India</span></h1>
-            </a>
-            <span class="text-[10px] text-gray-400 dark:text-slate-500 font-bold tracking-widest uppercase mt-1 ml-0.5">Share Your Truth</span>
-        </div>
-        <a href="index.html" class="bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl font-bold text-[10px] hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-slate-100 dark:border-slate-700">Cancel</a>
-    </div>
-</header>
-    <main class="max-w-2xl mx-auto px-6 py-10 pb-24 flex-grow w-full">
-        <div class="mb-10">
-            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 mb-2 block">Live Preview</label>
-            <div id="previewContainer" class="p-8 bg-white dark:bg-[#1e293b] shadow-sm rounded-3xl border border-slate-100 dark:border-red-500/30">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="flex flex-col gap-1">
-                        <div class="flex items-center">
-                            <span id="p-cat" class="text-[10px] font-black uppercase bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-indigo-500 mr-2">OTHER</span>
-                            <h4 id="p-user" class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest inline-block">BY ANONYMOUS</h4>
-                        </div>
-                        <span id="p-lang-tag" class="text-[9px] text-slate-300 dark:text-slate-600 font-bold ml-0.5 uppercase tracking-tighter">English Feed</span>
-                    </div>
-                </div>
-                <p id="p-msg" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 italic opacity-60">"Your truth starts here..."</p>
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-slate-900 rounded-[40px] shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-50 dark:border-slate-800 overflow-visible">
-            <form id="postForm" class="p-8 space-y-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 ml-1">Pen Name</label>
-                        <input type="text" id="userInput" placeholder="Silent Lion / Lioness" class="w-full p-4 bg-slate-50 dark:bg-slate-800/80 border-2 border-transparent dark:text-white rounded-2xl outline-none focus:border-indigo-500 transition-all font-bold text-slate-700" required>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 ml-1">Category</label>
-                        <select id="catInput" class="w-full p-4 bg-slate-50 dark:bg-slate-800/80 border-2 border-transparent dark:text-white rounded-2xl outline-none cursor-pointer font-bold text-slate-700">
-                            <option value="relationship">Relationships</option>
-                            <option value="family">Family</option>
-                            <option value="marriage">Marriage</option>
-                            <option value="other" selected>Other</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <div class="flex justify-between mb-2 px-1">
-                        <label class="block text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Your Confession</label>
-                        <span id="charCount" class="text-[10px] font-bold text-slate-300 dark:text-slate-600 transition-colors">0 / 2000</span>
-                    </div>
-                    <textarea id="msgInput" rows="8" maxlength="2000" placeholder="Type your truth anonymously..." class="w-full p-6 bg-slate-50 dark:bg-slate-800/80 border-2 border-transparent dark:text-white rounded-[32px] outline-none focus:border-indigo-500 transition-all leading-relaxed resize-none font-medium text-slate-700 text-lg"></textarea>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-4 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-900/30 flex items-start gap-3">
-                        <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse-green mt-1"></div>
-                        <div>
-                            <p class="text-[10px] text-indigo-900 dark:text-indigo-300 font-black uppercase tracking-widest mb-0.5">Privacy Shield Active</p>
-                            <p class="text-[10px] text-indigo-600/80 dark:text-indigo-400/60 font-bold leading-tight">No IP logging. 100% Anonymous.</p>
-                        </div>
-                    </div>
-                    <div id="redAlertNote" class="p-4 bg-white dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex items-start gap-3 transition-all">
-                        <span class="text-sm">⚠️</span>
-                        <div>
-                            <p class="text-[10px] text-slate-800 dark:text-slate-200 font-black uppercase tracking-widest mb-0.5">Safety Filter</p>
-                            <p id="safetyText" class="text-[10px] text-slate-500 dark:text-slate-500 font-bold leading-tight">Social IDs & Abuse are blocked.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="submitBtn" type="submit" class="w-full bg-indigo-600 text-white py-5 rounded-[24px] font-black text-lg shadow-xl shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all active:scale-95">Post Anonymously</button>
-            </form>
-        </div>
-    </main>
-
-    <footer class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-auto border-t border-slate-800">
-        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
-            <div class="space-y-4">
-                <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
-                <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths without judgment, fear, or recognition.</p>
-                <div class="flex items-center gap-3 bg-slate-800/50 w-fit px-4 py-2 rounded-full border border-slate-700">
-                    <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-8 md:col-span-2">
-                <div>
-                    <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Platform</h3>
-                    <ul class="space-y-3 text-sm font-bold">
-                        <li><a href="legal.html#mission" class="hover:text-white transition-colors">Our Mission</a></li>
-                        <li><a href="legal.html#privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="legal.html#rules" class="hover:text-white transition-colors">Community Rules</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Connect</h3>
-                    <ul class="space-y-3 text-sm font-bold">
-                        <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
-                        <li><a href="support.html?type=abuse" class="hover:text-red-400 transition-colors text-red-500/80">Report Abuse</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center space-y-4">
-            <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest mb-2">
-                <span>📍 HYD: <span id="hyd-time">--:--</span></span>
-                <span class="text-red-600">|</span>
-                <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
-            </div>
-            <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">No Cookies • No Emails • Just the Truth</p>
-            <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built with Integrity from HYD to LDN.</p>
-        </div>
-    </footer>
-
+    <script src="script.js"></script>
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        const scrollTab = document.getElementById('scrollTab');
-        const scrollIcon = document.getElementById('scrollIcon');
-        let isAtBottom = false;
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); } 
-            else { scrollTab.classList.add('hidden'); }
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-                scrollIcon.style.transform = "rotate(180deg)";
-                isAtBottom = true;
-            } else {
-                scrollIcon.style.transform = "rotate(0deg)";
-                isAtBottom = false;
-            }
+        // Live Preview Logic
+        const area = document.getElementById('confessionText');
+        const preview = document.getElementById('previewText');
+        area.addEventListener('input', () => {
+            preview.innerText = area.value || "Your truth starts here...";
+            preview.classList.remove('text-slate-400', 'italic');
+            preview.classList.add('text-slate-800', 'font-medium');
         });
-
-        function handleScrollAction() {
-            if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
-            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
-
-        const langMap = { en: "English", te: "Telugu", ta: "Tamil", kn: "Kannada", ml: "Malayalam", hi: "Hindi" };
-        const userLang = localStorage.getItem('userLang') || 'en';
-        document.getElementById('p-lang-tag').innerText = langMap[userLang] + " Feed";
-
-        const msgInput = document.getElementById('msgInput');
-        const userInput = document.getElementById('userInput');
-        const catInput = document.getElementById('catInput');
-        const charCount = document.getElementById('charCount');
-        const safetyText = document.getElementById('safetyText');
-        const submitBtn = document.getElementById('submitBtn');
-
-        function updateClocks() {
-            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-            try {
-                document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...options, timeZone: 'Asia/Kolkata' }).format(new Date());
-                document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
-            } catch (e) {}
-        }
-        setInterval(updateClocks, 60000); updateClocks();
-
-        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
-        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
-        const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde", "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "punda", "baadu", "thevidiya", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
-
-        function containsBadWords(text) {
-            if(!text) return false;
-            const normalizedText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
-            return BAD_WORDS.some(word => normalizedText.includes(word.replace(/[^a-z0-9]/g, '')));
-        }
-
-        function updateUI(){
-    document.getElementById('p-msg').innerText = msgInput.value ? `"${msgInput.value}"` : "Your truth starts here...";
-    document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
-    document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
-    charCount.innerText = `${msgInput.value.length} / 2000`;
-
-    // FORCED RED GLOW TRIGGER
-    if(msgInput.value.trim().length >= 10) {
-        submitBtn.classList.add('glow-red');
-        submitBtn.innerText = "Post Anonymously";
-    } else {
-        submitBtn.classList.remove('glow-red');
-        submitBtn.innerText = "Post Anonymously";
-    }
-    
-    // Safety filter logic...
-
-            const currentText = msgInput.value.toLowerCase();
-            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText)) {
-                safetyText.innerText = "Conflict detected! Remove contact info/abuse.";
-                safetyText.classList.add('text-red-500');
-            } else {
-                safetyText.innerText = "Social IDs & Abuse are blocked.";
-                safetyText.classList.remove('text-red-500');
-            }
-        }
-
-        [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
-        catInput.addEventListener('change', updateUI);
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const content = msgInput.value.trim();
-            if(content.length < 10) return alert("Secret too short!");
-            submitBtn.disabled = true; submitBtn.innerText = "Securing...";
-            try {
-                await db.collection('confessions').add({
-                    username: userInput.value || "Anonymous",
-                    category: catInput.value,
-                    content: content,
-                    language: userLang,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    supportCount: 0, meTooCount: 0, status: "public"
-                });
-                document.getElementById('toast').classList.add('show');
-                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
-            } catch (err) {
-                submitBtn.disabled = false; submitBtn.innerText = "Post Anonymously";
-                alert("Connection failed.");
-            }
+            const content = area.value;
+            const username = document.getElementById('username').value || "Anonymous";
+            const category = document.getElementById('category').value;
+
+            await db.collection('confessions').add({
+                content, username, category,
+                status: 'active', metoo: 0, reportCount: 0,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            window.location.href = 'index.html';
         });
     </script>
 </body>
