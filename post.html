@@ -26,9 +26,10 @@
         }
         
         #submitBtn:disabled {
-            background-color: #94a3b8;
+            background-color: #94a3b8 !important;
             cursor: not-allowed;
             transform: none !important;
+            box-shadow: none !important;
         }
 
         .animate-pulse-green {
@@ -37,6 +38,11 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: .5; }
+        }
+
+        /* Smooth UI Transitions */
+        #previewContainer, #submitBtn, #confidence-bar, #p-lang-tag {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
@@ -65,20 +71,31 @@
         <a href="index.html" class="bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl font-bold text-[10px] hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-slate-100 dark:border-slate-700">Cancel</a>
     </div>
 </header>
+
     <main class="max-w-2xl mx-auto px-6 py-10 pb-24 flex-grow w-full">
         <div class="mb-10">
             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 mb-2 block">Live Preview</label>
-            <div id="previewContainer" class="p-8 bg-white dark:bg-[#1e293b] shadow-sm rounded-3xl border border-slate-100 dark:border-red-500/30">
+            <div id="previewContainer" class="p-8 bg-white dark:bg-[#1e293b] shadow-sm rounded-3xl border-2 border-slate-100 dark:border-red-500/30">
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex flex-col gap-1">
                         <div class="flex items-center">
                             <span id="p-cat" class="text-[10px] font-black uppercase bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-indigo-500 mr-2">OTHER</span>
                             <h4 id="p-user" class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest inline-block">BY ANONYMOUS</h4>
                         </div>
-                        <span id="p-lang-tag" class="text-[9px] text-slate-300 dark:text-slate-600 font-bold ml-0.5 uppercase tracking-tighter">English Feed</span>
+                        <span id="p-lang-tag" class="text-[9px] font-black mt-1 uppercase tracking-widest px-2 py-0.5 rounded-md w-fit bg-slate-100 text-slate-500">English Feed</span>
                     </div>
                 </div>
-                <p id="p-msg" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 italic opacity-60">"Your truth starts here..."</p>
+                <p id="p-msg" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-4 italic opacity-60">"Your truth starts here..."</p>
+                
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[8px] font-black uppercase text-slate-400 tracking-tighter">Dialect Accuracy</span>
+                        <span id="conf-pct" class="text-[8px] font-black text-slate-400">0%</span>
+                    </div>
+                    <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div id="confidence-bar" class="w-0 h-full bg-slate-400"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -176,105 +193,156 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const scrollTab = document.getElementById('scrollTab');
-        const scrollIcon = document.getElementById('scrollIcon');
-        let isAtBottom = false;
-
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); } 
-            else { scrollTab.classList.add('hidden'); }
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-                scrollIcon.style.transform = "rotate(180deg)";
-                isAtBottom = true;
-            } else {
-                scrollIcon.style.transform = "rotate(0deg)";
-                isAtBottom = false;
+        // 1. Language Engine & Slang Dictionary
+        const LanguageEngine = {
+            dictionaries: {
+                te: ['vadu', 'ledhu', 'kadha', 'ekkada', 'cheppu', 'ante', 'unnadu', 'vachindi', 'thindi', 'emundi', 'telusu', 'chesadu', 'avunu', 'kuda', 'bhaya', 'mowa', 'enti', 'ela', 'ivvali', 'oddu', 'amma', 'nanna', 'abbayi', 'ammayi', 'undhi', 'ra', 're', 'guru', 'manchi', 'teliyadu', 'velli'],
+                hi: ['kya', 'hai', 'nhi', 'rha', 'tha', 'liye', 'raha', 'hota', 'kar', 'baat', 'sab', 'kuch', 'kaise', 'accha', 'yaar', 'bhai', 'matlab', 'pata', 'hoga', 'phir', 'kyu', 'chahiye', 'lekin', 'aur', 'toh', 'bol', 'chal'],
+                ta: ['enna', 'irukku', 'pannu', 'sapadu', 'illai', 'romba', 'nalla', 'solunga', 'vaanga', 'ponga', 'theriyum', 'eppadi', 'konjam', 'machi', 'da', 'di', 'nanba', 'vaada', 'poitu', 'iruken', 'venum'],
+                kn: ['ide', 'madi', 'yelli', 'agide', 'hogu', 'barutthe', 'nodu', 'namaskara', 'chennagidi', 'oota', 'gothu', 'enu', 'ivattu', 'kano', 'guru', 'aythu', 'beku', 'beda', 'namma', 'tumba'],
+                ml: ['entha', 'nalla', 'ivide', 'evide', 'poyi', 'kazhichu', 'ariyilla', 'cheyyanam', 'santhosham', 'nanni', 'venda', 'undu', 'aliyan', 'mone', 'poda', 'engane', 'ippol']
+            },
+            analyze: function(text) {
+                if (!text || text.length < 5) return { lang: 'en', confidence: 0 };
+                const words = text.toLowerCase().replace(/[^\w\s]/gi, '').split(/\s+/);
+                let scores = { te: 0, hi: 0, ta: 0, kn: 0, ml: 0 };
+                words.forEach(word => {
+                    for (const lang in this.dictionaries) {
+                        if (this.dictionaries[lang].includes(word)) scores[lang] += 2;
+                    }
+                });
+                let winner = 'en';
+                let maxScore = 0;
+                for (const lang in scores) { if (scores[lang] > maxScore) { maxScore = scores[lang]; winner = lang; } }
+                let confidence = Math.min((maxScore / (words.length * 0.4)) * 100, 100);
+                return { lang: winner, confidence: Math.round(confidence) };
             }
-        });
+        };
 
-        function handleScrollAction() {
-            if (isAtBottom) window.scrollTo({ top: 0, behavior: 'smooth' });
-            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        }
+        const langTheme = {
+            te: { color: '#f97316', label: 'Tenglish Feed', btn: 'Post to Telugu ⚡' },
+            hi: { color: '#3b82f6', label: 'Hinglish Feed', btn: 'Post to Hindi ⚡' },
+            ta: { color: '#eab308', label: 'Tamlish Feed', btn: 'Post to Tamil ⚡' },
+            kn: { color: '#10b981', label: 'Kannadish Feed', btn: 'Post to Kannada ⚡' },
+            ml: { color: '#10b981', label: 'Manglish Feed', btn: 'Post to Malayalam ⚡' },
+            en: { color: '#ef4444', label: 'English Feed', btn: 'Post Anonymously' }
+        };
 
-        const langMap = { en: "English", te: "Telugu", ta: "Tamil", kn: "Kannada", ml: "Malayalam", hi: "Hindi" };
-        const userLang = localStorage.getItem('userLang') || 'en';
-        document.getElementById('p-lang-tag').innerText = langMap[userLang] + " Feed";
+        const BAD_WORDS = [
+            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy",
+            "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde",
+            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "modda",
+            "punda", "baadu", "thevidiya", "omala", "koothi", "bolimaga", "sule", "thayoli", "kunna", "pooru"
+        ];
 
+        // 2. Elements
         const msgInput = document.getElementById('msgInput');
         const userInput = document.getElementById('userInput');
         const catInput = document.getElementById('catInput');
         const charCount = document.getElementById('charCount');
         const safetyText = document.getElementById('safetyText');
         const submitBtn = document.getElementById('submitBtn');
+        const previewBox = document.getElementById('previewContainer');
+        const langTag = document.getElementById('p-lang-tag');
+        const confBar = document.getElementById('confidence-bar');
+        const confPct = document.getElementById('conf-pct');
 
-        function updateClocks() {
-            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-            try {
-                document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...options, timeZone: 'Asia/Kolkata' }).format(new Date());
-                document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
-            } catch (e) {}
-        }
-        setInterval(updateClocks, 60000); updateClocks();
+        let detectedLang = 'en';
 
-        const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
-        const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
-        const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "kamine", "lavde", "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "punda", "baadu", "thevidiya", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
+        // 3. UI Logic
+        function updateUI() {
+            const val = msgInput.value;
+            const analysis = LanguageEngine.analyze(val);
+            const theme = langTheme[analysis.lang];
+            detectedLang = analysis.lang;
 
-        function containsBadWords(text) {
-            if(!text) return false;
-            const normalizedText = text.toLowerCase().replace(/[^a-z0-9]/g, '');
-            return BAD_WORDS.some(word => normalizedText.includes(word.replace(/[^a-z0-9]/g, '')));
-        }
+            // Content Updates
+            document.getElementById('p-msg').innerText = val ? `"${val}"` : "Your truth starts here...";
+            document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
+            document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
+            charCount.innerText = `${val.length} / 2000`;
 
-        function updateUI(){
-    document.getElementById('p-msg').innerText = msgInput.value ? `"${msgInput.value}"` : "Your truth starts here...";
-    document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
-    document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
-    charCount.innerText = `${msgInput.value.length} / 2000`;
+            // Color & Language Morphing
+            previewBox.style.borderColor = theme.color;
+            langTag.innerText = theme.label;
+            langTag.style.backgroundColor = `${theme.color}15`;
+            langTag.style.color = theme.color;
+            
+            confBar.style.width = analysis.confidence + "%";
+            confBar.style.backgroundColor = theme.color;
+            confPct.innerText = analysis.confidence + "%";
+            confPct.style.color = theme.color;
 
-    // FORCED RED GLOW TRIGGER
-    if(msgInput.value.trim().length >= 10) {
-        submitBtn.classList.add('glow-red');
-        submitBtn.innerText = "Post Anonymously";
-    } else {
-        submitBtn.classList.remove('glow-red');
-        submitBtn.innerText = "Post Anonymously";
-    }
-    
-    // Safety filter logic...
+            // Button Logic
+            if(val.trim().length >= 10) {
+                submitBtn.disabled = false;
+                submitBtn.style.backgroundColor = theme.color;
+                submitBtn.style.boxShadow = `0 10px 30px ${theme.color}40`;
+                submitBtn.innerText = theme.btn;
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.innerText = "Write more...";
+            }
 
-            const currentText = msgInput.value.toLowerCase();
-            if(PHONE_REGEX.test(currentText) || SOCIAL_REGEX.test(currentText) || containsBadWords(currentText)) {
+            // Safety Check
+            const lowerText = val.toLowerCase();
+            const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
+            const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
+            
+            const isAbuse = BAD_WORDS.some(word => lowerText.includes(word));
+            if(PHONE_REGEX.test(lowerText) || SOCIAL_REGEX.test(lowerText) || isAbuse) {
                 safetyText.innerText = "Conflict detected! Remove contact info/abuse.";
-                safetyText.classList.add('text-red-500');
+                safetyText.style.color = "#ef4444";
+                submitBtn.disabled = true;
             } else {
                 safetyText.innerText = "Social IDs & Abuse are blocked.";
-                safetyText.classList.remove('text-red-500');
+                safetyText.style.color = "";
             }
         }
 
+        // 4. Events
         [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
         catInput.addEventListener('change', updateUI);
 
+        // Clocks
+        function updateClocks() {
+            const opt = { hour: '2-digit', minute: '2-digit', hour12: true };
+            document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...opt, timeZone: 'Asia/Kolkata' }).format(new Date());
+            document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...opt, timeZone: 'Europe/London' }).format(new Date());
+        }
+        setInterval(updateClocks, 60000); updateClocks();
+
+        // Scroll
+        const scrollTab = document.getElementById('scrollTab');
+        const scrollIcon = document.getElementById('scrollIcon');
+        let isAtBottom = false;
+        window.addEventListener('scroll', () => {
+            scrollTab.classList.toggle('hidden', window.scrollY <= 300);
+            isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
+            scrollIcon.style.transform = isAtBottom ? "rotate(180deg)" : "rotate(0deg)";
+        });
+        function handleScrollAction() {
+            window.scrollTo({ top: isAtBottom ? 0 : document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Form Submit
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
-            if(content.length < 10) return alert("Secret too short!");
             submitBtn.disabled = true; submitBtn.innerText = "Securing...";
             try {
                 await db.collection('confessions').add({
                     username: userInput.value || "Anonymous",
                     category: catInput.value,
                     content: content,
-                    language: userLang,
+                    language: detectedLang, // Now dynamically saves the detected dialect
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, meTooCount: 0, status: "public"
                 });
                 document.getElementById('toast').classList.add('show');
                 setTimeout(() => { window.location.href = 'index.html'; }, 2000);
             } catch (err) {
-                submitBtn.disabled = false; submitBtn.innerText = "Post Anonymously";
+                submitBtn.disabled = false; updateUI();
                 alert("Connection failed.");
             }
         });
