@@ -41,6 +41,18 @@
         @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .animate-pulse-green { animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         
+        /* Shake Highlight Effect */
+        @keyframes shake-red {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .highlight-shake { 
+            animation: shake-red 0.4s ease-in-out 3; 
+            border: 3px solid #ef4444 !important; 
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.4) !important;
+        }
+
         .share-pill {
             background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             transition: all 0.3s ease;
@@ -207,7 +219,7 @@
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less", shareTruth: "Share Truth" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి", shareTruth: "షేర్ చేయండి" },
             hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
-            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீబத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சమூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
             ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ఫీడ్", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
         };
@@ -252,7 +264,6 @@
             const btn = document.getElementById(`btn-${id}`);
             const fullText = decodeURIComponent(content.getAttribute('data-full'));
             const shortText = decodeURIComponent(content.getAttribute('data-short'));
-            
             if (btn.getAttribute('data-state') === "short") {
                 content.innerText = `"${fullText}"`;
                 btn.innerText = translations[currentLang].readLess;
@@ -264,15 +275,54 @@
             }
         }
 
+        // --- SHARE MODAL LOGIC ---
+        function openShare(id) {
+            const modal = document.getElementById('shareModal');
+            const contentEl = document.getElementById(`text-${id}`);
+            const fullContent = decodeURIComponent(contentEl.getAttribute('data-full'));
+            const shareUrl = `${SITE_URL}/index.html?id=${id}`;
+            const shareText = `"${fullContent.substring(0, 100)}..."\n\nRead the full secret on Confess India:\n${shareUrl}`;
+
+            modal.classList.add('show');
+
+            // WhatsApp Fix: Direct Send to Contact Picker
+            document.getElementById('waBtn').onclick = () => {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+            };
+
+            document.getElementById('fbBtn').onclick = () => {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+            };
+
+            document.getElementById('xBtn').onclick = () => {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, '_blank');
+            };
+
+            document.getElementById('igBtn').onclick = () => downloadSecret(id, fullContent);
+
+            // Enhanced Copy: Secret Text + Website Credit
+            document.getElementById('copyTxtBtn').onclick = () => {
+                const credit = `\n\nShared via Confess India\nRead more at: ${shareUrl}`;
+                navigator.clipboard.writeText(`"${fullContent}"${credit}`);
+                alert("Secret copied with link!");
+            };
+
+            document.getElementById('copyBtn').onclick = () => {
+                navigator.clipboard.writeText(shareUrl);
+                alert("Link copied!");
+            };
+        }
+
+        function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
+
         window.downloadSecret = (id, content) => {
             const tempDiv = document.createElement('div');
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
+            tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px';
             tempDiv.innerHTML = `
-                <div id="capture-${id}" style="width: 500px; min-height: 500px; height: auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 40px; text-align: center; font-family: sans-serif; box-sizing: border-box;">
-                    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; opacity: 0.9;">Confess India</div>
-                    <div style="font-size: 18px; font-weight: 700; font-style: italic; line-height: 1.5; word-wrap: break-word; width: 100%;">"${content}"</div>
-                    <div style="margin-top: 40px; font-size: 14px; font-weight: 800; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div>
+                <div id="capture-${id}" style="width: 500px; min-height: 500px; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 40px; text-align: center; font-family: sans-serif;">
+                    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px;">Confess India</div>
+                    <div style="font-size: 20px; font-weight: 700; font-style: italic; line-height: 1.5; word-wrap: break-word;">"${content}"</div>
+                    <div style="margin-top: 40px; font-size: 14px; font-weight: 800; opacity: 0.9;">confessionindia.in</div>
                 </div>`;
             document.body.appendChild(tempDiv);
             html2canvas(document.getElementById(`capture-${id}`), { scale: 2 }).then(canvas => {
@@ -365,6 +415,19 @@
                         </div>
                     </div>`);
             });
+
+            // Highlight & Shake shared post
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+            if (targetId) {
+                setTimeout(() => {
+                    const el = document.getElementById(`post-${targetId}`);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('highlight-shake');
+                    }
+                }, 800);
+            }
         }
 
         async function loadPosts(category = 'all') {
@@ -407,37 +470,21 @@
             const btn = e.currentTarget;
             btn.classList.add('opacity-50', 'pointer-events-none');
             const docRef = db.collection('confessions').doc(id);
-            db.runTransaction(async (transaction) => {
-                const sfDoc = await transaction.get(docRef);
-                if (!sfDoc.exists) return;
-                const newCount = (sfDoc.data()[field] || 0) + 1;
-                transaction.update(docRef, { [field]: newCount });
-                const labelId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
-                document.getElementById(labelId).innerText = newCount;
-            }).then(() => { isUserInteracting = false; }).catch(() => { isUserInteracting = false; });
+            db.runTransaction(async (t) => {
+                const doc = await t.get(docRef);
+                const newVal = (doc.data()[field] || 0) + 1;
+                t.update(docRef, { [field]: newVal });
+            }).then(() => { isUserInteracting = false; });
         };
 
-        window.openShare = (id) => {
-            const text = decodeURIComponent(document.getElementById(`text-${id}`).getAttribute('data-full'));
-            const modal = document.getElementById('shareModal');
-            const link = `${SITE_URL}/index.html?id=${id}`;
-            modal.classList.add('show');
-            document.getElementById('waBtn').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n\nRead more: " + link)}`);
-            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
-            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`);
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(link); alert("Link Copied!"); };
-            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(text); alert("Secret Text Copied!"); };
-            document.getElementById('igBtn').onclick = () => downloadSecret(id, text);
-        };
-
-        window.closeShare = () => document.getElementById('shareModal').classList.remove('show');
-
-        window.reportPost = (id) => {
-            if (confirm("Report this post?")) {
-                db.collection('reports').add({ postId: id, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-                alert("Thank you. Our moderators will review this.");
+        async function reportPost(id) {
+            if(confirm("Report this confession for review?")) {
+                await db.collection('confessions').doc(id).update({ 
+                    reportCount: firebase.firestore.FieldValue.increment(1) 
+                });
+                alert("Thank you. Our moderators will check this.");
             }
-        };
+        }
 
         setLanguage(currentLang);
     </script>
