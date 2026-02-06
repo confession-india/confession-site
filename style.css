@@ -1,54 +1,43 @@
-/* Confess India Master CSS - 2026 */
+/* Confess India - Master Recovery CSS 2026 */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
     --primary: #4f46e5;
     --primary-glow: rgba(79, 70, 229, 0.4);
-    --bg-dark: #0b0f1a;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
-body { background-color: #fdfdff; scroll-behavior: smooth; }
+body { background-color: #fdfdff; scroll-behavior: smooth; position: relative; }
 
-/* Mouse Glow Effect */
+/* Fixed Mouse Glow - Lower Z-Index so it stays behind text */
 #mouse-glow {
     position: fixed; width: 450px; height: 450px;
     background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
-    pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
+    pointer-events: none; z-index: -1; transform: translate(-50%, -50%);
 }
 
-/* Card Lift & Interaction */
 .confession-card {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     background: white; border: 1px solid #f1f5f9;
-}
-.confession-card:hover {
-    transform: translateY(-12px);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
-    border-color: #e2e8f0;
+    position: relative; z-index: 10;
 }
 
-/* Deep Link Shake Animation */
+.confession-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.05);
+}
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px) rotate(-1deg); }
-    50% { transform: translateX(10px) rotate(1deg); }
-}
-.shake-active {
-    animation: shake 0.5s ease-in-out 3;
-    border: 2px solid var(--primary) !important;
-    box-shadow: 0 0 30px var(--primary-glow) !important;
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
 }
 
-/* Modal Styling */
+.shake-active { animation: shake 0.4s ease-in-out 3; border: 2px solid var(--primary) !important; }
+
 #shareModal {
     display: none; position: fixed; inset: 0; background: rgba(11, 17, 32, 0.8);
     backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;
 }
 #shareModal.show { display: flex; }
-
-/* Category Tags */
-.cat-badge {
-    font-size: 10px; font-weight: 900; letter-spacing: 0.15em; color: #94a3b8; text-transform: uppercase;
-}
