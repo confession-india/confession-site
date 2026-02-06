@@ -2,300 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HQ Moderation - Confess India</title>
-    
-    <meta name="robots" content="noindex, nofollow">
-
+    <title>Admin HQ - Confess India</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-    
-    <style>
-        body { background-color: #0b0f1a; scroll-behavior: smooth; }
-        .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .item-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #1e293b; }
-        .item-card:hover { border-color: #4f46e5; background-color: #1e293b; transform: translateY(-2px); }
-        .report-warning { border-color: #ef4444 !important; background: rgba(239, 68, 68, 0.08); box-shadow: 0 0 20px rgba(239, 68, 68, 0.1); }
-        .tab-active { background: #6366f1 !important; color: white !important; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
-        .stat-card { background: linear-gradient(145deg, #1e293b, #0f172a); border: 1px solid #334155; transition: all 0.2s; cursor: pointer; }
-        .stat-card:hover { transform: scale(1.05); border-color: #6366f1; }
-        .stat-card:active { transform: scale(0.95); }
-        input:focus, select:focus { border-color: #6366f1 !important; outline: none; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
-        .scroll-btn { transition: all 0.2s; opacity: 0.8; cursor: pointer; }
-        .scroll-btn:hover { opacity: 1; transform: scale(1.1); }
-        .mass-delete-btn { background: linear-gradient(to right, #ef4444, #b91c1c); box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="text-slate-200 min-h-screen font-sans">
-
-    <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#0b0f1a] p-4">
-        <div class="glass-card w-full max-w-md p-8 rounded-[40px] text-center">
-            <div class="mb-8">
-                <div class="w-16 h-16 bg-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-indigo-500/30">
-                    <span class="text-2xl">🔐</span>
-                </div>
-                <h2 class="text-2xl font-black text-white">HQ <span class="text-indigo-500">Access</span></h2>
-                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-2">Confess India Administration</p>
-            </div>
-            <div class="space-y-4">
-                <input type="email" id="loginEmail" placeholder="Admin Email" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all text-white">
-                <input type="password" id="loginPassword" placeholder="Secret Key" class="w-full bg-slate-900 border border-slate-800 rounded-2xl px-6 py-4 text-sm font-medium transition-all text-white">
-                <button onclick="signIn()" id="loginBtn" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 active:scale-[0.98]">INITIALIZE ACCESS</button>
-            </div>
-            <p id="errorMsg" class="text-red-500 text-xs font-bold mt-4 hidden"></p>
+<body class="bg-slate-950 text-white min-h-screen">
+    <div id="authOverlay" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center p-6">
+        <div class="bg-slate-900 p-10 rounded-[40px] w-full max-w-md border border-slate-800 text-center">
+            <h2 class="text-2xl font-black mb-8 italic uppercase tracking-tighter">Admin Initialized</h2>
+            <input type="email" id="loginEmail" placeholder="Sanjeev's ID" class="w-full bg-slate-800 p-4 rounded-2xl mb-4 border border-slate-700 outline-none">
+            <input type="password" id="loginPassword" placeholder="Secret Phrase" class="w-full bg-slate-800 p-4 rounded-2xl mb-8 border border-slate-700 outline-none">
+            <button onclick="signIn()" class="w-full bg-indigo-600 py-4 rounded-2xl font-black shadow-lg">UNLOCK HQ</button>
         </div>
     </div>
 
     <div id="adminUI" class="hidden">
-        <header class="bg-slate-900/80 backdrop-blur-xl border-b border-slate-800 sticky top-0 z-50">
-            <div class="max-w-6xl mx-auto p-6 flex flex-col md:flex-row justify-between items-center gap-6">
-                <div>
-                    <h1 class="text-xl font-black text-white tracking-tight">Control<span class="text-indigo-500">Center</span></h1>
-                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Safety Protocols Active</p>
-                </div>
-                <div class="flex bg-slate-800 p-1 rounded-2xl border border-slate-700">
-                    <button onclick="switchTab('posts')" id="tab-posts" class="px-6 py-2 rounded-xl text-xs font-black transition-all tab-active">CONFESSIONS</button>
-                    <button onclick="switchTab('inbox')" id="tab-inbox" class="px-6 py-2 rounded-xl text-xs font-black transition-all text-slate-400">INBOX</button>
-                </div>
-                <div class="flex gap-4">
-                    <button onclick="logout()" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-5 py-2 rounded-2xl text-[10px] font-black transition-all border border-red-500/20">LOGOUT</button>
-                    <button onclick="window.location.href='index.html'" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-2xl text-[10px] font-black transition-all border border-slate-700">EXIT</button>
-                </div>
+        <header class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 sticky top-0 backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse"></div>
+                <h1 class="font-black text-sm uppercase tracking-widest">Live Moderation</h1>
             </div>
+            <button onclick="auth.signOut().then(()=>location.reload())" class="text-[10px] font-black uppercase text-red-500">Disconnect</button>
         </header>
 
-        <main class="max-w-5xl mx-auto p-6">
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-                <div onclick="setFilter('all_posts')" class="stat-card p-5 rounded-3xl text-center">
-                    <p class="text-slate-500 text-[9px] font-black uppercase tracking-widest mb-1">Total</p>
-                    <h4 id="stat-total" class="text-xl font-black text-white">0</h4>
-                </div>
-                <div onclick="setFilter('reported')" class="stat-card p-5 rounded-3xl text-center border-orange-900/30">
-                    <p class="text-orange-500 text-[9px] font-black uppercase tracking-widest mb-1">Flagged</p>
-                    <h4 id="stat-reported" class="text-xl font-black text-orange-500">0</h4>
-                </div>
-                <div onclick="setFilter('banned')" class="stat-card p-5 rounded-3xl text-center border-red-900/40">
-                    <p class="text-red-500 text-[9px] font-black uppercase tracking-widest mb-1">Banned (10+)</p>
-                    <h4 id="stat-banned" class="text-xl font-black text-red-500">0</h4>
-                </div>
-                <div onclick="setFilter('all_msgs')" class="stat-card p-5 rounded-3xl text-center border-indigo-900/30">
-                    <p class="text-indigo-400 text-[9px] font-black uppercase tracking-widest mb-1">Inbox</p>
-                    <h4 id="stat-messages" class="text-xl font-black text-indigo-400">0</h4>
-                </div>
-                <div onclick="setFilter('abuse')" class="stat-card p-5 rounded-3xl text-center border-pink-900/30">
-                    <p class="text-pink-400 text-[9px] font-black uppercase tracking-widest mb-1">Abuse</p>
-                    <h4 id="stat-abuse" class="text-xl font-black text-pink-400">0</h4>
-                </div>
+        <div id="adminFeed" class="max-w-4xl mx-auto p-6 space-y-4">
             </div>
-
-            <div id="filterBar" class="flex flex-wrap items-center gap-3 mb-8 justify-between bg-slate-900/40 p-4 rounded-3xl border border-slate-800">
-                <div class="flex flex-wrap gap-3 items-center">
-                    <input type="text" id="searchInput" oninput="renderPosts()" placeholder="Search..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white w-48">
-                    <select id="langFilter" onchange="renderPosts()" class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-xs font-bold text-slate-300">
-                        <option value="all">All Languages</option>
-                        <option value="en">English</option>
-                        <option value="hi">Hindi</option>
-                        <option value="te">Telugu</option>
-                        <option value="ta">Tamil</option>
-                    </select>
-                    <span id="activeFilterLabel" class="hidden text-[9px] font-black bg-indigo-600 px-3 py-1.5 rounded-full text-white uppercase"></span>
-                </div>
-
-                <button id="massDeleteBtn" onclick="massDeleteReported()" class="hidden mass-delete-btn text-white text-[10px] font-black px-5 py-2 rounded-xl transition-all">
-                    DELETE ALL SHOWN
-                </button>
-            </div>
-
-            <div id="feed" class="grid grid-cols-1 gap-4 pb-20">
-                <div class="text-center py-20 text-slate-600 font-bold uppercase text-xs">Connecting...</div>
-            </div>
-        </main>
     </div>
 
-    <div class="fixed bottom-6 right-6 flex flex-col gap-2 z-[60]">
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="scroll-btn p-3 bg-indigo-600 text-white rounded-full">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 15l7-7 7 7"/></svg>
-        </button>
-    </div>
-
-    <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", 
-            authDomain: "confession-india.firebaseapp.com", 
-            projectId: "confession-india", 
-            storageBucket: "confession-india.firebasestorage.app", 
-            messagingSenderId: "345080016810", 
-            appId: "1:345080016810:web:3032f570077ea8d6dd45d3" 
-        };
-
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        const MASTER_EMAIL = "sanjeevraju716@gmail.com";
-        const BANNED_THRESHOLD = 10;
-
-        let currentView = 'posts'; 
-        let currentFilter = 'all'; 
-        let allConfessions = [];
-        let allMessages = [];
-
-        auth.onAuthStateChanged(user => {
-            if (user && user.email === MASTER_EMAIL) {
-                document.getElementById('authOverlay').classList.add('hidden');
-                document.getElementById('adminUI').classList.remove('hidden');
-                startHQ();
-            } else {
-                document.getElementById('authOverlay').classList.remove('hidden');
-                document.getElementById('adminUI').classList.add('hidden');
-            }
-        });
-
-        async function signIn() {
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPassword').value;
-            const btn = document.getElementById('loginBtn');
-            btn.innerText = "VERIFYING..."; btn.disabled = true;
-            try { await auth.signInWithEmailAndPassword(email, pass); } catch (e) {
-                document.getElementById('errorMsg').innerText = "ACCESS DENIED";
-                document.getElementById('errorMsg').classList.remove('hidden'); 
-                btn.innerText = "INITIALIZE ACCESS"; btn.disabled = false;
-            }
-        }
-
-        function logout() { auth.signOut().then(() => location.reload()); }
-
-        function startHQ() {
-            db.collection('confessions').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                allConfessions = [];
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    allConfessions.push({ id: doc.id, ...data });
-                    // AUTO-BAN LOGIC
-                    if (data.reportCount >= BANNED_THRESHOLD && data.status !== 'banned') {
-                        db.collection('confessions').doc(doc.id).update({ status: 'banned' });
-                    }
-                });
-                updateStats();
-                if(currentView === 'posts') renderPosts();
-            });
-
-            db.collection('support_messages').orderBy('timestamp', 'desc').onSnapshot(snap => {
-                allMessages = [];
-                snap.forEach(doc => allMessages.push({ id: doc.id, ...doc.data() }));
-                updateStats();
-                if(currentView === 'inbox') renderInbox();
-            });
-        }
-
-        function updateStats() {
-            document.getElementById('stat-total').innerText = allConfessions.length;
-            document.getElementById('stat-reported').innerText = allConfessions.filter(p => p.reportCount > 0 && p.reportCount < BANNED_THRESHOLD).length;
-            document.getElementById('stat-banned').innerText = allConfessions.filter(p => p.status === 'banned' || p.reportCount >= BANNED_THRESHOLD).length;
-            document.getElementById('stat-messages').innerText = allMessages.length;
-            document.getElementById('stat-abuse').innerText = allMessages.filter(m => m.type === 'ABUSE_REPORT').length;
-        }
-
-        window.setFilter = (type) => {
-            const label = document.getElementById('activeFilterLabel');
-            const massBtn = document.getElementById('massDeleteBtn');
-            currentFilter = type;
-            
-            if(type === 'all_msgs' || type === 'abuse') {
-                currentView = 'inbox';
-                label.innerText = type === 'abuse' ? "🚫 Filter: Abuse" : "";
-                massBtn.classList.add('hidden');
-            } else {
-                currentView = 'posts';
-                if(type === 'reported') label.innerText = "🚩 Filter: Flagged";
-                else if(type === 'banned') label.innerText = "🚫 Filter: Banned";
-                else label.innerText = "";
-                massBtn.classList.toggle('hidden', type === 'all_posts');
-            }
-            
-            label.classList.toggle('hidden', label.innerText === "");
-            switchTab(currentView, false); 
-        };
-
-        window.switchTab = (tab, resetFilter = true) => {
-            currentView = tab;
-            if(resetFilter) {
-                currentFilter = 'all';
-                document.getElementById('activeFilterLabel').classList.add('hidden');
-                document.getElementById('massDeleteBtn').classList.add('hidden');
-            }
-            document.getElementById('tab-posts').classList.toggle('tab-active', tab === 'posts');
-            document.getElementById('tab-inbox').classList.toggle('tab-active', tab === 'inbox');
-            tab === 'posts' ? renderPosts() : renderInbox();
-        };
-
-        window.renderPosts = function() {
-            const feed = document.getElementById('feed');
-            const term = document.getElementById('searchInput').value.toLowerCase();
-            const lang = document.getElementById('langFilter').value;
-
-            let filtered = allConfessions.filter(p => {
-                const matchesSearch = (p.content || "").toLowerCase().includes(term);
-                const matchesLang = lang === 'all' || (p.language === lang);
-                if (currentFilter === 'reported') return matchesSearch && matchesLang && p.reportCount > 0 && p.reportCount < BANNED_THRESHOLD;
-                if (currentFilter === 'banned') return matchesSearch && matchesLang && (p.status === 'banned' || p.reportCount >= BANNED_THRESHOLD);
-                return matchesSearch && matchesLang;
-            });
-
-            feed.innerHTML = filtered.map(p => {
-                const isBanned = p.status === 'banned' || p.reportCount >= BANNED_THRESHOLD;
-                return `
-                <div class="item-card p-6 rounded-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${p.reportCount > 0 ? 'report-warning' : ''}">
-                    <div class="flex-grow">
-                        <div class="flex items-center gap-3 mb-3">
-                            <span class="text-[9px] font-black uppercase tracking-widest ${isBanned ? 'bg-red-600' : (p.reportCount > 0 ? 'bg-orange-500' : 'bg-slate-700')} text-white px-2.5 py-1 rounded-full">
-                                ${isBanned ? 'AUTO-BANNED' : (p.reportCount > 0 ? '🚩 ' + p.reportCount + ' REPORTS' : '✓ Safe')}
-                            </span>
-                        </div>
-                        <h3 class="text-white font-black text-sm uppercase mb-1">${p.username || 'Anonymous'}</h3>
-                        <p class="text-slate-400 text-sm font-medium leading-relaxed">${p.content}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        ${isBanned ? `<button onclick="restorePost('${p.id}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white px-4 py-3 rounded-2xl text-[9px] font-black transition-all">RESTORE</button>` : ''}
-                        <button onclick="delPost('${p.id}')" class="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-3 rounded-2xl text-[9px] font-black transition-all">DELETE</button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        window.renderInbox = function() {
-            const feed = document.getElementById('feed');
-            let filtered = allMessages.filter(m => currentFilter === 'abuse' ? (m.type === 'ABUSE_REPORT') : true);
-            feed.innerHTML = filtered.map(m => `
-                <div class="item-card p-6 rounded-[32px] flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ${m.type === 'ABUSE_REPORT' ? 'report-warning' : ''}">
-                    <div class="flex-grow w-full">
-                        <h3 class="text-white font-black text-sm mb-1">${m.name} <span class="text-slate-500 ml-2 font-normal text-xs">— ${m.email}</span></h3>
-                        <p class="text-slate-300 text-sm mt-2 font-medium">${m.message}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <a href="mailto:${m.email}" class="bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">REPLY</a>
-                        <button onclick="resolveMsg('${m.id}')" class="bg-emerald-500/10 hover:bg-emerald-500 text-emerald-500 hover:text-white px-6 py-3 rounded-2xl text-[10px] font-black transition-all">RESOLVE</button>
-                    </div>
-                </div>`).join('');
-        }
-
-        window.massDeleteReported = async () => {
-            const toDelete = allConfessions.filter(p => {
-                if(currentFilter === 'reported') return p.reportCount > 0 && p.reportCount < BANNED_THRESHOLD;
-                if(currentFilter === 'banned') return p.status === 'banned' || p.reportCount >= BANNED_THRESHOLD;
-                return false;
-            });
-            if(!toDelete.length || !confirm(`Delete ${toDelete.length} items permanently?`)) return;
-            const batch = db.batch();
-            toDelete.forEach(p => batch.delete(db.collection('confessions').doc(p.id)));
-            await batch.commit();
-            alert("Cleared!");
-        };
-
-        window.restorePost = (id) => { if(confirm("Restore this post?")) db.collection('confessions').doc(id).update({ status: 'active', reportCount: 0 }); };
-        window.delPost = (id) => { if(confirm("Delete permanently?")) db.collection('confessions').doc(id).delete(); };
-        window.resolveMsg = (id) => { if(confirm("Mark resolved?")) db.collection('support_messages').doc(id).delete(); };
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
