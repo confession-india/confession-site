@@ -1,53 +1,445 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT5SF025XK"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-LT5SF025XK');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confess India | Anonymous Secrets</title>
+    <meta name="google-site-verification" content="E0eroPpuSrFX_H8NK5GV0vtHNz5S-xScaEDuM25Zth4" />
+
+    <title>Confess India | Share Your Truth Anonymously</title>
     
-    <meta property="og:title" content="Confess India | Anonymous Secrets">
-    <meta property="og:description" content="Read and share anonymous secrets safely. The truth is out here.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200">
-    <meta property="og:url" content="https://confession-india.github.io/confession-site/">
-    <meta property="og:type" content="website">
+    <meta name="description" content="Confess India: The safest digital sanctuary to share secrets. భారతీయుల కోసం అజ్ఞాత రహస్యాల వేదిక. भारतीयों के लिए गुप्त रहस्य साझा करने का मंच। Support for Telugu, Hindi, Tamil & more.">
+    <meta name="keywords" content="anonymous confessions india, share secrets online, telugu confessions, hindi confessions, anonymous chat india">
+    <link rel="canonical" href="https://confessionindia.in/" />
+    
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:locale:alternate" content="hi_IN">
+    <meta property="og:locale:alternate" content="te_IN">
+    <meta property="og:locale:alternate" content="ta_IN">
+    <meta name="content-language" content="en, hi, te, ta, kn, ml">
+    <meta name="theme-color" content="#0f172a">
+
+    <link rel="icon" href="https://fav.farm/🤫">
+
+    <style>
+        #shareModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 200;
+        }
+        #shareModal.show { display: flex; }
+        .lang-active { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
+        .cat-active { background-color: #4f46e5 !important; color: white !important; border-color: #4f46e5 !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse-green { animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        .share-pill {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            transition: all 0.3s ease;
+        }
+        .share-pill:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    </style>
+
+    <script>
+        if (localStorage.getItem('userLang') === null) { localStorage.setItem('userLang', 'en'); }
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme')) {
+            document.documentElement.classList.add('dark');
+        } else if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#fdfdff] text-slate-900 min-h-screen">
-    <div id="mouse-glow"></div>
+<body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
 
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 px-6 h-20 flex justify-between items-center">
-        <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent uppercase tracking-tighter">Confess India</h1>
-        <a href="post.html" class="bg-indigo-600 text-white px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg shadow-indigo-200">Post Secret</a>
-    </header>
-
-    <main class="max-w-4xl mx-auto px-6 py-12">
-        <div id="confessionFeed" class="space-y-8"></div>
-    </main>
-
-    <div id="shareModal" onclick="this.classList.remove('show')">
-        <div class="bg-white p-8 rounded-[40px] w-full max-w-sm m-4 space-y-4" onclick="event.stopPropagation()">
-            <h3 class="text-xl font-black mb-6">Spread the Truth</h3>
-            <button onclick="shareWhatsApp()" class="w-full py-4 bg-[#25D366] text-white rounded-2xl font-bold hover:scale-105 transition-transform">WhatsApp</button>
-            <button onclick="shareInstagram()" class="w-full py-4 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white rounded-2xl font-bold hover:scale-105 transition-transform">Save for Insta</button>
-            <button onclick="copyToClipboard()" class="w-full py-4 bg-slate-100 rounded-2xl font-bold hover:bg-slate-200 transition-all">Copy Branded Link</button>
+    <div class="sticky top-0 z-[100] bg-slate-900 py-3 overflow-x-auto no-scrollbar border-b border-slate-800">
+        <div class="max-w-4xl mx-auto px-4 flex gap-2">
+            <button onclick="setLanguage('en')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-en">English</button>
+            <button onclick="setLanguage('te')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-te">తెలుగు</button>
+            <button onclick="setLanguage('ta')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ta">தமிழ்</button>
+            <button onclick="setLanguage('kn')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-kn">ಕನ್ನಡ</button>
+            <button onclick="setLanguage('ml')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-ml">മലയാളം</button>
+            <button onclick="setLanguage('hi')" class="lang-pill px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-slate-700 whitespace-nowrap" id="lang-hi">हिंदी</button>
         </div>
     </div>
 
-    <footer class="p-12 text-center border-t border-slate-100 mt-20">
-        <div class="mb-6 flex justify-center gap-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            <a href="legal.html" class="hover:text-indigo-600">Privacy Policy</a>
-            <a href="support.html" class="hover:text-indigo-600">Support</a>
+    <header class="sticky top-[52px] z-[90] bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl global-header">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <div class="flex flex-col">
+                <a href="index.html" class="hover:opacity-80 transition-opacity">
+                    <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess India</h1>
+                </a>
+                <span id="ui-subheading" class="text-[10px] text-gray-400 dark:text-slate-500 font-bold tracking-widest uppercase mt-1 ml-0.5">Community Feed</span>
+            </div>
+            <a href="post.html" id="ui-share-btn" class="bg-indigo-600 text-white px-5 py-2.5 rounded-2xl shadow-lg font-bold text-sm transition-all hover:bg-indigo-700">+ Share Secret</a>
         </div>
-        <div class="flex justify-center gap-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
-            <span>📍 HYD: <span id="hyd-time">--:--</span></span>
-            <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
-        </div>
-    </footer>
+    </header>
 
-    <script src="script.js"></script>
+    <div class="page-wrapper">
+        <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[110] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
+            <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </button>
+
+        <div id="shareModal" onclick="closeShare()">
+            <div class="bg-white dark:bg-[#1e293b] p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 border dark:border-slate-700" onclick="event.stopPropagation()">
+                <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">WhatsApp</button>
+                    <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Instagram (as Image)</button>
+                    <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Facebook</button>
+                    <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">X (Twitter)</button>
+                    <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 py-4 rounded-2xl font-bold">Copy Secret Text</button>
+                    <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 py-4 rounded-2xl font-bold">Copy Web Link</button>
+                </div>
+                <button onclick="closeShare()" class="w-full text-slate-400 font-bold py-2 mt-2 uppercase text-xs tracking-widest">Close</button>
+            </div>
+        </div>
+
+        <main class="max-w-4xl mx-auto p-4">
+            <div id="dailyWisdom" class="mb-2 hidden">
+                <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl flex flex-col md:flex-row items-center gap-6 border-4 border-indigo-500/30">
+                    <div class="bg-white/20 p-4 rounded-2xl text-2xl">🔥</div>
+                    <div class="flex-1 text-center md:text-left overflow-hidden">
+                        <h3 class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Most Supported Today</h3>
+                        <p id="top-secret-text" class="text-lg font-bold leading-tight italic break-words">"Loading..."</p>
+                        <button id="banner-read-more" class="hidden text-[10px] font-black uppercase tracking-widest mt-2 opacity-70 hover:opacity-100" data-state="short"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex overflow-x-auto py-6 space-x-3 no-scrollbar items-center">
+                <button onclick="filterCat('all', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm cat-active" id="cat-all">Latest</button>
+                <button onclick="filterCat('relationship', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-rel">Relationships</button>
+                <button onclick="filterCat('family', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-fam">Family</button>
+                <button onclick="filterCat('marriage', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-mar">Marriage</button>
+                <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-oth">Other</button>
+            </div>
+
+            <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
+
+            <section class="mt-20 py-12 border-t border-slate-100 dark:border-slate-800">
+                <div class="text-center mb-10">
+                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em]">Privacy First</span>
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white mt-2">Your Identity is Protected</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Zero Logs</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">No Accounts</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
+                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Human Moderated</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 overflow-hidden border-t border-slate-800">
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div class="space-y-4">
+                    <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
+                    <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths without judgment, fear, or recognition.</p>
+                    <div class="flex items-center gap-3 bg-slate-800/50 w-fit px-4 py-2 rounded-full border border-slate-700">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-8 md:col-span-2">
+                    <div>
+                        <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Platform</h3>
+                        <ul class="space-y-3 text-sm font-bold">
+                            <li><a href="legal.html#mission" class="hover:text-white transition-colors">Our Mission</a></li>
+                            <li><a href="legal.html#privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                            <li><a href="legal.html#rules" class="hover:text-white transition-colors">Community Rules</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Connect</h3>
+                        <ul class="space-y-3 text-sm font-bold">
+                            <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
+                            <li><a href="support.html?type=abuse" class="hover:text-red-400 transition-colors text-red-500/80">Report Abuse</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center space-y-4">
+                <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest">
+                    <span>📍 HYD: <span id="hyd-time">--:--</span></span>
+                    <span class="text-red-600">|</span>
+                    <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
+                </div>
+                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">No Cookies • No Emails • Just the Truth</p>
+                <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built with Integrity from HYD to LDN.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const SITE_URL = "https://confessionindia.in";
+        
+        const translations = {
+            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less", shareTruth: "Share Truth" },
+            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి", shareTruth: "షేర్ చేయండి" },
+            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
+            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ఫీడ్", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
+        };
+
+        let currentLang = localStorage.getItem('userLang') || 'en';
+        let currentCategory = 'all';
+        let unsubscribe = null;
+        let isUserInteracting = false; 
+
+        window.onscroll = function() {
+            const scrollTab = document.getElementById('scrollTab');
+            const scrollIcon = document.getElementById('scrollIcon');
+            if (window.scrollY > 300) { scrollTab.classList.remove('hidden'); scrollTab.classList.add('flex'); } else { scrollTab.classList.add('hidden'); }
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) { scrollIcon.style.transform = "rotate(180deg)"; } else { scrollIcon.style.transform = "rotate(0deg)"; }
+        };
+
+        function handleScrollAction() {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) window.scrollTo({ top: 0, behavior: 'smooth' });
+            else window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        function updateClocks() {
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
+            try {
+                document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...options, timeZone: 'Asia/Kolkata' }).format(new Date());
+                document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
+            } catch (e) { }
+        }
+        setInterval(updateClocks, 60000); updateClocks();
+
+        function timeAgo(date) {
+            if (!date) return 'Just now';
+            const seconds = Math.floor((new Date() - date.toDate()) / 1000);
+            if (seconds < 60) return "Just now";
+            const interval = Math.floor(seconds / 3600);
+            if (interval >= 1) return interval + "h ago";
+            return Math.floor(seconds / 60) + "m ago";
+        }
+
+        function toggleReadMore(id) {
+            const content = document.getElementById(`text-${id}`);
+            const btn = document.getElementById(`btn-${id}`);
+            const fullText = decodeURIComponent(content.getAttribute('data-full'));
+            const shortText = decodeURIComponent(content.getAttribute('data-short'));
+            
+            if (btn.getAttribute('data-state') === "short") {
+                content.innerText = `"${fullText}"`;
+                btn.innerText = translations[currentLang].readLess;
+                btn.setAttribute('data-state', 'long');
+            } else {
+                content.innerText = `"${shortText}..."`;
+                btn.innerText = translations[currentLang].readMore;
+                btn.setAttribute('data-state', 'short');
+            }
+        }
+
+        window.downloadSecret = (id, content) => {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.left = '-9999px';
+            tempDiv.innerHTML = `
+                <div id="capture-${id}" style="width: 500px; min-height: 500px; height: auto; background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 50px 40px; text-align: center; font-family: sans-serif; box-sizing: border-box;">
+                    <div style="font-size: 12px; font-weight: 900; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 2px; opacity: 0.9;">Confess India</div>
+                    <div style="font-size: 18px; font-weight: 700; font-style: italic; line-height: 1.5; word-wrap: break-word; width: 100%;">"${content}"</div>
+                    <div style="margin-top: 40px; font-size: 14px; font-weight: 800; opacity: 0.9; letter-spacing: 1px;">confessionindia.in</div>
+                </div>`;
+            document.body.appendChild(tempDiv);
+            html2canvas(document.getElementById(`capture-${id}`), { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Confession-${id}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                document.body.removeChild(tempDiv);
+            });
+        };
+
+        function renderPosts(posts) {
+            if (isUserInteracting) return;
+            const feed = document.getElementById('feed');
+            feed.innerHTML = '';
+            
+            const activePosts = posts.filter(p => p.status !== "hidden");
+            activePosts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+            if (activePosts.length > 0) {
+                const topPost = [...activePosts].sort((a,b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
+                const bannerDiv = document.getElementById('dailyWisdom');
+                const bannerText = document.getElementById('top-secret-text');
+                const bannerBtn = document.getElementById('banner-read-more');
+                
+                bannerDiv.classList.remove('hidden');
+                const isBannerLong = topPost.content.length > 200;
+                const bannerShort = topPost.content.substring(0, 200);
+                bannerText.innerText = isBannerLong ? `"${bannerShort}..."` : `"${topPost.content}"`;
+                
+                if(isBannerLong) {
+                    bannerBtn.classList.remove('hidden');
+                    bannerBtn.innerText = translations[currentLang].readMore;
+                    bannerBtn.setAttribute('data-state', 'short');
+                    bannerBtn.onclick = () => {
+                        if(bannerBtn.getAttribute('data-state') === "short") {
+                            bannerText.innerText = `"${topPost.content}"`;
+                            bannerBtn.innerText = translations[currentLang].readLess;
+                            bannerBtn.setAttribute('data-state', 'long');
+                        } else {
+                            bannerText.innerText = `"${bannerShort}..."`;
+                            bannerBtn.innerText = translations[currentLang].readMore;
+                            bannerBtn.setAttribute('data-state', 'short');
+                        }
+                    };
+                }
+            }
+
+            activePosts.forEach(post => {
+                const safeContent = encodeURIComponent(post.content);
+                const isHearted = localStorage.getItem(`supportCount-${post.id}`);
+                const isMeTooed = localStorage.getItem(`meTooCount-${post.id}`);
+                const authorName = post.username || "Anonymous";
+                const isLong = post.content.length > 300;
+                const shortText = isLong ? post.content.substring(0, 300) : post.content;
+                const displayContent = isLong ? `"${shortText}..."` : `"${post.content}"`;
+
+                feed.insertAdjacentHTML('beforeend', `
+                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-6 transition-all duration-300">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black uppercase text-indigo-500 mb-1">${post.category || 'other'}</span>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[9px] text-slate-400 dark:text-slate-300 font-black uppercase tracking-widest">${authorName}</span>
+                                    <span class="text-[15px] text-slate-300 leading-none">·</span>
+                                    <span class="text-[9px] text-slate-300 dark:text-slate-500 font-bold uppercase tracking-widest">${timeAgo(post.timestamp)}</span>
+                                </div>
+                            </div>
+                            <button onclick="reportPost('${post.id}')" class="text-[9px] font-black text-slate-300 dark:text-slate-500 uppercase hover:text-red-500">${translations[currentLang].report}</button>
+                        </div>
+                        <p id="text-${post.id}" data-full="${safeContent}" data-short="${encodeURIComponent(shortText)}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words">
+                            ${displayContent}
+                        </p>
+                        ${isLong ? `<button id="btn-${post.id}" data-state="short" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-sm mb-6 block">${translations[currentLang].readMore}</button>` : '<div class="mb-6"></div>'}
+                        
+                        <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+                            <div class="flex gap-2">
+                                <button onclick="interact(event, '${post.id}', 'supportCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 dark:text-pink-400 transition-all active:scale-95 ${isHearted ? 'opacity-50 pointer-events-none' : ''}">
+                                    <span class="text-sm">❤️</span> <span class="text-xs font-black" id="sup-${post.id}">${post.supportCount || 0}</span>
+                                </button>
+                                <button onclick="interact(event, '${post.id}', 'meTooCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 dark:text-indigo-400 transition-all active:scale-95 ${isMeTooed ? 'opacity-50 pointer-events-none' : ''}">
+                                    <span class="text-sm">🫂</span> <span class="text-xs font-black" id="metoo-${post.id}">${post.meTooCount || 0}</span>
+                                </button>
+                            </div>
+                            
+                            <button onclick="openShare('${post.id}')" class="share-pill flex items-center justify-center gap-2 py-3 rounded-2xl text-white shadow-lg active:scale-95 transition-all">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+                                <span class="text-[11px] font-black uppercase tracking-widest">${translations[currentLang].shareTruth}</span>
+                            </button>
+                        </div>
+                    </div>`);
+            });
+        }
+
+        async function loadPosts(category = 'all') {
+            if (unsubscribe) unsubscribe();
+            unsubscribe = db.collection('confessions').onSnapshot(snapshot => {
+                let allPosts = [];
+                snapshot.forEach(doc => allPosts.push({ id: doc.id, ...doc.data() }));
+                let filtered = category === 'all' ? allPosts : allPosts.filter(p => p.category === category.toLowerCase());
+                renderPosts(filtered.filter(p => (p.language || 'en') === currentLang));
+            });
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang; localStorage.setItem('userLang', lang);
+            document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
+            const activePill = document.getElementById(`lang-${lang}`);
+            if(activePill) activePill.classList.add('lang-active');
+            
+            document.getElementById('cat-all').innerText = translations[lang].latest;
+            document.getElementById('cat-rel').innerText = translations[lang].rel;
+            document.getElementById('cat-fam').innerText = translations[lang].fam;
+            document.getElementById('cat-mar').innerText = translations[lang].mar;
+            document.getElementById('cat-oth').innerText = translations[lang].oth;
+            document.getElementById('ui-share-btn').innerText = translations[lang].shareBtn;
+            document.getElementById('ui-subheading').innerText = translations[lang].sub;
+            loadPosts(currentCategory);
+        }
+
+        function filterCat(cat, btn) { 
+            currentCategory = cat; 
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active')); 
+            btn.classList.add('cat-active'); 
+            loadPosts(cat); 
+        }
+
+        window.interact = (e, id, field) => {
+            if (localStorage.getItem(`${field}-${id}`)) return;
+            isUserInteracting = true; 
+            localStorage.setItem(`${field}-${id}`, 'true');
+            const btn = e.currentTarget;
+            btn.classList.add('opacity-50', 'pointer-events-none');
+            const docRef = db.collection('confessions').doc(id);
+            db.runTransaction(async (transaction) => {
+                const sfDoc = await transaction.get(docRef);
+                if (!sfDoc.exists) return;
+                const newCount = (sfDoc.data()[field] || 0) + 1;
+                transaction.update(docRef, { [field]: newCount });
+                const labelId = field === 'supportCount' ? `sup-${id}` : `metoo-${id}`;
+                document.getElementById(labelId).innerText = newCount;
+            }).then(() => { isUserInteracting = false; }).catch(() => { isUserInteracting = false; });
+        };
+
+        window.openShare = (id) => {
+            const text = decodeURIComponent(document.getElementById(`text-${id}`).getAttribute('data-full'));
+            const modal = document.getElementById('shareModal');
+            const link = `${SITE_URL}/index.html?id=${id}`;
+            modal.classList.add('show');
+            document.getElementById('waBtn').onclick = () => window.open(`https://wa.me/?text=${encodeURIComponent(text + "\n\nRead more: " + link)}`);
+            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`);
+            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(link)}`);
+            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(link); alert("Link Copied!"); };
+            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(text); alert("Secret Text Copied!"); };
+            document.getElementById('igBtn').onclick = () => downloadSecret(id, text);
+        };
+
+        window.closeShare = () => document.getElementById('shareModal').classList.remove('show');
+
+        window.reportPost = (id) => {
+            if (confirm("Report this post?")) {
+                db.collection('reports').add({ postId: id, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                alert("Thank you. Our moderators will review this.");
+            }
+        };
+
+        setLanguage(currentLang);
+    </script>
 </body>
 </html>
