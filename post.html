@@ -17,36 +17,16 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        #submitBtn:disabled {
-            background-color: #94a3b8 !important;
-            cursor: not-allowed;
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        .animate-pulse-green {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-
-        /* Smooth UI Transitions */
-        #previewContainer, #submitBtn, #confidence-bar, #p-lang-tag {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+        html, body { margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        #submitBtn:disabled { background-color: #94a3b8 !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+        .animate-pulse-green { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        #previewContainer, #submitBtn, #confidence-bar, #p-lang-tag { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
+    
+    <div id="mouse-glow"></div>
 
     <div id="toast">
         <div class="bg-indigo-600 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-3">
@@ -142,7 +122,7 @@
                     </div>
                 </div>
 
-                <button id="submitBtn" type="submit" class="w-full bg-indigo-600 text-white py-5 rounded-[24px] font-black text-lg shadow-xl shadow-indigo-100 dark:shadow-none hover:bg-indigo-700 transition-all active:scale-95">Post Anonymously</button>
+                <button id="submitBtn" type="submit" class="w-full bg-indigo-600 text-white py-5 rounded-[24px] font-black text-lg shadow-xl shadow-indigo-100 dark:shadow-none transition-all active:scale-95">Post Anonymously</button>
             </form>
         </div>
     </main>
@@ -193,7 +173,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 1. Language Engine & Slang Dictionary
         const LanguageEngine = {
             dictionaries: {
                 te: ['vadu', 'ledhu', 'kadha', 'ekkada', 'cheppu', 'ante', 'unnadu', 'vachindi', 'thindi', 'emundi', 'telusu', 'chesadu', 'avunu', 'kuda', 'bhaya', 'mowa', 'enti', 'ela', 'ivvali', 'oddu', 'amma', 'nanna', 'abbayi', 'ammayi', 'undhi', 'ra', 're', 'guru', 'manchi', 'teliyadu', 'velli'],
@@ -228,14 +207,8 @@
             en: { color: '#ef4444', label: 'English Feed', btn: 'Post Anonymously' }
         };
 
-        const BAD_WORDS = [
-            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy",
-            "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde",
-            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "modda",
-            "punda", "baadu", "thevidiya", "omala", "koothi", "bolimaga", "sule", "thayoli", "kunna", "pooru"
-        ];
+        const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy","maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde","lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "modda","punda", "baadu", "thevidiya", "omala", "koothi", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
 
-        // 2. Elements
         const msgInput = document.getElementById('msgInput');
         const userInput = document.getElementById('userInput');
         const catInput = document.getElementById('catInput');
@@ -246,23 +219,32 @@
         const langTag = document.getElementById('p-lang-tag');
         const confBar = document.getElementById('confidence-bar');
         const confPct = document.getElementById('conf-pct');
+        const pMsg = document.getElementById('p-msg');
 
         let detectedLang = 'en';
 
-        // 3. UI Logic
+        // Mouse Glow motion logic
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouse-glow');
+            if (glow) {
+                glow.style.left = e.clientX + 'px';
+                glow.style.top = e.clientY + 'px';
+            }
+        });
+
         function updateUI() {
             const val = msgInput.value;
             const analysis = LanguageEngine.analyze(val);
             const theme = langTheme[analysis.lang];
             detectedLang = analysis.lang;
 
-            // Content Updates
-            document.getElementById('p-msg').innerText = val ? `"${val}"` : "Your truth starts here...";
+            pMsg.innerText = val ? `"${val}"` : "Your truth starts here...";
+            if(val) { pMsg.classList.remove('opacity-60', 'italic'); } else { pMsg.classList.add('opacity-60', 'italic'); }
+            
             document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
             document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
             charCount.innerText = `${val.length} / 2000`;
 
-            // Color & Language Morphing
             previewBox.style.borderColor = theme.color;
             langTag.innerText = theme.label;
             langTag.style.backgroundColor = `${theme.color}15`;
@@ -273,23 +255,31 @@
             confPct.innerText = analysis.confidence + "%";
             confPct.style.color = theme.color;
 
-            // Button Logic
             if(val.trim().length >= 10) {
                 submitBtn.disabled = false;
-                submitBtn.style.backgroundColor = theme.color;
-                submitBtn.style.boxShadow = `0 10px 30px ${theme.color}40`;
                 submitBtn.innerText = theme.btn;
+                if(detectedLang === 'en') {
+                    submitBtn.classList.add('glow-red');
+                    submitBtn.style.backgroundColor = ""; 
+                    submitBtn.style.boxShadow = "";
+                } else {
+                    submitBtn.classList.remove('glow-red');
+                    submitBtn.style.backgroundColor = theme.color;
+                    submitBtn.style.boxShadow = `0 10px 30px ${theme.color}40`;
+                }
             } else {
                 submitBtn.disabled = true;
                 submitBtn.innerText = "Write more...";
+                submitBtn.classList.remove('glow-red');
+                submitBtn.style.backgroundColor = ""; 
+                submitBtn.style.boxShadow = "";
             }
 
-            // Safety Check
             const lowerText = val.toLowerCase();
             const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
             const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
-            
             const isAbuse = BAD_WORDS.some(word => lowerText.includes(word));
+            
             if(PHONE_REGEX.test(lowerText) || SOCIAL_REGEX.test(lowerText) || isAbuse) {
                 safetyText.innerText = "Conflict detected! Remove contact info/abuse.";
                 safetyText.style.color = "#ef4444";
@@ -300,11 +290,9 @@
             }
         }
 
-        // 4. Events
         [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
         catInput.addEventListener('change', updateUI);
 
-        // Clocks
         function updateClocks() {
             const opt = { hour: '2-digit', minute: '2-digit', hour12: true };
             document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...opt, timeZone: 'Asia/Kolkata' }).format(new Date());
@@ -312,7 +300,6 @@
         }
         setInterval(updateClocks, 60000); updateClocks();
 
-        // Scroll
         const scrollTab = document.getElementById('scrollTab');
         const scrollIcon = document.getElementById('scrollIcon');
         let isAtBottom = false;
@@ -321,11 +308,8 @@
             isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
             scrollIcon.style.transform = isAtBottom ? "rotate(180deg)" : "rotate(0deg)";
         });
-        function handleScrollAction() {
-            window.scrollTo({ top: isAtBottom ? 0 : document.body.scrollHeight, behavior: 'smooth' });
-        }
+        function handleScrollAction() { window.scrollTo({ top: isAtBottom ? 0 : document.body.scrollHeight, behavior: 'smooth' }); }
 
-        // Form Submit
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
@@ -335,7 +319,7 @@
                     username: userInput.value || "Anonymous",
                     category: catInput.value,
                     content: content,
-                    language: detectedLang, // Now dynamically saves the detected dialect
+                    language: detectedLang,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, meTooCount: 0, status: "public"
                 });
