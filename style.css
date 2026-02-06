@@ -1,43 +1,176 @@
-/* Confess India - Master Recovery CSS 2026 */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* Confess India - Ultimate Unified Design System 
+   Theme: London-Hyderabad Hybrid (Indigo/Red/Deep Slate)
+*/
 
-:root {
-    --primary: #4f46e5;
-    --primary-glow: rgba(79, 70, 229, 0.4);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-
-body { background-color: #fdfdff; scroll-behavior: smooth; position: relative; }
-
-/* Fixed Mouse Glow - Lower Z-Index so it stays behind text */
-#mouse-glow {
-    position: fixed; width: 450px; height: 450px;
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
-    pointer-events: none; z-index: -1; transform: translate(-50%, -50%);
-}
-
-.confession-card {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    background: white; border: 1px solid #f1f5f9;
-    position: relative; z-index: 10;
-}
-
-.confession-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.05);
+/* 1. ANIMATIONS & MICRO-INTERACTIONS */
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
 }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-10px); }
-    75% { transform: translateX(10px); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
 }
 
-.shake-active { animation: shake 0.4s ease-in-out 3; border: 2px solid var(--primary) !important; }
+@keyframes slideUp {
+    from { transform: translate(-50%, 20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
+}
 
+.animate-pulse-green { animation: pulse-green 2s infinite; }
+
+.shake-active { 
+    animation: shake 0.3s ease-in-out; 
+    border-color: #ef4444 !important; 
+    background-color: #fef2f2 !important; 
+}
+
+/* 2. CORE LAYOUT & MOUSE GLOW - Fixed Z-index */
+html { scroll-behavior: smooth; }
+
+#mouse-glow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.03) 50%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: -1; /* Moved to -1 so it never blocks clicks */
+    filter: blur(50px);
+    transition: opacity 0.5s ease;
+}
+
+/* 3. COMPONENT STYLING */
+.confession-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.confession-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 10;
+}
+
+.cat-active, .lang-active {
+    background: #4f46e5 !important;
+    color: white !important;
+    border-color: #4f46e5 !important;
+    transform: scale(1.05);
+}
+
+/* 4. NOTIFICATIONS (TOAST) */
+#toast { 
+    position: fixed; 
+    bottom: 30px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    z-index: 9999;
+    display: none;
+}
+
+#toast.show { 
+    display: block;
+    animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+/* 5. SHARE MODAL & BLUR */
 #shareModal {
-    display: none; position: fixed; inset: 0; background: rgba(11, 17, 32, 0.8);
-    backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px) saturate(180%);
+    z-index: 10000;
+    display: none;
 }
 #shareModal.show { display: flex; }
+
+.share-pill {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    transition: all 0.3s ease;
+}
+.share-pill:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+}
+
+/* 6. CUSTOM SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+/* 7. REFINED DARK MODE CORE */
+.dark body { 
+    background-color: #0b1120 !important; 
+    color: #f1f5f9 !important; 
+}
+
+.dark input, .dark textarea {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: white !important;
+}
+
+.dark ::-webkit-scrollbar-thumb { background: #334155; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+
+/* 8. UTILS */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 9. GLOBAL BRANDED HEADER - RED LINE & BLUR FIX */
+.global-header {
+    /* Removed transparent !important to allow backdrop-blur to work */
+    position: relative;
+    border-bottom: none !important;
+    overflow: visible !important;
+}
+
+/* Red Line Fix - London Tube Aesthetic */
+.global-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px; /* Thicker for better branding */
+    background: #ef4444 !important; /* London Red */
+    z-index: 100;
+}
+
+/* Dark mode header background */
+.dark .global-header {
+    background-color: rgba(11, 17, 32, 0.9) !important;
+}
+
+/* 10. PREVIEW BOX DARK FIX */
+.dark #previewContainer {
+    background-color: #1e293b !important;
+    border: 1px solid rgba(239, 68, 68, 0.4) !important;
+    color: #f1f5f9 !important;
+}
+
+/* 11. SUBMIT BUTTON & RADIANT GLOW */
+#submitBtn {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* The logic you mentioned - multi-layered glow */
+#submitBtn.glow-red {
+    background-color: #ef4444 !important;
+    border: 1px solid #ef4444 !important;
+    color: white !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5), 
+                0 0 30px rgba(239, 68, 68, 0.3) !important;
+    transform: translateY(-2px);
+}
+
+/* Force the form to show the glow instead of cutting it off */
+#postForm {
+    overflow: visible !important;
+}
