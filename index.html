@@ -284,8 +284,8 @@
             
             let query = db.collection('confessions');
             
-            // FIX: Always filter by language so the index works consistently across all buttons
-            query = query.where('lang', '==', currentLang);
+            // FIX: Using 'language' to match your database field precisely
+            query = query.where('language', '==', currentLang);
             
             if (currentCategory !== 'all') {
                 query = query.where('category', '==', currentCategory);
@@ -299,9 +299,8 @@
                 checkDeepLink();
             }, (error) => {
                 console.error("Firestore Error:", error);
-                // This will help you find the Index Link if it's missing
                 if (error.message.includes("index")) {
-                    alert("Buttons need a Firestore Index. Check console (F12) for the link.");
+                    console.log("New index required for 'language' field. Click link in error above.");
                 }
             });
         }
