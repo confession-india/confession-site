@@ -16,6 +16,12 @@
     75% { transform: translateX(6px); }
 }
 
+/* Added: Smooth flow for the branded header line */
+@keyframes flow-gradient {
+    0% { background-position: 0% 0%; }
+    100% { background-position: -200% 0%; }
+}
+
 @keyframes slideUp {
     from { transform: translate(-50%, 20px); opacity: 0; }
     to { transform: translate(-50%, 0); opacity: 1; }
@@ -30,8 +36,8 @@
 
 .shake-active { 
     animation: shake 0.3s ease-in-out; 
-    border-color: #ef4444 !important; 
-    background-color: #fef2f2 !important; 
+    border: 3px solid #ef4444 !important; 
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.4) !important;
 }
 
 /* 2. CORE LAYOUT & MOUSE GLOW */
@@ -132,7 +138,7 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER */
+/* 9. GLOBAL BRANDED HEADER - UPDATED WITH HYBRID FLOW */
 .global-header {
     position: relative;
     border-bottom: none !important;
@@ -146,7 +152,15 @@ html { scroll-behavior: smooth; }
     left: 0;
     right: 0;
     height: 2px;
-    background: #ef4444 !important; /* London Red */
+    /* Animated London Red to Hyderabad Indigo transition */
+    background: linear-gradient(90deg, 
+        #ef4444 0%, 
+        #4f46e5 25%, 
+        #ef4444 50%, 
+        #4f46e5 75%, 
+        #ef4444 100%);
+    background-size: 200% auto;
+    animation: flow-gradient 5s linear infinite;
     z-index: 100;
 }
 
@@ -179,7 +193,7 @@ html { scroll-behavior: smooth; }
     overflow: visible !important;
 }
 
-/* 12. MANIFESTO & SIGNATURE STYLES (NEW) */
+/* 12. MANIFESTO & SIGNATURE STYLES */
 .legal-section h2 {
     background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
     -webkit-background-clip: text;
@@ -204,7 +218,6 @@ html { scroll-behavior: smooth; }
     box-shadow: 0 10px 20px -5px rgba(35, 134, 54, 0.2);
 }
 
-/* Smooth highlight when navigating to rules via footer links */
 section:target {
     animation: highlight-section 1.5s ease-out;
 }
