@@ -43,20 +43,18 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-        /* Essential layout fixes for the Share Modal */
         #shareModal {
-            display: none; /* Hidden by default */
+            display: none; 
             align-items: center;
             justify-content: center;
             padding: 20px;
-            position: fixed; /* Added fix */
-            inset: 0; /* Added fix */
-            z-index: 200; /* Added fix */
-            background: rgba(0,0,0,0.5); /* Added fix */
+            position: fixed; 
+            inset: 0; 
+            z-index: 200; 
+            background: rgba(0,0,0,0.5); 
         }
         #shareModal.show { display: flex; }
 
-        /* Off-screen capture area for Instagram Image Generation */
         #capture-area {
             position: absolute;
             left: -9999px;
@@ -70,7 +68,6 @@
             border: 4px solid #4f46e5;
         }
 
-        /* Technical Fixes for new features */
         .line-clamp-3 {
             display: -webkit-box;
             -webkit-line-clamp: 3;
@@ -229,14 +226,12 @@
         let currentCategory = 'all';
         let unsubscribe = null;
 
-        // --- MOUSE GLOW ---
         const glow = document.getElementById('mouse-glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
-        // --- SCROLL LOGIC ---
         window.onscroll = function() {
             const scrollTab = document.getElementById('scrollTab');
             const scrollIcon = document.getElementById('scrollIcon');
@@ -269,33 +264,48 @@
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
-            document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`)?.classList.add('lang-active');
+            document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active', 'bg-indigo-600', 'text-white'));
+            const activeBtn = document.getElementById(`lang-${lang}`);
+            if(activeBtn) {
+                activeBtn.classList.add('lang-active', 'bg-indigo-600', 'text-white');
+            }
             initFeed();
         }
 
         function filterCat(cat, btn) {
             currentCategory = cat;
-            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active'));
-            btn.classList.add('cat-active');
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active', 'bg-indigo-600', 'text-white'));
+            btn.classList.add('cat-active', 'bg-indigo-600', 'text-white');
             initFeed();
         }
 
         function initFeed() {
             if (unsubscribe) unsubscribe();
+            
             let query = db.collection('confessions');
-            if (currentLang !== 'en') query = query.where('lang', '==', currentLang);
-            if (currentCategory !== 'all') query = query.where('category', '==', currentCategory);
+            
+            // FIX: Always filter by language so the index works consistently across all buttons
+            query = query.where('lang', '==', currentLang);
+            
+            if (currentCategory !== 'all') {
+                query = query.where('category', '==', currentCategory);
+            }
+            
             query = query.orderBy('timestamp', 'desc');
             
             unsubscribe = query.onSnapshot(snapshot => {
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
                 checkDeepLink();
+            }, (error) => {
+                console.error("Firestore Error:", error);
+                // This will help you find the Index Link if it's missing
+                if (error.message.includes("index")) {
+                    alert("Buttons need a Firestore Index. Check console (F12) for the link.");
+                }
             });
         }
 
-        // --- READ MORE TOGGLE ---
         function toggleReadMore(id) {
             const p = document.getElementById(`text-${id}`);
             const btn = document.getElementById(`rm-btn-${id}`);
@@ -329,7 +339,7 @@
                                 <button onclick="interact('${post.id}', 'supportCount')" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black">❤️ ${post.supportCount || 0}</button>
                                 <button onclick="interact('${post.id}', 'meTooCount')" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black">🫂 ${post.meTooCount || 0}</button>
                             </div>
-                            <button onclick="openShare('${post.id}')" class="share-pill py-3 rounded-2xl text-white text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</button>
+                            <button onclick="openShare('${post.id}')" class="bg-slate-900 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</button>
                         </div>
                     </div>`);
             });
@@ -364,8 +374,10 @@
 
         async function interact(id, field) {
             if (localStorage.getItem(`${field}-${id}`)) return;
-            await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
-            localStorage.setItem(`${field}-${id}`, 'true');
+            try {
+                await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+                localStorage.setItem(`${field}-${id}`, 'true');
+            } catch(e) { console.error("Update failed", e); }
         }
 
         function checkDeepLink() {
@@ -375,7 +387,6 @@
                 const el = document.getElementById(`post-${targetId}`);
                 if (el) {
                     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    el.classList.add('shake-active');
                 }
             }
         }
