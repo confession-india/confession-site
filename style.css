@@ -1,5 +1,6 @@
 /* Confess India - Ultimate Unified Design System 
-   Theme: London-Hyderabad Hybrid (Indigo/Red/Deep Slate)
+    Theme: London-Hyderabad Hybrid (Indigo/Red/Deep Slate)
+    Architecture by: Sanjeev Raju (MSc Advanced CS)
 */
 
 /* 1. ANIMATIONS & MICRO-INTERACTIONS */
@@ -18,6 +19,11 @@
 @keyframes slideUp {
     from { transform: translate(-50%, 20px); opacity: 0; }
     to { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes highlight-section {
+    0% { background-color: rgba(99, 102, 241, 0.1); border-radius: 10px; }
+    100% { background-color: transparent; }
 }
 
 .animate-pulse-green { animation: pulse-green 2s infinite; }
@@ -85,7 +91,7 @@ html { scroll-behavior: smooth; }
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(12px) saturate(180%);
     z-index: 10000;
-    display: flex; /* Changed from none to allow JS control */
+    display: flex;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -171,4 +177,34 @@ html { scroll-behavior: smooth; }
 
 #postForm {
     overflow: visible !important;
+}
+
+/* 12. MANIFESTO & SIGNATURE STYLES (NEW) */
+.legal-section h2 {
+    background: linear-gradient(135deg, #1e293b 0%, #4f46e5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.dark .legal-section h2 {
+    background: linear-gradient(135deg, #f8fafc 0%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.privacy-stamp {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(35, 134, 54, 0.2) !important;
+}
+
+.privacy-stamp:hover {
+    background: rgba(35, 134, 54, 0.1) !important;
+    transform: translateY(-3px);
+    border-color: #238636 !important;
+    box-shadow: 0 10px 20px -5px rgba(35, 134, 54, 0.2);
+}
+
+/* Smooth highlight when navigating to rules via footer links */
+section:target {
+    animation: highlight-section 1.5s ease-out;
 }
