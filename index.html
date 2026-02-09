@@ -49,6 +49,10 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: fixed; /* Added fix */
+            inset: 0; /* Added fix */
+            z-index: 200; /* Added fix */
+            background: rgba(0,0,0,0.5); /* Added fix */
         }
         #shareModal.show { display: flex; }
 
@@ -65,6 +69,15 @@
             font-family: 'Inter', sans-serif;
             border: 4px solid #4f46e5;
         }
+
+        /* Technical Fixes for new features */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .confession-card { scroll-margin-top: 100px; }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -104,6 +117,7 @@
                 <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
                     <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">WhatsApp</button>
+                    <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Facebook</button>
                     <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Instagram (as Image)</button>
                     <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">X (Twitter)</button>
                     <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 py-4 rounded-2xl font-bold">Copy Secret Text</button>
@@ -281,6 +295,19 @@
             });
         }
 
+        // --- READ MORE TOGGLE ---
+        function toggleReadMore(id) {
+            const p = document.getElementById(`text-${id}`);
+            const btn = document.getElementById(`rm-btn-${id}`);
+            if (p.classList.contains('line-clamp-3')) {
+                p.classList.remove('line-clamp-3');
+                btn.innerText = "Read Less";
+            } else {
+                p.classList.add('line-clamp-3');
+                btn.innerText = "Read More";
+            }
+        }
+
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             feed.innerHTML = posts.length ? '' : '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>';
@@ -288,13 +315,15 @@
 
             posts.forEach(post => {
                 const content = post.content || "";
+                const isLong = content.length > 280;
                 feed.insertAdjacentHTML('beforeend', `
                     <div id="post-${post.id}" class="confession-card bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all">
                         <div class="mb-4">
                             <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
                             <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
                         </div>
-                        <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-6 break-words whitespace-pre-wrap">${content}</p>
+                        <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
+                        ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest">Read More</button>` : '<div class="mb-4"></div>'}
                         <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex gap-2">
                                 <button onclick="interact('${post.id}', 'supportCount')" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black">❤️ ${post.supportCount || 0}</button>
@@ -312,7 +341,8 @@
             const modal = document.getElementById('shareModal');
             modal.classList.add('show');
 
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('"' + content.substring(0,100) + '..."\n\nRead more: ' + shareUrl)}`);
+            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('Read this secret: ' + shareUrl)}`);
+            document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(content.substring(0,100))}...`);
             document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Link Copied!"); };
             document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(content); alert("Secret Text Copied!"); };
@@ -344,8 +374,7 @@
             if (targetId) {
                 const el = document.getElementById(`post-${targetId}`);
                 if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Synced with your style.css 'shake-active' class
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     el.classList.add('shake-active');
                 }
             }
