@@ -41,6 +41,31 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Essential layout fixes for the Share Modal */
+        #shareModal {
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #shareModal.show { display: flex; }
+
+        /* Off-screen capture area for Instagram Image Generation */
+        #capture-area {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 500px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            border-radius: 0;
+            font-family: 'Inter', sans-serif;
+            border: 4px solid #4f46e5;
+        }
+    </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
 
@@ -74,19 +99,24 @@
             </svg>
         </button>
 
-        <div id="shareModal" onclick="closeShare()" class="show:flex">
+        <div id="shareModal" onclick="closeShare()">
             <div class="bg-white dark:bg-[#1e293b] p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 border dark:border-slate-700" onclick="event.stopPropagation()">
                 <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
                     <button id="waBtn" class="flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">WhatsApp</button>
                     <button id="igBtn" class="flex items-center justify-center gap-3 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Instagram (as Image)</button>
-                    <button id="fbBtn" class="flex items-center justify-center gap-3 bg-[#1877F2] text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">Facebook</button>
                     <button id="xBtn" class="flex items-center justify-center gap-3 bg-black text-white py-4 rounded-2xl font-bold hover:opacity-90 transition-all">X (Twitter)</button>
                     <button id="copyTxtBtn" class="flex items-center justify-center gap-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 py-4 rounded-2xl font-bold">Copy Secret Text</button>
                     <button id="copyBtn" class="flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 py-4 rounded-2xl font-bold">Copy Web Link</button>
                 </div>
                 <button onclick="closeShare()" class="w-full text-slate-400 font-bold py-2 mt-2 uppercase text-xs tracking-widest">Close</button>
             </div>
+        </div>
+
+        <div id="capture-area">
+            <div style="font-weight: 900; font-size: 14px; letter-spacing: 4px; color: #6366f1; margin-bottom: 30px; text-transform: uppercase;">Confess India</div>
+            <div id="capture-text" style="font-size: 26px; font-weight: 500; line-height: 1.5; color: #f8fafc; margin-bottom: 40px;"></div>
+            <div style="font-size: 12px; color: #64748b; border-top: 1px solid #334155; padding-top: 20px;">Read more anonymous truths at confessindia.in</div>
         </div>
 
         <main class="max-w-4xl mx-auto p-4">
@@ -114,12 +144,12 @@
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
                         <h4 class="font-bold text-slate-800 dark:text-white mb-2">No Accounts</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. Complete anonymity by design for every Indian citizen.</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. Complete anonymity by design.</p>
                     </div>
                     <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
                         <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
                         <h4 class="font-bold text-slate-800 dark:text-white mb-2">Human Moderated</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe and kind.</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe.</p>
                     </div>
                 </div>
             </section>
@@ -159,7 +189,6 @@
                     <span class="text-red-600">|</span>
                     <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
                 </div>
-                <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">No Cookies • No Emails • Just the Truth</p>
                 <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built with Integrity from HYD to LDN.</p>
             </div>
         </footer>
@@ -168,19 +197,18 @@
     <div id="mouse-glow"></div>
 
     <script>
-        // --- FIREBASE CONFIG ---
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const SITE_URL = "https://confessionindia.in";
         
         const translations = {
-            en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less", shareTruth: "Share Truth" },
-            te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి", shareTruth: "షేర్ చేయండి" },
-            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", codes: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
-            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
-            kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
+            en: { shareTruth: "Share Truth" },
+            te: { shareTruth: "షేర్ చేయండి" },
+            hi: { shareTruth: "साझा करें" },
+            ta: { shareTruth: "பகிர்" },
+            kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
+            ml: { shareTruth: "പങ്കുവെക്കുക" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
@@ -220,32 +248,15 @@
             if (!date) return 'Just now';
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
             if (seconds < 60) return "Just now";
-            const interval = Math.floor(seconds / 3600);
-            if (interval >= 1) return interval + "h ago";
-            return Math.floor(seconds / 60) + "m ago";
-        }
-
-        function checkDeepLink() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const targetId = urlParams.get('id');
-            if (targetId) {
-                const checkInterval = setInterval(() => {
-                    const el = document.getElementById(`post-${targetId}`);
-                    if (el) {
-                        clearInterval(checkInterval);
-                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        el.classList.add('highlight-shake');
-                    }
-                }, 100);
-            }
+            if (seconds < 3600) return Math.floor(seconds / 60) + "m ago";
+            return Math.floor(seconds / 3600) + "h ago";
         }
 
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            const activePill = document.getElementById(`lang-${lang}`);
-            if(activePill) activePill.classList.add('lang-active');
+            document.getElementById(`lang-${lang}`)?.classList.add('lang-active');
             initFeed();
         }
 
@@ -258,97 +269,88 @@
 
         function initFeed() {
             if (unsubscribe) unsubscribe();
-            
             let query = db.collection('confessions');
-
-            // BACKWARDS COMPATIBILITY: 
-            // If English, show everything (even posts with no 'lang' field)
-            // If other language, filter strictly.
-            if (currentLang !== 'en') {
-                query = query.where('lang', '==', currentLang);
-            }
-
-            if (currentCategory !== 'all') {
-                query = query.where('category', '==', currentCategory);
-            }
-
-            // Order by most recent
+            if (currentLang !== 'en') query = query.where('lang', '==', currentLang);
+            if (currentCategory !== 'all') query = query.where('category', '==', currentCategory);
             query = query.orderBy('timestamp', 'desc');
             
             unsubscribe = query.onSnapshot(snapshot => {
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
                 checkDeepLink();
-            }, error => {
-                console.error("Firestore Error:", error);
-                // If you see a "requires an index" error in Console, click the link provided there.
             });
         }
 
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
-            feed.innerHTML = '';
-            
-            if (posts.length === 0) {
-                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets found in this category yet.</div>';
-                return;
-            }
-
+            feed.innerHTML = posts.length ? '' : '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>';
             const langData = translations[currentLang] || translations['en'];
 
             posts.forEach(post => {
                 const content = post.content || "";
-                const safeContent = encodeURIComponent(content);
-                const displayContent = content.length > 300 ? `"${content.substring(0,300)}..."` : `"${content}"`;
-
                 feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex flex-col">
-                                <span class="text-[10px] font-black uppercase text-indigo-500 mb-1">${post.category || 'other'}</span>
-                                <span class="text-[9px] text-slate-400 dark:text-slate-300 font-black uppercase tracking-widest">${post.username || "Anonymous"} · ${timeAgo(post.timestamp)}</span>
-                            </div>
+                    <div id="post-${post.id}" class="confession-card bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all">
+                        <div class="mb-4">
+                            <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
+                            <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
                         </div>
-                        <p id="text-${post.id}" data-full="${safeContent}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-6 break-words">${displayContent}</p>
+                        <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-6 break-words whitespace-pre-wrap">${content}</p>
                         <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex gap-2">
-                                <button onclick="interact('${post.id}', 'supportCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 dark:text-pink-400">
-                                    ❤️ <span class="text-xs font-black">${post.supportCount || 0}</span>
-                                </button>
-                                <button onclick="interact('${post.id}', 'meTooCount')" class="flex-1 flex items-center justify-center gap-2 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 dark:text-indigo-400">
-                                    🫂 <span class="text-xs font-black">${post.meTooCount || 0}</span>
-                                </button>
+                                <button onclick="interact('${post.id}', 'supportCount')" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black">❤️ ${post.supportCount || 0}</button>
+                                <button onclick="interact('${post.id}', 'meTooCount')" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black">🫂 ${post.meTooCount || 0}</button>
                             </div>
-                            <button onclick="openShare('${post.id}')" class="share-pill flex items-center justify-center gap-2 py-3 rounded-2xl text-white shadow-lg active:scale-95 transition-all bg-indigo-600">
-                                <span class="text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</span>
-                            </button>
+                            <button onclick="openShare('${post.id}')" class="share-pill py-3 rounded-2xl text-white text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</button>
                         </div>
                     </div>`);
             });
         }
 
         function openShare(id) {
-            const modal = document.getElementById('shareModal');
-            const contentEl = document.getElementById(`text-${id}`);
-            const fullContent = decodeURIComponent(contentEl.getAttribute('data-full'));
+            const content = document.getElementById(`text-${id}`).innerText;
             const shareUrl = `${SITE_URL}/index.html?id=${id}`;
-            const shareText = `"${fullContent.substring(0, 100)}..."\n\nRead the full secret on Confess India:\n${shareUrl}`;
-
+            const modal = document.getElementById('shareModal');
             modal.classList.add('show');
-            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Link copied!"); };
+
+            document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent('"' + content.substring(0,100) + '..."\n\nRead more: ' + shareUrl)}`);
+            document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(content.substring(0,100))}...`);
+            document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Link Copied!"); };
+            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(content); alert("Secret Text Copied!"); };
+
+            document.getElementById('igBtn').onclick = async () => {
+                const btn = document.getElementById('igBtn');
+                btn.innerText = "Generating...";
+                document.getElementById('capture-text').innerText = content;
+                const canvas = await html2canvas(document.getElementById('capture-area'), { backgroundColor: '#0f172a' });
+                const link = document.createElement('a');
+                link.download = `confess-${id}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+                btn.innerText = "Instagram (as Image)";
+            };
         }
 
         function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
 
         async function interact(id, field) {
             if (localStorage.getItem(`${field}-${id}`)) return;
-            const docRef = db.collection('confessions').doc(id);
-            await docRef.update({ [field]: firebase.firestore.FieldValue.increment(1) });
+            await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
             localStorage.setItem(`${field}-${id}`, 'true');
         }
 
-        // --- INITIALIZE ---
+        function checkDeepLink() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+            if (targetId) {
+                const el = document.getElementById(`post-${targetId}`);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Synced with your style.css 'shake-active' class
+                    el.classList.add('shake-active');
+                }
+            }
+        }
+
         setLanguage(currentLang);
     </script>
 </body>
