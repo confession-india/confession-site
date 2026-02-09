@@ -90,17 +90,6 @@
         </div>
 
         <main class="max-w-4xl mx-auto p-4">
-            <div id="dailyWisdom" class="mb-2 hidden">
-                <div class="bg-indigo-600 rounded-[32px] p-6 text-white shadow-xl flex flex-col md:flex-row items-center gap-6 border-4 border-indigo-500/30">
-                    <div class="bg-white/20 p-4 rounded-2xl text-2xl">🔥</div>
-                    <div class="flex-1 text-center md:text-left overflow-hidden">
-                        <h3 class="text-[10px] font-black uppercase tracking-widest opacity-80 mb-1">Most Supported Today</h3>
-                        <p id="top-secret-text" class="text-lg font-bold leading-tight italic break-words">"Loading..."</p>
-                        <button id="banner-read-more" class="hidden text-[10px] font-black uppercase tracking-widest mt-2 opacity-70 hover:opacity-100" data-state="short"></button>
-                    </div>
-                </div>
-            </div>
-
             <div class="flex overflow-x-auto py-6 space-x-3 no-scrollbar items-center">
                 <button onclick="filterCat('all', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm cat-active" id="cat-all">Latest</button>
                 <button onclick="filterCat('relationship', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-rel">Relationships</button>
@@ -188,16 +177,15 @@
         const translations = {
             en: { meToo: "Me Too", report: "Report", latest: "Latest", rel: "Relationships", fam: "Family", mar: "Marriage", oth: "Other", shareBtn: "+ Share Secret", sub: "Community Feed", readMore: "Read More", readLess: "Read Less", shareTruth: "Share Truth" },
             te: { meToo: "నేను కూడా", report: "రిపోర్ట్", latest: "తాజా", rel: "సంబంధాలు", fam: " కుటుంబం", mar: "వివాహం", oth: "ఇతర", shareBtn: "+ రహస్యం పంచుకోండి", sub: "కమ్యూనిటీ ఫీడ్", readMore: "మరింత చదవండి", readLess: "తక్కువ చదవండి", shareTruth: "షేర్ చేయండి" },
-            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", oth: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
-            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "సమூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
+            hi: { meToo: "मैं भी", report: "रिपोर्ट", latest: "नवीनतम", rel: "रिश्ते", fam: "परिवार", mar: "शादी", codes: "अन्य", shareBtn: "+ राज साझा करें", sub: "कम्युनिटी फीड", readMore: "और पढ़ें", readLess: "कम पढ़ें", shareTruth: "साझा करें" },
+            ta: { meToo: "நானும்", report: "புகார்", latest: "சமீபத்திய", rel: "உறவுகள்", fam: "குடும்பம்", mar: "திருமணம்", oth: "மற்றவை", shareBtn: "+ பகிரவும்", sub: "சமூக ஊட்டம்", readMore: "மேலும் படிக்க", readLess: "குறைவாக படிக்க", shareTruth: "பகிர்" },
             kn: { meToo: "ನಾನು ಕೂಡ", report: "ವರದಿ", latest: "ಇತ್ತೀಚಿನ", rel: "ಸಂಬಂಧಗಳು", fam: "ಕುಟುಂಬ", mar: "ಮದುವೆ", oth: "ಇತರೆ", shareBtn: "+ ರಹಸ್ಯ ಹಂಚಿಕೊಳ್ಳಿ", sub: "ಸಮುದಾಯ ಫೀಡ್", readMore: "ಮತ್ತಷ್ಟು ಓದಿ", readLess: "ಕಡಿಮೆ ಓದಿ", shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ" },
-            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ఫీడ్", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
+            ml: { meToo: "ഞാനും", report: "റിപ്പോർട്ട്", latest: "ഏറ്റവും പുതിയത്", rel: "ബന്ധങ്ങൾ", fam: "കുടുംബം", mar: "വിവാഹം", oth: "മറ്റുള്ളവ", shareBtn: "+ രഹസ്യം പങ്കിടുക", sub: "കമ്മ്യൂണിറ്റി ഫീഡ്", readMore: "കൂടുതൽ വായിക്കുക", readLess: "കുറച്ച് വായിക്കുക", shareTruth: "പങ്കുവെക്കുക" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
         let currentCategory = 'all';
         let unsubscribe = null;
-        let isUserInteracting = false; 
 
         // --- MOUSE GLOW ---
         const glow = document.getElementById('mouse-glow');
@@ -237,7 +225,6 @@
             return Math.floor(seconds / 60) + "m ago";
         }
 
-        // --- DEEP LINK HANDLER (Shake and Scroll) ---
         function checkDeepLink() {
             const urlParams = new URLSearchParams(window.location.search);
             const targetId = urlParams.get('id');
@@ -247,18 +234,18 @@
                     if (el) {
                         clearInterval(checkInterval);
                         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        el.classList.add('highlight-shake'); // This triggers the red glow and shake from CSS
+                        el.classList.add('highlight-shake');
                     }
                 }, 100);
             }
         }
 
-        // --- CATEGORY & LANGUAGE SWITCHING ---
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
             document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active'));
-            document.getElementById(`lang-${lang}`).classList.add('lang-active');
+            const activePill = document.getElementById(`lang-${lang}`);
+            if(activePill) activePill.classList.add('lang-active');
             initFeed();
         }
 
@@ -269,16 +256,32 @@
             initFeed();
         }
 
-        // --- MAIN FEED ENGINE ---
         function initFeed() {
             if (unsubscribe) unsubscribe();
-            let query = db.collection('confessions').where('lang', '==', currentLang);
-            if (currentCategory !== 'all') query = query.where('category', '==', currentCategory);
+            
+            let query = db.collection('confessions');
+
+            // BACKWARDS COMPATIBILITY: 
+            // If English, show everything (even posts with no 'lang' field)
+            // If other language, filter strictly.
+            if (currentLang !== 'en') {
+                query = query.where('lang', '==', currentLang);
+            }
+
+            if (currentCategory !== 'all') {
+                query = query.where('category', '==', currentCategory);
+            }
+
+            // Order by most recent
+            query = query.orderBy('timestamp', 'desc');
             
             unsubscribe = query.onSnapshot(snapshot => {
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
-                checkDeepLink(); // Run after posts are rendered
+                checkDeepLink();
+            }, error => {
+                console.error("Firestore Error:", error);
+                // If you see a "requires an index" error in Console, click the link provided there.
             });
         }
 
@@ -286,11 +289,17 @@
             const feed = document.getElementById('feed');
             feed.innerHTML = '';
             
-            posts.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+            if (posts.length === 0) {
+                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets found in this category yet.</div>';
+                return;
+            }
+
+            const langData = translations[currentLang] || translations['en'];
 
             posts.forEach(post => {
-                const safeContent = encodeURIComponent(post.content);
-                const displayContent = post.content.length > 300 ? `"${post.content.substring(0,300)}..."` : `"${post.content}"`;
+                const content = post.content || "";
+                const safeContent = encodeURIComponent(content);
+                const displayContent = content.length > 300 ? `"${content.substring(0,300)}..."` : `"${content}"`;
 
                 feed.insertAdjacentHTML('beforeend', `
                     <div id="post-${post.id}" class="bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-300">
@@ -310,15 +319,14 @@
                                     🫂 <span class="text-xs font-black">${post.meTooCount || 0}</span>
                                 </button>
                             </div>
-                            <button onclick="openShare('${post.id}')" class="share-pill flex items-center justify-center gap-2 py-3 rounded-2xl text-white shadow-lg active:scale-95 transition-all">
-                                <span class="text-[11px] font-black uppercase tracking-widest">${translations[currentLang].shareTruth}</span>
+                            <button onclick="openShare('${post.id}')" class="share-pill flex items-center justify-center gap-2 py-3 rounded-2xl text-white shadow-lg active:scale-95 transition-all bg-indigo-600">
+                                <span class="text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</span>
                             </button>
                         </div>
                     </div>`);
             });
         }
 
-        // --- SHARE MODAL LOGIC ---
         function openShare(id) {
             const modal = document.getElementById('shareModal');
             const contentEl = document.getElementById(`text-${id}`);
