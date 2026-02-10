@@ -28,24 +28,40 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    
     <style>
-        /* Essential Inline Overrides */
-        #scroll-nav { 
+        /* Modern Branded Scroll Pill - Matching post.html design */
+        #dynamic-scroll-btn { 
             position: fixed; 
-            right: 20px; 
-            bottom: 100px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
+            right: 25px; 
+            bottom: 30px; 
             z-index: 1000; 
             opacity: 0; 
             pointer-events: none; 
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform: translateY(20px);
         }
-        #scroll-nav.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .scroll-btn { background: #6366f1; color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer; border: none; }
-        .scroll-btn:hover { transform: scale(1.1); background: #4f46e5; }
+        #dynamic-scroll-btn.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        
+        .custom-scroll-pill { 
+            background: #6366f1; 
+            color: white; 
+            width: 54px; 
+            height: 54px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 18px; 
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4); 
+            transition: all 0.3s ease; 
+            border: none; 
+        }
+        .custom-scroll-pill:hover { transform: scale(1.1); background: #4f46e5; }
+        
+        /* Smooth Icon Fade/Rotate Transition */
+        #scrollIcon { transition: transform 0.4s ease, opacity 0.3s ease; }
+        .icon-flip { transform: rotate(180deg); }
+        .icon-fade { opacity: 0; }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -148,9 +164,13 @@
         </footer>
     </div>
 
-    <div id="scroll-nav">
-        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="scroll-btn">↑</button>
-        <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="scroll-btn">↓</button>
+    <div id="dynamic-scroll-btn">
+        <button id="scrollActionBtn" class="custom-scroll-pill">
+            <svg id="scrollIcon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+        </button>
     </div>
 
     <div id="mouse-glow"></div>
@@ -163,7 +183,7 @@
         
         const translations = {
             en: { shareTruth: "Share Truth", potd: "Post of the Day" },
-            te: { shareTruth: "షేర్ చేయండి", potd: "ഈరోజు ఉత్తമ പോസ്റ്റ്" },
+            te: { shareTruth: "షేర్ చేయండి", potd: "ఈరోజు ఉత్తమ పోస్ట్" },
             hi: { shareTruth: "साझा करें", potd: "आज की खास पोस्ट" },
             ta: { shareTruth: "பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
             kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
@@ -174,22 +194,54 @@
         let currentCategory = 'all';
         let unsubscribe = null;
 
-        // Mouse Glow Logic
+        // Mouse Glow
         const glow = document.getElementById('mouse-glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
-        // Dynamic Scroll Button Logic
+        // Directional Scroll Button Logic with Fade-Flip Effect
+        let lastScrollTop = 0;
+        const scrollBtnWrapper = document.getElementById('dynamic-scroll-btn');
+        const scrollActionBtn = document.getElementById('scrollActionBtn');
+        const scrollIcon = document.getElementById('scrollIcon');
+
         window.addEventListener('scroll', () => {
-            const nav = document.getElementById('scroll-nav');
-            if (window.scrollY > 300) {
-                nav.classList.add('visible');
+            let st = window.pageYOffset || document.documentElement.scrollTop;
+            
+            // Basic visibility toggle
+            if (st > 400) {
+                scrollBtnWrapper.classList.add('visible');
             } else {
-                nav.classList.remove('visible');
+                scrollBtnWrapper.classList.remove('visible');
             }
+
+            // Scroll Direction Logic
+            if (st > lastScrollTop) {
+                // Downward -> Scroll to Bottom
+                if (scrollIcon.classList.contains('icon-flip')) {
+                    toggleIconEffect(false);
+                }
+                scrollActionBtn.onclick = () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+            } else {
+                // Upward -> Scroll to Top
+                if (!scrollIcon.classList.contains('icon-flip')) {
+                    toggleIconEffect(true);
+                }
+                scrollActionBtn.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+            lastScrollTop = st <= 0 ? 0 : st;
         });
+
+        function toggleIconEffect(isUp) {
+            scrollIcon.classList.add('icon-fade');
+            setTimeout(() => {
+                if (isUp) scrollIcon.classList.add('icon-flip');
+                else scrollIcon.classList.remove('icon-flip');
+                scrollIcon.classList.remove('icon-fade');
+            }, 150);
+        }
 
         function updateClocks() {
             const options = { hour: '2-digit', minute: '2-digit', hour12: true };
@@ -228,58 +280,46 @@
             }, error => console.error(error));
         }
 
-        // ... (rest of your Firebase config and init remains same)
-
-function getCardHTML(post, isPotd, langData) {
-    const content = post.content || "";
-    // Pulling the name as you requested
-    const displayName = post.displayName || post.name || "Anonymous";
-    const isLong = content.length > 250;
-    
-    // Check local storage for all interactions
-    const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
-    const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
-    const hasReported = localStorage.getItem(`reportCount-${post.id}`);
-
-    return `
-        <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700 mb-4">
-            ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
+        function getCardHTML(post, isPotd, langData) {
+            const content = post.content || "";
+            // FIXED: Name Priority
+            const displayName = post.displayName || post.name || "Anonymous";
+            const isLong = content.length > 250;
             
-            <div class="mb-4 flex justify-between items-start">
-                <div>
-                    <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
-                    <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
-                    <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
-                </div>
-                <button onclick="interact(event, '${post.id}', 'reportCount', this)" 
-                        class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors ${hasReported ? 'hidden' : ''}">
-                    🚩 Report
-                </button>
-            </div>
+            const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
+            const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
+            const hasReported = localStorage.getItem(`reportCount-${post.id}`);
 
-            <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
-            
-            ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
-            
-            <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
-                <div class="flex gap-2">
-                    <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasSupported ? 'active-interact already-interacted' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                    <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasMetoo ? 'active-interact already-interacted' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
-                </div>
-                <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
-            </div>
-        </div>`;
-}
+            return `
+                <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
+                    ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
+                    
+                    <div class="mb-4 flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
+                            <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
+                            <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
+                        </div>
+                        <button onclick="interact(event, '${post.id}', 'reportCount', this)" 
+                                class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors ${hasReported ? 'hidden' : ''}">
+                            🚩 Report
+                        </button>
+                    </div>
 
-// Logic for Dynamic Scroll Visibility
-window.addEventListener('scroll', () => {
-    const nav = document.getElementById('scroll-nav');
-    if (window.scrollY > 400) {
-        nav.classList.add('visible');
-    } else {
-        nav.classList.remove('visible');
-    }
-});
+                    <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
+                    
+                    ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
+                    
+                    <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+                        <div class="flex gap-2">
+                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 ${hasSupported ? 'active-interact' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 ${hasMetoo ? 'active-interact' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                        </div>
+                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+                    </div>
+                </div>`;
+        }
+
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             const potdContainer = document.getElementById('potd-container');
@@ -304,10 +344,11 @@ window.addEventListener('scroll', () => {
             if (localStorage.getItem(`${field}-${id}`)) return;
             const countSpan = btn.querySelector('.count');
             try {
-                btn.classList.add('active-interact', 'already-interacted');
-                countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                btn.classList.add('active-interact');
+                if(countSpan) countSpan.innerText = parseInt(countSpan.innerText) + 1;
                 localStorage.setItem(`${field}-${id}`, 'true');
                 await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+                if(field === 'reportCount') btn.classList.add('hidden');
             } catch(e) { console.error(e); }
         }
 
