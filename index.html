@@ -29,10 +29,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Essential Inline Overrides for smooth JS interaction */
-        #scroll-nav { position: fixed; right: 20px; bottom: 100px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-        .scroll-btn { background: #6366f1; color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s; }
-        .scroll-btn:hover { transform: scale(1.1); }
+        /* Essential Inline Overrides */
+        #scroll-nav { 
+            position: fixed; 
+            right: 20px; 
+            bottom: 100px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            z-index: 1000; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(20px);
+        }
+        #scroll-nav.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .scroll-btn { background: #6366f1; color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: transform 0.2s; cursor: pointer; border: none; }
+        .scroll-btn:hover { transform: scale(1.1); background: #4f46e5; }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -150,7 +163,7 @@
         
         const translations = {
             en: { shareTruth: "Share Truth", potd: "Post of the Day" },
-            te: { shareTruth: "షేర్ చేయండి", potd: "ఈరోజు ఉత్తమ పోస్ట్" },
+            te: { shareTruth: "షేర్ చేయండి", potd: "ഈరోజు ఉత్తമ പോസ്റ്റ്" },
             hi: { shareTruth: "साझा करें", potd: "आज की खास पोस्ट" },
             ta: { shareTruth: "பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
             kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
@@ -161,10 +174,21 @@
         let currentCategory = 'all';
         let unsubscribe = null;
 
+        // Mouse Glow Logic
         const glow = document.getElementById('mouse-glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
+        });
+
+        // Dynamic Scroll Button Logic
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('scroll-nav');
+            if (window.scrollY > 300) {
+                nav.classList.add('visible');
+            } else {
+                nav.classList.remove('visible');
+            }
         });
 
         function updateClocks() {
@@ -204,35 +228,58 @@
             }, error => console.error(error));
         }
 
-        function getCardHTML(post, isPotd, langData) {
-            const content = post.content || "";
-            const displayName = post.name || post.displayName || "Anonymous";
-            const isLong = content.length > 250;
-            const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
-            const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
+        // ... (rest of your Firebase config and init remains same)
 
-            return `
-                <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700 mb-4">
-                    ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
-                    <div class="mb-4 flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
-                            <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
-                            <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
-                        </div>
-                    </div>
-                    <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
-                    ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
-                    <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
-                        <div class="flex gap-2">
-                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasSupported ? 'active-interact already-interacted' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasMetoo ? 'active-interact already-interacted' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
-                        </div>
-                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
-                    </div>
-                </div>`;
-        }
+function getCardHTML(post, isPotd, langData) {
+    const content = post.content || "";
+    // Pulling the name as you requested
+    const displayName = post.displayName || post.name || "Anonymous";
+    const isLong = content.length > 250;
+    
+    // Check local storage for all interactions
+    const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
+    const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
+    const hasReported = localStorage.getItem(`reportCount-${post.id}`);
 
+    return `
+        <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700 mb-4">
+            ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
+            
+            <div class="mb-4 flex justify-between items-start">
+                <div>
+                    <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
+                    <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
+                    <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
+                </div>
+                <button onclick="interact(event, '${post.id}', 'reportCount', this)" 
+                        class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors ${hasReported ? 'hidden' : ''}">
+                    🚩 Report
+                </button>
+            </div>
+
+            <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
+            
+            ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
+            
+            <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+                <div class="flex gap-2">
+                    <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasSupported ? 'active-interact already-interacted' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                    <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasMetoo ? 'active-interact already-interacted' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                </div>
+                <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+            </div>
+        </div>`;
+}
+
+// Logic for Dynamic Scroll Visibility
+window.addEventListener('scroll', () => {
+    const nav = document.getElementById('scroll-nav');
+    if (window.scrollY > 400) {
+        nav.classList.add('visible');
+    } else {
+        nav.classList.remove('visible');
+    }
+});
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             const potdContainer = document.getElementById('potd-container');
@@ -253,10 +300,7 @@
         }
 
         async function interact(e, id, field, btn) {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+            if (e) { e.preventDefault(); e.stopPropagation(); }
             if (localStorage.getItem(`${field}-${id}`)) return;
             const countSpan = btn.querySelector('.count');
             try {
