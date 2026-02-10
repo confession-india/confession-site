@@ -28,6 +28,12 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .potd-card { border: 2px solid #fbbf24 !important; }
+        .already-interacted { opacity: 0.4; pointer-events: none; }
+        #scroll-nav { position: fixed; right: 20px; bottom: 100px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .scroll-btn { background: #6366f1; color: white; width: 45px; height: 45px; rounded-full: 999px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
 
@@ -85,6 +91,8 @@
                 <button onclick="filterCat('other', this)" class="cat-btn shrink-0 bg-white dark:bg-slate-800 text-gray-500 dark:text-slate-400 px-6 py-2 rounded-2xl font-bold border border-gray-100 dark:border-slate-700 transition-all text-sm" id="cat-other">Other</button>
             </div>
 
+            <div id="potd-container" class="mb-10"></div>
+            
             <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
         </main>
 
@@ -128,6 +136,11 @@
         </footer>
     </div>
 
+    <div id="scroll-nav">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="scroll-btn">↑</button>
+        <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})" class="scroll-btn">↓</button>
+    </div>
+
     <div id="mouse-glow"></div>
 
     <script>
@@ -138,7 +151,7 @@
         
         const translations = {
             en: { shareTruth: "Share Truth", potd: "Post of the Day" },
-            te: { shareTruth: "షేర్ చేయండి", potd: "ఈరోజు ఉత్తಮ ಪೋಸ್ಟ್" },
+            te: { shareTruth: "షేర్ చేయండి", potd: "ఈరోజు ఉత్తమ పోస్ట్" },
             hi: { shareTruth: "साझा करें", potd: "आज की खास पोस्ट" },
             ta: { shareTruth: "பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
             kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
@@ -149,14 +162,12 @@
         let currentCategory = 'all';
         let unsubscribe = null;
 
-        // Interaction Glow
         const glow = document.getElementById('mouse-glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
-        // Clocks
         function updateClocks() {
             const options = { hour: '2-digit', minute: '2-digit', hour12: true };
             document.getElementById('hyd-time').innerText = new Date().toLocaleTimeString('en-US', { ...options, timeZone: 'Asia/Kolkata' });
@@ -194,55 +205,68 @@
             unsubscribe = query.onSnapshot(snapshot => {
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
-                // Run deep link check after posts are rendered
                 setTimeout(() => checkDeepLink(posts), 500);
             }, error => console.error(error));
         }
 
+        function getCardHTML(post, isPotd, langData) {
+            const content = post.content || "";
+            const isLong = content.length > 250;
+            const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
+            const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
+
+            return `
+                <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700 mb-4">
+                    ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
+                    <div class="mb-4">
+                        <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
+                        <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
+                    </div>
+                    <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
+                    ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
+                    <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+                        <div class="flex gap-2">
+                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasSupported ? 'already-interacted' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasMetoo ? 'already-interacted' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                        </div>
+                        <button onclick="openShare('${post.id}', '${post.category}')" class="bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+                    </div>
+                </div>`;
+        }
+
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
-            if (!posts.length) { feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; return; }
+            const potdContainer = document.getElementById('potd-container');
+            if (!posts.length) { 
+                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; 
+                potdContainer.innerHTML = '';
+                return; 
+            }
 
-            // POTD Logic: Always pick one, but only show badge if it's actually popular or top of current list
             const potd = [...posts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
             const langData = translations[currentLang] || translations['en'];
             
+            // Render POTD at the top
+            potdContainer.innerHTML = getCardHTML(potd, true, langData);
+
+            // Render rest of the feed excluding the POTD
             feed.innerHTML = '';
             posts.forEach(post => {
-                const isPotd = post.id === potd.id;
-                const content = post.content || "";
-                const isLong = content.length > 250;
-                
-                feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700 mb-2" style="scroll-margin-top: 150px;">
-                        ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
-                        <div class="mb-4">
-                            <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
-                            <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
-                        </div>
-                        <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
-                        ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
-                        <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
-                            <div class="flex gap-2">
-                                <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                                <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer">🫂 <span class="count">${post.meTooCount || 0}</span></button>
-                            </div>
-                            <button onclick="openShare('${post.id}', '${post.category}')" class="bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
-                        </div>
-                    </div>`);
+                if(post.id !== potd.id) {
+                    feed.insertAdjacentHTML('beforeend', getCardHTML(post, false, langData));
+                }
             });
         }
 
         async function interact(e, id, field, btn) {
-            if (e) e.preventDefault(); // STOPS REFRESH
+            if (e) e.preventDefault();
             if (localStorage.getItem(`${field}-${id}`)) return;
             const countSpan = btn.querySelector('.count');
             try {
+                btn.classList.add('already-interacted');
                 await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
                 countSpan.innerText = parseInt(countSpan.innerText) + 1;
                 localStorage.setItem(`${field}-${id}`, 'true');
-                btn.classList.add('opacity-50');
-                btn.style.pointerEvents = 'none';
             } catch(e) { console.error(e); }
         }
 
@@ -264,17 +288,12 @@
             
             document.getElementById('igBtn').onclick = async () => {
                 const btn = document.getElementById('igBtn');
-                btn.innerText = "Generating HD...";
-                btn.disabled = true;
-                
+                btn.innerText = "Generating HD..."; btn.disabled = true;
                 const captureArea = document.getElementById('capture-area');
                 const captureText = document.getElementById('capture-text');
                 captureText.innerText = content;
-                
-                if(content.length > 1000) captureText.style.fontSize = "22px";
-                else if(content.length > 500) captureText.style.fontSize = "28px";
+                if(content.length > 500) captureText.style.fontSize = "28px";
                 else captureText.style.fontSize = "36px";
-
                 try {
                     const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: '#0f172a', useCORS: true });
                     const link = document.createElement('a');
@@ -291,8 +310,7 @@
         function toggleReadMore(id) {
             const p = document.getElementById(`text-${id}`);
             const btn = document.getElementById(`rm-btn-${id}`);
-            const isCollapsed = p.classList.contains('line-clamp-3');
-            if (isCollapsed) {
+            if (p.classList.contains('line-clamp-3')) {
                 p.classList.remove('line-clamp-3');
                 btn.innerText = "Read Less";
             } else {
@@ -306,13 +324,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const targetId = urlParams.get('id');
             const targetCat = urlParams.get('cat');
-
-            // If we have a category in the URL but we aren't viewing it yet
-            if (targetCat && targetCat !== currentCategory) {
-                filterCat(targetCat);
-                return; // Let the next snapshot handle the scroll
-            }
-
+            if (targetCat && targetCat !== currentCategory) { filterCat(targetCat); return; }
             if (targetId) {
                 const el = document.getElementById(`post-${targetId}`);
                 if (el) {
@@ -329,7 +341,7 @@
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
             if (seconds < 60) return "Just now";
             if (seconds < 3600) return Math.floor(seconds / 60) + "m ago";
-            if (seconds < 86400) return Math.floor(seconds / 3600) + "h ago";
+            if (seconds < 8400) return Math.floor(seconds / 3600) + "h ago";
             return Math.floor(seconds / 86400) + "d ago";
         }
 
