@@ -29,10 +29,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* These ensure your specific classes from style.css work with the JS */
         .potd-card { border: 2px solid #fbbf24 !important; }
         .already-interacted { opacity: 0.4; pointer-events: none; }
         #scroll-nav { position: fixed; right: 20px; bottom: 100px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-        .scroll-btn { background: #6366f1; color: white; width: 45px; height: 45px; rounded-full: 999px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .scroll-btn { background: #6366f1; color: white; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -61,7 +62,7 @@
     </header>
 
     <div class="page-wrapper">
-        <div id="shareModal" onclick="closeShare()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(15, 23, 42, 0.8); backdrop-filter:blur(12px); align-items:center; justify-content:center; padding:20px;">
+        <div id="shareModal" onclick="closeShare()">
             <div class="bg-white dark:bg-[#1e293b] p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 border dark:border-slate-700" onclick="event.stopPropagation()">
                 <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
@@ -76,7 +77,7 @@
             </div>
         </div>
 
-        <div id="capture-area" style="position: absolute; left: -9999px; width: 1080px; min-height: 1080px; padding: 100px; background: #0f172a; display: flex; flex-direction: column; justify-content: center;">
+        <div id="capture-area">
             <div style="font-weight: 900; font-size: 24px; letter-spacing: 8px; color: #6366f1; margin-bottom: 40px; text-transform: uppercase;">Confess India</div>
             <div id="capture-text" style="font-size: 36px; font-weight: 500; line-height: 1.6; color: #f8fafc; margin-bottom: 60px; white-space: pre-wrap;"></div>
             <div style="font-size: 18px; color: #64748b; border-top: 2px solid #334155; padding-top: 30px; font-weight: bold;">Read more anonymous truths at confessindia.in</div>
@@ -189,10 +190,6 @@
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active', 'bg-indigo-600', 'text-white'));
             if(btn) btn.classList.add('cat-active', 'bg-indigo-600', 'text-white');
-            else {
-                const targetBtn = document.getElementById(`cat-${cat}`);
-                if(targetBtn) targetBtn.classList.add('cat-active', 'bg-indigo-600', 'text-white');
-            }
             initFeed();
         }
 
@@ -226,10 +223,10 @@
                     ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
                     <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                         <div class="flex gap-2">
-                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasSupported ? 'already-interacted' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasMetoo ? 'already-interacted' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasSupported ? 'active-interact already-interacted' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer ${hasMetoo ? 'active-interact already-interacted' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
                         </div>
-                        <button onclick="openShare('${post.id}', '${post.category}')" class="bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+                        <button onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
                     </div>
                 </div>`;
         }
@@ -242,14 +239,9 @@
                 potdContainer.innerHTML = '';
                 return; 
             }
-
             const potd = [...posts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
             const langData = translations[currentLang] || translations['en'];
-            
-            // Render POTD at the top
             potdContainer.innerHTML = getCardHTML(potd, true, langData);
-
-            // Render rest of the feed excluding the POTD
             feed.innerHTML = '';
             posts.forEach(post => {
                 if(post.id !== potd.id) {
@@ -263,10 +255,10 @@
             if (localStorage.getItem(`${field}-${id}`)) return;
             const countSpan = btn.querySelector('.count');
             try {
-                btn.classList.add('already-interacted');
-                await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+                btn.classList.add('active-interact', 'already-interacted');
                 countSpan.innerText = parseInt(countSpan.innerText) + 1;
                 localStorage.setItem(`${field}-${id}`, 'true');
+                await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
             } catch(e) { console.error(e); }
         }
 
@@ -274,9 +266,8 @@
             const content = document.getElementById(`text-${id}`).innerText;
             const shareUrl = `${SITE_URL}/index.html?id=${id}&cat=${category}`;
             const modal = document.getElementById('shareModal');
-            modal.style.display = 'flex';
+            modal.classList.add('show');
             const preview = content.substring(0, 80) + "...";
-
             document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(preview + " Read more: " + shareUrl)}`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(preview)}`);
@@ -285,15 +276,13 @@
                 navigator.clipboard.writeText(`"${content}"\n\nShared via: confessindia.in`); 
                 alert("Text copied!"); 
             };
-            
             document.getElementById('igBtn').onclick = async () => {
                 const btn = document.getElementById('igBtn');
                 btn.innerText = "Generating HD..."; btn.disabled = true;
                 const captureArea = document.getElementById('capture-area');
                 const captureText = document.getElementById('capture-text');
                 captureText.innerText = content;
-                if(content.length > 500) captureText.style.fontSize = "28px";
-                else captureText.style.fontSize = "36px";
+                captureText.style.fontSize = content.length > 500 ? "28px" : "36px";
                 try {
                     const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: '#0f172a', useCORS: true });
                     const link = document.createElement('a');
@@ -305,7 +294,7 @@
             };
         }
 
-        function closeShare() { document.getElementById('shareModal').style.display = 'none'; }
+        function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
 
         function toggleReadMore(id) {
             const p = document.getElementById(`text-${id}`);
@@ -329,8 +318,7 @@
                 const el = document.getElementById(`post-${targetId}`);
                 if (el) {
                     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    el.style.outline = "4px solid #6366f1";
-                    el.style.outlineOffset = "4px";
+                    el.classList.add('highlight-post');
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
@@ -341,10 +329,9 @@
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
             if (seconds < 60) return "Just now";
             if (seconds < 3600) return Math.floor(seconds / 60) + "m ago";
-            if (seconds < 8400) return Math.floor(seconds / 3600) + "h ago";
+            if (seconds < 86400) return Math.floor(seconds / 3600) + "h ago";
             return Math.floor(seconds / 86400) + "d ago";
         }
-
         setLanguage(currentLang);
     </script>
 </body>
