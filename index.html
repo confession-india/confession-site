@@ -55,13 +55,7 @@
     </header>
 
     <div class="page-wrapper">
-        <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[110] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
-            <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-            </svg>
-        </button>
-
-        <div id="shareModal" onclick="closeShare()">
+        <div id="shareModal" onclick="closeShare()" style="display:none; position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); align-items:center; justify-content:center; padding:20px;">
             <div class="bg-white dark:bg-[#1e293b] p-8 rounded-[40px] w-full max-w-sm shadow-2xl space-y-3 border dark:border-slate-700" onclick="event.stopPropagation()">
                 <h3 class="font-black text-xl text-center mb-6 text-slate-800 dark:text-white">Share Secret</h3>
                 <div class="grid grid-cols-1 gap-3">
@@ -76,10 +70,10 @@
             </div>
         </div>
 
-        <div id="capture-area">
-            <div style="font-weight: 900; font-size: 14px; letter-spacing: 4px; color: #6366f1; margin-bottom: 30px; text-transform: uppercase;">Confess India</div>
-            <div id="capture-text" style="font-size: 26px; font-weight: 500; line-height: 1.5; color: #f8fafc; margin-bottom: 40px;"></div>
-            <div style="font-size: 12px; color: #64748b; border-top: 1px solid #334155; padding-top: 20px;">Read more anonymous truths at confessindia.in</div>
+        <div id="capture-area" style="position: absolute; left: -9999px; width: 1080px; min-height: 1080px; padding: 100px; background: #0f172a; display: flex; flex-direction: column; justify-content: center;">
+            <div style="font-weight: 900; font-size: 24px; letter-spacing: 8px; color: #6366f1; margin-bottom: 40px; text-transform: uppercase;">Confess India</div>
+            <div id="capture-text" style="font-size: 36px; font-weight: 500; line-height: 1.6; color: #f8fafc; margin-bottom: 60px; white-space: pre-wrap;"></div>
+            <div style="font-size: 18px; color: #64748b; border-top: 2px solid #334155; padding-top: 30px; font-weight: bold;">Read more anonymous truths at confessindia.in</div>
         </div>
 
         <main class="max-w-4xl mx-auto p-4">
@@ -92,41 +86,13 @@
             </div>
 
             <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
-
-            <section class="mt-20 py-12 border-t border-slate-100 dark:border-slate-800">
-                <div class="text-center mb-10">
-                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em]">Privacy First</span>
-                    <h2 class="text-2xl font-black text-slate-800 dark:text-white mt-2">Your Identity is Protected</h2>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">🛡️</div>
-                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Zero Logs</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">We don't store IP addresses or tracking data. Your secrets stay yours.</p>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👻</div>
-                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">No Accounts</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">No emails. No passwords. Complete anonymity by design.</p>
-                    </div>
-                    <div class="bg-white dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-50 dark:border-slate-800 shadow-sm">
-                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4 text-xl">👀</div>
-                        <h4 class="font-bold text-slate-800 dark:text-white mb-2">Human Moderated</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">Every report is checked by a person to keep the community safe.</p>
-                    </div>
-                </div>
-            </section>
         </main>
 
         <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 border-t border-slate-800">
-            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
                 <div class="space-y-4">
                     <h2 class="text-white text-xl font-black italic">Confess<span class="text-indigo-400">India</span></h2>
                     <p class="text-sm leading-relaxed">The safest digital space for Indians worldwide to share their truths without judgment.</p>
-                    <div class="flex items-center gap-3 bg-slate-800/50 w-fit px-4 py-2 rounded-full border border-slate-700">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse-green"></div>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">100% Anonymous</span>
-                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-8 md:col-span-2">
                     <div>
@@ -134,25 +100,18 @@
                         <ul class="space-y-3 text-sm font-bold">
                             <li><a href="legal.html#mission" class="hover:text-white transition-colors">Our Mission</a></li>
                             <li><a href="legal.html#privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                            <li><a href="legal.html#rules" class="hover:text-white transition-colors">Community Rules</a></li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="text-white text-xs font-black uppercase tracking-widest mb-6">Connect</h3>
                         <ul class="space-y-3 text-sm font-bold">
-                            <li><a href="support.html" class="hover:text-white transition-colors">Contact Support</a></li>
-                            <li><a href="support.html?type=abuse" class="hover:text-red-400 transition-colors text-red-500/80">Report Abuse</a></li>
+                            <li><a href="support.html" class="hover:text-white transition-colors">Support</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-            <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center space-y-4">
-                <div class="flex justify-center gap-4 text-slate-500 text-[10px] uppercase font-black tracking-widest">
-                    <span>📍 HYD: <span id="hyd-time">--:--</span></span>
-                    <span class="text-red-600">|</span>
-                    <span>🇬🇧 LDN: <span id="ldn-time">--:--</span></span>
-                </div>
-                <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India. Built with Integrity from HYD to LDN.</p>
+            <div class="max-w-4xl mx-auto mt-16 pt-8 border-t border-slate-800 text-center">
+                <p class="text-[10px] text-slate-600 font-medium tracking-wider">© 2026 Confess India.</p>
             </div>
         </footer>
     </div>
@@ -170,22 +129,21 @@
             te: { shareTruth: "షేర్ చేయండి", potd: "ఈరోజు ఉత్తమ పోస్ట్" },
             hi: { shareTruth: "साझा करें", potd: "आज की खास पोस्ट" },
             ta: { shareTruth: "பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
-            kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋస్ట్" },
-            ml: { shareTruth: "പങ്കുവെക്കുക", potd: "ഇന്നത്തെ పోస్ట్" }
+            kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
+            ml: { shareTruth: "പങ്കുവെക്കുക", potd: "ഇന്നത്തെ പോസ്റ്റ്" }
         };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
         let currentCategory = 'all';
         let unsubscribe = null;
 
-        // Interaction Glow
+        // Interaction Glow (Fix: Added cursor check)
         const glow = document.getElementById('mouse-glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
-        // Language Handling
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('userLang', lang);
@@ -195,7 +153,6 @@
             initFeed();
         }
 
-        // Category Handling
         function filterCat(cat, btn) {
             currentCategory = cat;
             document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('cat-active', 'bg-indigo-600', 'text-white'));
@@ -203,7 +160,6 @@
             initFeed();
         }
 
-        // Firestore Connection
         function initFeed() {
             if (unsubscribe) unsubscribe();
             let query = db.collection('confessions').where('language', '==', currentLang);
@@ -213,7 +169,7 @@
             unsubscribe = query.onSnapshot(snapshot => {
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
-                checkDeepLink(posts);
+                setTimeout(() => checkDeepLink(posts), 500);
             }, error => console.error(error));
         }
 
@@ -221,7 +177,7 @@
             const feed = document.getElementById('feed');
             if (!posts.length) { feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; return; }
 
-            // Post of the Day logic
+            // POTD Logic: Pick top liked, must have >0 likes
             const potd = [...posts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
             const langData = translations[currentLang] || translations['en'];
             
@@ -229,28 +185,28 @@
             posts.forEach(post => {
                 const isPotd = post.id === potd.id && (post.supportCount > 0);
                 const content = post.content || "";
-                const isLong = content.length > 280;
+                const isLong = content.length > 250;
+                
                 feed.insertAdjacentHTML('beforeend', `
-                    <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700">
+                    <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm transition-all duration-700 mb-2" style="scroll-margin-top: 150px;">
                         ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
                         <div class="mb-4">
                             <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
                             <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
                         </div>
                         <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
-                        ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest">Read More</button>` : '<div class="mb-4"></div>'}
+                        ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
                         <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                             <div class="flex gap-2">
-                                <button onclick="interact('${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                                <button onclick="interact('${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                                <button onclick="interact('${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 cursor-pointer">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                                <button onclick="interact('${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 cursor-pointer">🫂 <span class="count">${post.meTooCount || 0}</span></button>
                             </div>
-                            <button onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</button>
+                            <button onclick="openShare('${post.id}', '${post.category}')" class="bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest cursor-pointer hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
                         </div>
                     </div>`);
             });
         }
 
-        // Logic for Like/Me Too
         async function interact(id, field, btn) {
             if (localStorage.getItem(`${field}-${id}`)) return;
             const countSpan = btn.querySelector('.count');
@@ -258,16 +214,16 @@
                 await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
                 countSpan.innerText = parseInt(countSpan.innerText) + 1;
                 localStorage.setItem(`${field}-${id}`, 'true');
-                btn.classList.add('opacity-50', 'active-interact');
+                btn.classList.add('opacity-50');
+                btn.style.pointerEvents = 'none';
             } catch(e) { console.error(e); }
         }
 
-        // Logic for Sharing
         function openShare(id, category) {
             const content = document.getElementById(`text-${id}`).innerText;
             const shareUrl = `${SITE_URL}/index.html?id=${id}&cat=${category}`;
             const modal = document.getElementById('shareModal');
-            modal.classList.add('show');
+            modal.style.display = 'flex';
             const preview = content.substring(0, 80) + "...";
 
             document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(preview + " Read more: " + shareUrl)}`);
@@ -276,48 +232,69 @@
             document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Link Copied!"); };
             document.getElementById('copyTxtBtn').onclick = () => { 
                 navigator.clipboard.writeText(`"${content}"\n\nShared via: confessindia.in`); 
-                alert("Text copied with website credits!"); 
+                alert("Text copied!"); 
             };
+            
+            // HD INSTAGRAM GENERATOR FIX
             document.getElementById('igBtn').onclick = async () => {
-                const btn = document.getElementById('igBtn'); btn.innerText = "Generating...";
-                document.getElementById('capture-text').innerText = content;
-                const canvas = await html2canvas(document.getElementById('capture-area'), { backgroundColor: '#0f172a' });
-                const link = document.createElement('a'); link.download = `confess.png`; link.href = canvas.toDataURL(); link.click();
-                btn.innerText = "Instagram Image";
+                const btn = document.getElementById('igBtn');
+                btn.innerText = "Generating HD...";
+                btn.disabled = true;
+                
+                const captureArea = document.getElementById('capture-area');
+                const captureText = document.getElementById('capture-text');
+                captureText.innerText = content;
+                
+                // Adjust font size for 2000 chars
+                if(content.length > 1000) captureText.style.fontSize = "22px";
+                else if(content.length > 500) captureText.style.fontSize = "28px";
+                else captureText.style.fontSize = "36px";
+
+                try {
+                    const canvas = await html2canvas(captureArea, { 
+                        scale: 2, // 2x Scale for HD
+                        backgroundColor: '#0f172a',
+                        useCORS: true
+                    });
+                    const link = document.createElement('a');
+                    link.download = `ConfessIndia-${id}.png`;
+                    link.href = canvas.toDataURL("image/png");
+                    link.click();
+                } catch(e) { alert("Generation failed. Try copying text."); }
+                finally { btn.innerText = "Instagram Image"; btn.disabled = false; }
             };
         }
 
-        // Logic for Deep Link & Category Auto-Switch
+        function closeShare() { document.getElementById('shareModal').style.display = 'none'; }
+
+        function toggleReadMore(id) {
+            const p = document.getElementById(`text-${id}`);
+            const btn = document.getElementById(`rm-btn-${id}`);
+            const isCollapsed = p.classList.contains('line-clamp-3');
+            if (isCollapsed) {
+                p.classList.remove('line-clamp-3');
+                btn.innerText = "Read Less";
+            } else {
+                p.classList.add('line-clamp-3');
+                btn.innerText = "Read More";
+                document.getElementById(`post-${id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
         function checkDeepLink(posts) {
             const urlParams = new URLSearchParams(window.location.search);
             const targetId = urlParams.get('id');
-            const targetCat = urlParams.get('cat');
-
             if (targetId) {
-                // Auto-switch category if the shared post isn't in current view
-                if (targetCat && currentCategory !== targetCat && currentCategory !== 'all') {
-                    const btnId = targetCat === 'relationship' ? 'cat-rel' : targetCat === 'family' ? 'cat-fam' : targetCat === 'marriage' ? 'cat-mar' : 'cat-oth';
-                    filterCat(targetCat, document.getElementById(btnId));
-                    return; 
-                }
                 const el = document.getElementById(`post-${targetId}`);
                 if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.classList.add('highlight-post');
-                    setTimeout(() => el.classList.remove('highlight-post'), 4000);
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    el.style.outline = "4px solid #6366f1";
+                    el.style.outlineOffset = "4px";
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
         }
 
-        // Helpers
-        function closeShare() { document.getElementById('shareModal').classList.remove('show'); }
-        function toggleReadMore(id) {
-            const p = document.getElementById(`text-${id}`);
-            const btn = document.getElementById(`rm-btn-${id}`);
-            p.classList.toggle('line-clamp-3');
-            btn.innerText = p.classList.contains('line-clamp-3') ? "Read More" : "Read Less";
-        }
         function timeAgo(date) {
             if (!date) return 'Just now';
             const seconds = Math.floor((new Date() - date.toDate()) / 1000);
@@ -325,14 +302,6 @@
             if (seconds < 3600) return Math.floor(seconds / 60) + "m ago";
             return Math.floor(seconds / 3600) + "h ago";
         }
-        function updateClocks() {
-            const options = { hour: '2-digit', minute: '2-digit', hour12: true };
-            try {
-                document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...options, timeZone: 'Asia/Kolkata' }).format(new Date());
-                document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
-            } catch (e) { }
-        }
-        setInterval(updateClocks, 60000); updateClocks();
 
         setLanguage(currentLang);
     </script>
