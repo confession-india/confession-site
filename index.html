@@ -283,7 +283,7 @@
         function getCardHTML(post, isPotd, langData) {
             const content = post.content || "";
             // FIXED: Name Priority
-            const displayName = post.displayName || post.name || "Anonymous";
+            const displayName = post.displayName || post.name || post.username || "Anonymous";
             const isLong = content.length > 250;
             
             const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
