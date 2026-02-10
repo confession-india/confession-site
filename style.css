@@ -327,3 +327,45 @@ button, .cursor-pointer {
     pointer-events: none;
     opacity: 0.6;
 }
+
+/* 21. DYNAMIC SCROLL NAV */
+#scroll-nav { 
+    position: fixed; 
+    right: 20px; 
+    bottom: 100px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    z-index: 1000; 
+    opacity: 0; 
+    pointer-events: none; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateY(30px);
+}
+
+#scroll-nav.visible { 
+    opacity: 1; 
+    pointer-events: auto; 
+    transform: translateY(0); 
+}
+
+.scroll-btn { 
+    background: #6366f1; 
+    color: white; 
+    width: 45px; 
+    height: 45px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border-radius: 50%; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Report Success State */
+.report-success {
+    color: #ef4444 !important;
+    font-style: italic;
+}
