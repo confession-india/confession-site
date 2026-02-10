@@ -221,3 +221,53 @@ html { scroll-behavior: smooth; }
 section:target {
     animation: highlight-section 1.5s ease-out;
 }
+
+/* 13. POST OF THE DAY - PRESTIGE SYSTEM */
+@keyframes gold-glow {
+    0% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.2); border-color: rgba(251, 191, 36, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); border-color: rgba(251, 191, 36, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.2); border-color: rgba(251, 191, 36, 0.3); }
+}
+
+.potd-card {
+    animation: gold-glow 3s infinite ease-in-out;
+    border: 2px solid #fbbf24 !important; /* Gold/Amber */
+    position: relative;
+}
+
+/* 14. DEEP LINK HIGHLIGHTING */
+@keyframes deep-link-flash {
+    0% { ring-width: 0px; transform: scale(1); }
+    30% { ring-width: 4px; ring-color: #4f46e5; transform: scale(1.02); }
+    100% { ring-width: 0px; transform: scale(1); }
+}
+
+.highlight-post {
+    outline: 3px solid #4f46e5;
+    outline-offset: 4px;
+    border-radius: 32px;
+    z-index: 50;
+}
+
+/* 15. BRANDED SHARE BUTTON */
+.btn-brand {
+    background-color: #4f46e5 !important; /* Indigo - Matching your Share Secret btn */
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-brand:hover {
+    background-color: #4338ca !important; 
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+}
+
+/* Ensure the count spans update smoothly */
+.count {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.active-interact .count {
+    transform: scale(1.3);
+    color: inherit;
+}
