@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Modern Branded Scroll Pill - Matching post.html design */
+        /* Essential Inline Styles for Scroll Button - Logic depends on these */
         #dynamic-scroll-btn { 
             position: fixed; 
             right: 25px; 
@@ -58,10 +58,19 @@
         }
         .custom-scroll-pill:hover { transform: scale(1.1); background: #4f46e5; }
         
-        /* Smooth Icon Fade/Rotate Transition */
         #scrollIcon { transition: transform 0.4s ease, opacity 0.3s ease; }
         .icon-flip { transform: rotate(180deg); }
         .icon-fade { opacity: 0; }
+
+        /* Interaction Pulse Animation */
+        @keyframes interact-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        .animate-interact {
+            animation: interact-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -201,7 +210,7 @@
             glow.style.top = e.clientY + 'px';
         });
 
-        // Directional Scroll Button Logic with Fade-Flip Effect
+        // Directional Scroll Button Logic
         let lastScrollTop = 0;
         const scrollBtnWrapper = document.getElementById('dynamic-scroll-btn');
         const scrollActionBtn = document.getElementById('scrollActionBtn');
@@ -209,26 +218,14 @@
 
         window.addEventListener('scroll', () => {
             let st = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // Basic visibility toggle
-            if (st > 400) {
-                scrollBtnWrapper.classList.add('visible');
-            } else {
-                scrollBtnWrapper.classList.remove('visible');
-            }
+            if (st > 400) { scrollBtnWrapper.classList.add('visible'); } 
+            else { scrollBtnWrapper.classList.remove('visible'); }
 
-            // Scroll Direction Logic
             if (st > lastScrollTop) {
-                // Downward -> Scroll to Bottom
-                if (scrollIcon.classList.contains('icon-flip')) {
-                    toggleIconEffect(false);
-                }
+                if (scrollIcon.classList.contains('icon-flip')) { toggleIconEffect(false); }
                 scrollActionBtn.onclick = () => window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
             } else {
-                // Upward -> Scroll to Top
-                if (!scrollIcon.classList.contains('icon-flip')) {
-                    toggleIconEffect(true);
-                }
+                if (!scrollIcon.classList.contains('icon-flip')) { toggleIconEffect(true); }
                 scrollActionBtn.onclick = () => window.scrollTo({top: 0, behavior: 'smooth'});
             }
             lastScrollTop = st <= 0 ? 0 : st;
@@ -248,8 +245,7 @@
             document.getElementById('hyd-time').innerText = new Date().toLocaleTimeString('en-US', { ...options, timeZone: 'Asia/Kolkata' });
             document.getElementById('ldn-time').innerText = new Date().toLocaleTimeString('en-US', { ...options, timeZone: 'Europe/London' });
         }
-        setInterval(updateClocks, 1000);
-        updateClocks();
+        setInterval(updateClocks, 1000); updateClocks();
 
         function setLanguage(lang) {
             currentLang = lang;
@@ -282,13 +278,19 @@
 
         function getCardHTML(post, isPotd, langData) {
             const content = post.content || "";
-            // FIXED: Name Priority
             const displayName = post.displayName || post.name || post.username || "Anonymous";
             const isLong = content.length > 250;
             
             const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
             const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
             const hasReported = localStorage.getItem(`reportCount-${post.id}`);
+
+            const reportActionHTML = hasReported 
+                ? `<span class="text-[10px] font-black uppercase text-red-500 report-success">✅ Reported</span>`
+                : `<button type="button" onclick="interact(event, '${post.id}', 'reportCount', this)" 
+                           class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors">
+                    🚩 Report
+                   </button>`;
 
             return `
                 <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
@@ -300,10 +302,9 @@
                             <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
                             <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
                         </div>
-                        <button onclick="interact(event, '${post.id}', 'reportCount', this)" 
-                                class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors ${hasReported ? 'hidden' : ''}">
-                            🚩 Report
-                        </button>
+                        <div id="report-wrap-${post.id}">
+                            ${reportActionHTML}
+                        </div>
                     </div>
 
                     <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
@@ -312,10 +313,10 @@
                     
                     <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                         <div class="flex gap-2">
-                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-transform active:scale-95 ${hasSupported ? 'active-interact' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-transform active:scale-95 ${hasMetoo ? 'active-interact' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-all active:scale-95 ${hasSupported ? 'active-interact opacity-50' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-all active:scale-95 ${hasMetoo ? 'active-interact opacity-50' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
                         </div>
-                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
                     </div>
                 </div>`;
         }
@@ -323,16 +324,28 @@
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             const potdContainer = document.getElementById('potd-container');
+            
             if (!posts.length) { 
                 feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; 
                 potdContainer.innerHTML = '';
                 return; 
             }
-            const potd = [...posts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
+
+            const visiblePosts = posts.filter(post => (post.reportCount || 0) < 10);
+
+            if (visiblePosts.length === 0) {
+                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>';
+                potdContainer.innerHTML = '';
+                return;
+            }
+
+            const potd = [...visiblePosts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
             const langData = translations[currentLang] || translations['en'];
+            
             potdContainer.innerHTML = getCardHTML(potd, true, langData);
             feed.innerHTML = '';
-            posts.forEach(post => {
+            
+            visiblePosts.forEach(post => {
                 if(post.id !== potd.id) {
                     feed.insertAdjacentHTML('beforeend', getCardHTML(post, false, langData));
                 }
@@ -340,16 +353,51 @@
         }
 
         async function interact(e, id, field, btn) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
+            // FIX: Prevent default and stop propagation to stop the jump
+            if (e) { 
+                e.preventDefault(); 
+                e.stopPropagation(); 
+            }
+            
+            // Prevent double clicking
             if (localStorage.getItem(`${field}-${id}`)) return;
-            const countSpan = btn.querySelector('.count');
+            
             try {
-                btn.classList.add('active-interact');
-                if(countSpan) countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                // ADD PULSE ANIMATION
+                btn.classList.add('animate-interact');
+                setTimeout(() => btn.classList.remove('animate-interact'), 400);
+
+                if (field === 'reportCount') {
+                    btn.innerHTML = "⏳ Escalating...";
+                    btn.style.pointerEvents = "none";
+                } else {
+                    // OPTIMISTIC UPDATE: Change UI before DB confirms
+                    const countSpan = btn.querySelector('.count');
+                    if(countSpan) {
+                        countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                    }
+                    btn.classList.add('active-interact', 'opacity-50');
+                }
+
                 localStorage.setItem(`${field}-${id}`, 'true');
-                await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
-                if(field === 'reportCount') btn.classList.add('hidden');
-            } catch(e) { console.error(e); }
+                
+                // background update
+                await db.collection('confessions').doc(id).update({ 
+                    [field]: firebase.firestore.FieldValue.increment(1) 
+                });
+                
+                if (field === 'reportCount') {
+                    btn.innerHTML = "✅ Reported";
+                    btn.classList.add('report-success');
+                }
+            } catch(err) { 
+                console.error(err); 
+                // Revert if error
+                if (field === 'reportCount') { 
+                    btn.innerHTML = "🚩 Report"; 
+                    btn.style.pointerEvents = "auto";
+                }
+            }
         }
 
         function openShare(id, category) {
