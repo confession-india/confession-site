@@ -16,7 +16,13 @@
     75% { transform: translateX(6px); }
 }
 
-/* Added: Smooth flow for the branded header line */
+/* Pulse/Glow effect for Emoji Clicks */
+@keyframes interact-pulse {
+    0% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.1); filter: brightness(1.3); box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+    100% { transform: scale(1); filter: brightness(1); }
+}
+
 @keyframes flow-gradient {
     0% { background-position: 0% 0%; }
     100% { background-position: -200% 0%; }
@@ -33,6 +39,10 @@
 }
 
 .animate-pulse-green { animation: pulse-green 2s infinite; }
+
+.animate-interact {
+    animation: interact-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
 
 .shake-active { 
     animation: shake 0.3s ease-in-out; 
@@ -60,6 +70,10 @@ html { scroll-behavior: smooth; }
 /* 3. COMPONENT STYLING */
 .confession-card {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* STABILITY FIX: Prevents flickering/shaking during inner animations */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform, box-shadow;
 }
 
 .confession-card:hover {
@@ -97,12 +111,15 @@ html { scroll-behavior: smooth; }
     background: rgba(15, 23, 42, 0.8);
     backdrop-filter: blur(12px) saturate(180%);
     z-index: 10000;
-    display: flex;
+    display: none; /* Controlled by JS show class */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
 }
-#shareModal.show { opacity: 1; pointer-events: auto; }
+#shareModal.show { opacity: 1; pointer-events: auto; display: flex !important; }
 
 .share-pill {
     background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
@@ -138,7 +155,7 @@ html { scroll-behavior: smooth; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 9. GLOBAL BRANDED HEADER - UPDATED WITH HYBRID FLOW */
+/* 9. GLOBAL BRANDED HEADER */
 .global-header {
     position: relative;
     border-bottom: none !important;
@@ -152,13 +169,7 @@ html { scroll-behavior: smooth; }
     left: 0;
     right: 0;
     height: 2px;
-    /* Animated London Red to Hyderabad Indigo transition */
-    background: linear-gradient(90deg, 
-        #ef4444 0%, 
-        #4f46e5 25%, 
-        #ef4444 50%, 
-        #4f46e5 75%, 
-        #ef4444 100%);
+    background: linear-gradient(90deg, #ef4444 0%, #4f46e5 25%, #ef4444 50%, #4f46e5 75%, #ef4444 100%);
     background-size: 200% auto;
     animation: flow-gradient 5s linear infinite;
     z-index: 100;
@@ -184,13 +195,8 @@ html { scroll-behavior: smooth; }
     background-color: #ef4444 !important;
     border: 1px solid #ef4444 !important;
     color: white !important;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 
-                0 0 40px rgba(239, 68, 68, 0.2) !important;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), 0 0 40px rgba(239, 68, 68, 0.2) !important;
     transform: translateY(-2px);
-}
-
-#postForm {
-    overflow: visible !important;
 }
 
 /* 12. MANIFESTO & SIGNATURE STYLES */
@@ -218,10 +224,6 @@ html { scroll-behavior: smooth; }
     box-shadow: 0 10px 20px -5px rgba(35, 134, 54, 0.2);
 }
 
-section:target {
-    animation: highlight-section 1.5s ease-out;
-}
-
 /* 13. POST OF THE DAY - PRESTIGE SYSTEM */
 @keyframes gold-glow {
     0% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.2); border-color: rgba(251, 191, 36, 0.3); }
@@ -231,27 +233,28 @@ section:target {
 
 .potd-card {
     animation: gold-glow 3s infinite ease-in-out;
-    border: 2px solid #fbbf24 !important; /* Gold/Amber */
+    border: 2px solid #fbbf24 !important;
     position: relative;
 }
 
 /* 14. DEEP LINK HIGHLIGHTING */
-@keyframes deep-link-flash {
-    0% { ring-width: 0px; transform: scale(1); }
-    30% { ring-width: 4px; ring-color: #4f46e5; transform: scale(1.02); }
-    100% { ring-width: 0px; transform: scale(1); }
-}
-
 .highlight-post {
     outline: 3px solid #4f46e5;
     outline-offset: 4px;
     border-radius: 32px;
     z-index: 50;
+    animation: deep-link-flash 2s ease-out;
+}
+
+@keyframes deep-link-flash {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.02); }
+    100% { transform: scale(1); }
 }
 
 /* 15. BRANDED SHARE BUTTON */
 .btn-brand {
-    background-color: #4f46e5 !important; /* Indigo - Matching your Share Secret btn */
+    background-color: #4f46e5 !important;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -261,7 +264,6 @@ section:target {
     box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
 }
 
-/* Ensure the count spans update smoothly */
 .count {
     display: inline-block;
     transition: transform 0.2s ease;
@@ -269,12 +271,10 @@ section:target {
 
 .active-interact .count {
     transform: scale(1.3);
-    color: inherit;
 }
 
-/* 16. HD CAPTURE AREA - MUST BE ACCESSIBLE FOR HTML2CANVAS */
+/* 16. HD CAPTURE AREA */
 #capture-area {
-    /* We use absolute instead of hidden so the library can "see" and render it */
     position: absolute;
     left: -9999px; 
     top: 0;
@@ -289,7 +289,6 @@ section:target {
 }
 
 /* 17. READ MORE / LINE CLAMP LOGIC */
-/* This is crucial for the 2000 character posts */
 .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -297,23 +296,9 @@ section:target {
     overflow: hidden;
 }
 
-/* 18. MODAL CENTERING FIX */
-/* Overriding the flex behavior to ensure it stays centered on all screens */
-#shareModal {
-    display: none; /* JS will toggle this to 'flex' */
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-#shareModal.show {
-    display: flex !important;
-}
-
 /* 19. IMPROVED DEEP LINK LANDING */
-/* Adds extra space so the sticky header doesn't cover the post */
 .confession-card {
-    scroll-margin-top: 160px; /* Distance from top when navigating via link */
+    scroll-margin-top: 160px;
 }
 
 /* 20. BUTTON & POINTER FIXES */
@@ -322,49 +307,17 @@ button, .cursor-pointer {
     user-select: none;
 }
 
-/* Fix for counters appearing stuck */
 .active-interact {
     pointer-events: none;
     opacity: 0.6;
+    background: rgba(99, 102, 241, 0.2) !important;
 }
 
 /* 21. DYNAMIC SCROLL NAV */
-#scroll-nav { 
-    position: fixed; 
-    right: 20px; 
-    bottom: 100px; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 10px; 
-    z-index: 1000; 
-    opacity: 0; 
-    pointer-events: none; 
+#dynamic-scroll-btn {
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    transform: translateY(30px);
 }
 
-#scroll-nav.visible { 
-    opacity: 1; 
-    pointer-events: auto; 
-    transform: translateY(0); 
-}
-
-.scroll-btn { 
-    background: #6366f1; 
-    color: white; 
-    width: 45px; 
-    height: 45px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    border-radius: 50%; 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-    border: none;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* Update this in your style.css */
 .report-success {
     color: #ef4444 !important;
     font-weight: 800 !important;
