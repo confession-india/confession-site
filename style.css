@@ -364,8 +364,14 @@ button, .cursor-pointer {
     font-weight: bold;
 }
 
-/* Report Success State */
+/* Update this in your style.css */
 .report-success {
     color: #ef4444 !important;
-    font-style: italic;
+    font-weight: 800 !important;
+    animation: reportFadeIn 0.3s ease-out;
+}
+
+@keyframes reportFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
 }
