@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Essential Inline Styles for Scroll Button - Logic depends on these */
+        /* Essential Inline Styles for logic-heavy components */
         #dynamic-scroll-btn { 
             position: fixed; 
             right: 25px; 
@@ -61,16 +61,6 @@
         #scrollIcon { transition: transform 0.4s ease, opacity 0.3s ease; }
         .icon-flip { transform: rotate(180deg); }
         .icon-fade { opacity: 0; }
-
-        /* Interaction Pulse Animation */
-        @keyframes interact-pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-        .animate-interact {
-            animation: interact-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -269,7 +259,10 @@
             if (currentCategory !== 'all') { query = query.where('category', '==', currentCategory); }
             query = query.orderBy('timestamp', 'desc');
             
-            unsubscribe = query.onSnapshot(snapshot => {
+            unsubscribe = query.onSnapshot({ includeMetadataChanges: false }, snapshot => {
+                // Ignore metadata changes to help prevent flicker on interaction
+                if (snapshot.metadata.hasPendingWrites) return;
+
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
                 setTimeout(() => checkDeepLink(posts), 500);
@@ -353,63 +346,45 @@
         }
 
         async function interact(e, id, field, btn) {
-    // 1. COMPLETELY STOP THE JUMP
-    if (e) { 
-        e.preventDefault(); 
-        e.stopPropagation(); 
-    }
-    
-    if (localStorage.getItem(`${field}-${id}`)) return;
-    
-    try {
-        // 2. TRIGGER THE PULSE (GLOW) EFFECT
-        btn.classList.add('animate-interact');
-        
-        // 3. TARGET THE PARENT CARD FOR THE SHAKE/GLOW EFFECT
-        const card = document.getElementById(`post-${id}`);
-        if(card) {
-            card.style.boxShadow = "0 0 20px rgba(99, 102, 241, 0.3)";
-            setTimeout(() => card.style.boxShadow = "", 400);
-        }
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            if (localStorage.getItem(`${field}-${id}`)) return;
+            
+            try {
+                btn.classList.add('animate-interact');
+                const card = document.getElementById(`post-${id}`);
+                
+                if (field === 'reportCount') {
+                    btn.innerHTML = "⏳ Escalating...";
+                    btn.style.pointerEvents = "none";
+                } else {
+                    const countSpan = btn.querySelector('.count');
+                    if(countSpan) {
+                        countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                    }
+                    btn.classList.add('active-interact', 'opacity-50');
+                }
 
-        if (field === 'reportCount') {
-            btn.innerHTML = "⏳ Escalating...";
-            btn.style.pointerEvents = "none";
-        } else {
-            // 4. OPTIMISTIC UPDATE (Instant UI Change)
-            const countSpan = btn.querySelector('.count');
-            if(countSpan) {
-                countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                localStorage.setItem(`${field}-${id}`, 'true');
+                
+                await db.collection('confessions').doc(id).update({ 
+                    [field]: firebase.firestore.FieldValue.increment(1) 
+                });
+                
+                if (field === 'reportCount') {
+                    btn.innerHTML = "✅ Reported";
+                    btn.classList.add('report-success');
+                }
+                
+                setTimeout(() => btn.classList.remove('animate-interact'), 400);
+            } catch(err) { 
+                console.error(err); 
+                if (field === 'reportCount') { 
+                    btn.innerHTML = "🚩 Report"; 
+                    btn.style.pointerEvents = "auto";
+                }
             }
-            btn.classList.add('active-interact', 'opacity-50');
         }
 
-        localStorage.setItem(`${field}-${id}`, 'true');
-        
-        // 5. BACKGROUND UPDATE (Firebase)
-        // Note: The onSnapshot in initFeed() will still trigger a re-render.
-        // To truly stop the flicker, you'd usually use {includeMetadataChanges: false} 
-        // but this manual DOM update helps mask the lag.
-        await db.collection('confessions').doc(id).update({ 
-            [field]: firebase.firestore.FieldValue.increment(1) 
-        });
-        
-        if (field === 'reportCount') {
-            btn.innerHTML = "✅ Reported";
-            btn.classList.add('report-success');
-        }
-        
-        // Remove animation class after finish
-        setTimeout(() => btn.classList.remove('animate-interact'), 400);
-
-    } catch(err) { 
-        console.error(err); 
-        if (field === 'reportCount') { 
-            btn.innerHTML = "🚩 Report"; 
-            btn.style.pointerEvents = "auto";
-        }
-    }
-}
         function openShare(id, category) {
             const content = document.getElementById(`text-${id}`).innerText;
             const shareUrl = `${SITE_URL}/index.html?id=${id}&cat=${category}`;
