@@ -61,6 +61,40 @@
         #scrollIcon { transition: transform 0.4s ease, opacity 0.3s ease; }
         .icon-flip { transform: rotate(180deg); }
         .icon-fade { opacity: 0; }
+
+        /* FIXED: Share Modal Positioning */
+        #shareModal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        #shareModal.show { display: flex; animation: modalFadeIn 0.3s ease; }
+        
+        /* Modal Content Animation */
+        #shareModal > div {
+            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalSlideUp { 
+            from { transform: translateY(30px); opacity: 0; } 
+            to { transform: translateY(0); opacity: 1; } 
+        }
+
+        /* Hide Capture Area from main UI */
+        #capture-area {
+            position: absolute;
+            left: -9999px;
+            width: 1080px;
+            padding: 100px;
+            background: #0f172a;
+        }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -260,9 +294,7 @@
             query = query.orderBy('timestamp', 'desc');
             
             unsubscribe = query.onSnapshot({ includeMetadataChanges: false }, snapshot => {
-                // Ignore metadata changes to help prevent flicker on interaction
                 if (snapshot.metadata.hasPendingWrites) return;
-
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
                 setTimeout(() => checkDeepLink(posts), 500);
@@ -351,8 +383,6 @@
             
             try {
                 btn.classList.add('animate-interact');
-                const card = document.getElementById(`post-${id}`);
-                
                 if (field === 'reportCount') {
                     btn.innerHTML = "⏳ Escalating...";
                     btn.style.pointerEvents = "none";
@@ -363,18 +393,14 @@
                     }
                     btn.classList.add('active-interact', 'opacity-50');
                 }
-
                 localStorage.setItem(`${field}-${id}`, 'true');
-                
                 await db.collection('confessions').doc(id).update({ 
                     [field]: firebase.firestore.FieldValue.increment(1) 
                 });
-                
                 if (field === 'reportCount') {
                     btn.innerHTML = "✅ Reported";
                     btn.classList.add('report-success');
                 }
-                
                 setTimeout(() => btn.classList.remove('animate-interact'), 400);
             } catch(err) { 
                 console.error(err); 
