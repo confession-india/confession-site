@@ -103,11 +103,15 @@
                     <div>
                         <label class="block text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-2 ml-1">Category</label>
                         <select id="catInput" class="w-full p-4 bg-slate-50 dark:bg-slate-800/80 border-2 border-transparent dark:text-white rounded-2xl outline-none cursor-pointer font-bold text-slate-700">
-                            <option value="relationship">Relationships</option>
-                            <option value="family">Family</option>
-                            <option value="marriage">Marriage</option>
-                            <option value="other" selected>Other</option>
-                        </select>
+    <option value="heartbreak">💔 Heartbreak & Exes</option>
+    <option value="family">home Family Pressures</option>
+    <option value="situationship">🤡 Toxic Situationships</option>
+    <option value="mentalhealth">🧠 Mental Health / The Void</option>
+    <option value="career">💼 Career & Job Stress</option>
+    <option value="loneliness">🌑 Pure Loneliness</option>
+    <option value="marriage">💍 Marriage Struggles</option>
+    <option value="other" selected>✨ Other Random Truths</option>
+</select>
                     </div>
                 </div>
 
@@ -220,10 +224,11 @@
         // EXPANDED VIBE ENGINE
         const VibeEngine = {
             keywords: {
-                sad: ['badha', 'edupu', 'hurt', 'pain', 'alone', 'cry', 'vadhilesi', 'mosam', 'dukh', 'rona', 'dhokha', 'valikidhu', 'kannir', 'sankata', 'visham', 'feeling low', 'brokeback', 'tears', 'upset', 'broken', 'disappointed'],
+                sad:  ['pagilipotundi', 'valikidhu', 'vazhikku', 'bejaru', 'rona', 'badha', 'edupu', 'hurt', 'pain', 'alone', 'cry', 'vadhilesi', 'mosam', 'dukh', 'rona', 'dhokha', 'valikidhu', 'kannir', 'sankata', 'visham', 'feeling low', 'brokeback', 'tears', 'upset', 'broken', 'disappointed'],
                 love: ['prema', 'pelli', 'ishtam', 'crush', 'lover', 'pranam', 'loveu', 'pyar', 'mohabbat', 'ishq', 'kadhal', 'preethi', 'sneham', 'miss you', 'darling', 'heart', 'relationship', 'cute', 'forever', 'proposal'],
-                angry: ['kopam', 'chi', 'daridram', 'hate', 'gussa', 'bakwas', 'shame', 'kobha', 'poda', 'kadi', 'irritating', 'waste', 'bloody', 'annoying', 'angry', 'shut up', 'fake', 'liar', 'cheater'],
+                angry: ['abaddhalu', 'thittu', 'torture', 'gaslighting', 'kopam', 'chi', 'daridram', 'hate', 'gussa', 'bakwas', 'shame', 'kobha', 'poda', 'kadi', 'irritating', 'waste', 'bloody', 'annoying', 'angry', 'shut up', 'fake', 'liar', 'cheater'],
                 chill: ['mowa', 'vibe', 'chill', 'party', 'enjoy', 'scene', 'racha', 'mast', 'mazza', 'super', 'adipoli', 'pwoli', 'fun', 'happy', 'cool', 'awesome', 'lol', 'lmao', 'lit', 'fire']
+                
             },
             getVibe: function(text) {
                 const lowerText = text.toLowerCase();
