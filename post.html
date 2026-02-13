@@ -12,20 +12,28 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Share Your Secret - Confess India</title>
+    <link rel="icon" href="https://fav.farm/🤫">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
+    
     <style>
         html, body { margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
         #submitBtn:disabled { background-color: #94a3b8 !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-        .animate-pulse-green { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        #previewContainer, #submitBtn, #confidence-bar, #p-lang-tag { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        @keyframes strike {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 5px #facc15); }
+            100% { opacity: 0.3; transform: scale(0.8); }
+        }
+        .bolt-active { animation: strike 1s infinite; display: inline-block; margin-right: 4px; }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
     
+    <audio id="glowSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
+
     <div id="mouse-glow"></div>
 
     <div id="toast">
@@ -55,17 +63,23 @@
     <main class="max-w-2xl mx-auto px-6 py-10 pb-24 flex-grow w-full">
         <div class="mb-10">
             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 ml-1 mb-2 block">Live Preview</label>
-            <div id="previewContainer" class="p-8 bg-white dark:bg-[#1e293b] shadow-sm rounded-3xl border-2 border-slate-100 dark:border-red-500/30">
+            <div id="previewContainer" class="p-8 bg-white dark:bg-[#1e293b] shadow-sm rounded-3xl border-2 border-slate-100 dark:border-slate-800 transition-all duration-500">
                 <div class="flex justify-between items-start mb-4">
                     <div class="flex flex-col gap-1">
                         <div class="flex items-center">
                             <span id="p-cat" class="text-[10px] font-black uppercase bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded text-indigo-500 mr-2">OTHER</span>
                             <h4 id="p-user" class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest inline-block">BY ANONYMOUS</h4>
                         </div>
-                        <span id="p-lang-tag" class="text-[9px] font-black mt-1 uppercase tracking-widest px-2 py-0.5 rounded-md w-fit bg-slate-100 text-slate-500">English Feed</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span id="p-lang-tag" class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md w-fit bg-slate-100 text-slate-500 flex items-center">
+                                <span id="native-bolt" class="hidden bolt-active">⚡</span>
+                                <span id="lang-text">English Feed</span>
+                            </span>
+                            <div id="vibe-meter-container"></div>
+                        </div>
                     </div>
                 </div>
-                <p id="p-msg" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-4 italic opacity-60">"Your truth starts here..."</p>
+                <p id="p-msg" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-6 italic opacity-60">"Your truth starts here..."</p>
                 
                 <div class="space-y-1">
                     <div class="flex justify-between items-center">
@@ -73,7 +87,7 @@
                         <span id="conf-pct" class="text-[8px] font-black text-slate-400">0%</span>
                     </div>
                     <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                        <div id="confidence-bar" class="w-0 h-full bg-slate-400"></div>
+                        <div id="confidence-bar" class="w-0 h-full bg-slate-400 transition-all duration-700"></div>
                     </div>
                 </div>
             </div>
@@ -173,41 +187,77 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // MASSIVE EXPANDED DICTIONARY
         const LanguageEngine = {
+            patterns: { te: /[\u0c00-\u0c7f]/, hi: /[\u0900-\u097f]/, ta: /[\u0b80-\u0bff]/, kn: /[\u0c80-\u0cff]/, ml: /[\u0d00-\u0d7f]/ },
             dictionaries: {
-                te: ['vadu', 'ledhu', 'kadha', 'ekkada', 'cheppu', 'ante', 'unnadu', 'vachindi', 'thindi', 'emundi', 'telusu', 'chesadu', 'avunu', 'kuda', 'bhaya', 'mowa', 'enti', 'ela', 'ivvali', 'oddu', 'amma', 'nanna', 'abbayi', 'ammayi', 'undhi', 'ra', 're', 'guru', 'manchi', 'teliyadu', 'velli'],
-                hi: ['kya', 'hai', 'nhi', 'rha', 'tha', 'liye', 'raha', 'hota', 'kar', 'baat', 'sab', 'kuch', 'kaise', 'accha', 'yaar', 'bhai', 'matlab', 'pata', 'hoga', 'phir', 'kyu', 'chahiye', 'lekin', 'aur', 'toh', 'bol', 'chal'],
-                ta: ['enna', 'irukku', 'pannu', 'sapadu', 'illai', 'romba', 'nalla', 'solunga', 'vaanga', 'ponga', 'theriyum', 'eppadi', 'konjam', 'machi', 'da', 'di', 'nanba', 'vaada', 'poitu', 'iruken', 'venum'],
-                kn: ['ide', 'madi', 'yelli', 'agide', 'hogu', 'barutthe', 'nodu', 'namaskara', 'chennagidi', 'oota', 'gothu', 'enu', 'ivattu', 'kano', 'guru', 'aythu', 'beku', 'beda', 'namma', 'tumba'],
-                ml: ['entha', 'nalla', 'ivide', 'evide', 'poyi', 'kazhichu', 'ariyilla', 'cheyyanam', 'santhosham', 'nanni', 'venda', 'undu', 'aliyan', 'mone', 'poda', 'engane', 'ippol']
+                te: ['vadu', 'ledhu', 'kadha', 'ekkada', 'cheppu', 'ante', 'unnadu', 'vachindi', 'thindi', 'emundi', 'telusu', 'chesadu', 'avunu', 'kuda', 'bhaya', 'mowa', 'enti', 'ela', 'ivvali', 'oddu', 'abbayi', 'ammayi', 'ra', 're', 'guru', 'manchi', 'atla', 'itla', 'enduku', 'chestunnav', 'racha', 'baava', 'mama', 'pilla', 'poradu', 'kopam', 'bhayam', 'badha', 'evadu', 'nakenti', 'lite', 'scene', 'vadu', 'thammudu', 'akka', 'anna', 'chelli', 'asalu', 'emindi', 'namaskaram', 'bagunhara', 'velli'],
+                hi: ['kya', 'hai', 'nhi', 'rha', 'tha', 'liye', 'raha', 'hota', 'kar', 'baat', 'sab', 'kuch', 'kaise', 'accha', 'yaar', 'bhai', 'matlab', 'pata', 'hoga', 'phir', 'kyu', 'chahiye', 'lekin', 'aur', 'toh', 'bol', 'chal', 'zindagi', 'pagal', 'theek', 'kalam', 'shayar', 'khwab', 'nasha', 'mohabbat', 'ishq', 'dil', 'dhokha', 'pyaar', 'mast', 'gazab', 'badiya', 'thoko', 'chalna', 'rukna', 'kal', 'aaj'],
+                ta: ['enna', 'irukku', 'pannu', 'sapadu', 'illai', 'romba', 'nalla', 'solunga', 'vaanga', 'ponga', 'theriyum', 'eppadi', 'konjam', 'machi', 'da', 'di', 'nanba', 'vaada', 'poitu', 'iruken', 'venum', 'aama', 'illinga', 'super', 'vera', 'maari', 'vibe', 'kathu', 'loveu', 'ponnu', 'paiyan', 'thala', 'thalapathy', 'semma', 'podhum', 'veedu'],
+                kn: ['ide', 'madi', 'yelli', 'agide', 'hogu', 'barutthe', 'nodu', 'namaskara', 'chennagidi', 'oota', 'gothu', 'enu', 'ivattu', 'kano', 'guru', 'aythu', 'beku', 'beda', 'namma', 'tumba', 'houdu', 'allva', 'sakkat', 'maga', 'machi', 'huduga', 'hudugi', 'love-u', 'preethi', 'mane', 'iva', 'yaru', 'hengu', 'gothilla', 'matte'],
+                ml: ['entha', 'nalla', 'ivide', 'evide', 'poyi', 'kazhichu', 'ariyilla', 'cheyyanam', 'santhosham', 'nanni', 'venda', 'undu', 'aliyan', 'mone', 'poda', 'engane', 'ippol', 'shey', 'evideya', 'sherikum', 'innu', 'nale', 'adipoli', 'pwoli', 'kidu', 'mwonj', 'vibe', 'savam', 'kalla', 'pennu', 'aanu', 'ishtam', 'sneham']
             },
             analyze: function(text) {
-                if (!text || text.length < 5) return { lang: 'en', confidence: 0 };
+                if (!text || text.length < 5) return { lang: 'en', confidence: 0, isNative: false };
+                for (let lang in this.patterns) {
+                    if (this.patterns[lang].test(text)) return { lang: lang, confidence: 100, isNative: true };
+                }
                 const words = text.toLowerCase().replace(/[^\w\s]/gi, '').split(/\s+/);
                 let scores = { te: 0, hi: 0, ta: 0, kn: 0, ml: 0 };
                 words.forEach(word => {
                     for (const lang in this.dictionaries) {
-                        if (this.dictionaries[lang].includes(word)) scores[lang] += 2;
+                        if (this.dictionaries[lang].includes(word)) scores[lang] += 3; // Boosted weights
                     }
                 });
-                let winner = 'en';
-                let maxScore = 0;
+                let winner = 'en', maxScore = 0;
                 for (const lang in scores) { if (scores[lang] > maxScore) { maxScore = scores[lang]; winner = lang; } }
-                let confidence = Math.min((maxScore / (words.length * 0.4)) * 100, 100);
-                return { lang: winner, confidence: Math.round(confidence) };
+                let confidence = Math.min((maxScore / (words.length * 0.25)) * 100, 100);
+                if (maxScore < 2) { winner = 'en'; confidence = 0; }
+                return { lang: winner, confidence: Math.round(confidence), isNative: false };
+            }
+        };
+
+        // EXPANDED VIBE ENGINE
+        const VibeEngine = {
+            keywords: {
+                sad: ['badha', 'edupu', 'hurt', 'pain', 'alone', 'cry', 'vadhilesi', 'mosam', 'dukh', 'rona', 'dhokha', 'valikidhu', 'kannir', 'sankata', 'visham', 'feeling low', 'brokeback', 'tears', 'upset', 'broken', 'disappointed'],
+                love: ['prema', 'pelli', 'ishtam', 'crush', 'lover', 'pranam', 'loveu', 'pyar', 'mohabbat', 'ishq', 'kadhal', 'preethi', 'sneham', 'miss you', 'darling', 'heart', 'relationship', 'cute', 'forever', 'proposal'],
+                angry: ['kopam', 'chi', 'daridram', 'hate', 'gussa', 'bakwas', 'shame', 'kobha', 'poda', 'kadi', 'irritating', 'waste', 'bloody', 'annoying', 'angry', 'shut up', 'fake', 'liar', 'cheater'],
+                chill: ['mowa', 'vibe', 'chill', 'party', 'enjoy', 'scene', 'racha', 'mast', 'mazza', 'super', 'adipoli', 'pwoli', 'fun', 'happy', 'cool', 'awesome', 'lol', 'lmao', 'lit', 'fire']
+            },
+            getVibe: function(text) {
+                const lowerText = text.toLowerCase();
+                let scores = { sad: 0, love: 0, angry: 0, chill: 0 };
+                for (let vibe in this.keywords) {
+                    this.keywords[vibe].forEach(word => { if (lowerText.includes(word)) scores[vibe]++; });
+                }
+                let winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+                if (scores[winner] === 0) return { label: 'Neutral', emoji: '😐', color: '#94a3b8' };
+                const vibes = {
+                    sad: { label: 'Deeply Sad', emoji: '💔', color: '#3b82f6' },
+                    love: { label: 'True Romance', emoji: '❤️', color: '#ff4d6d' },
+                    angry: { label: 'Pure Vent', emoji: '🔥', color: '#ef4444' },
+                    chill: { label: 'Top Vibe', emoji: '🤙', color: '#10b981' }
+                };
+                return vibes[winner];
             }
         };
 
         const langTheme = {
-            te: { color: '#f97316', label: 'Tenglish Feed', btn: 'Post to Telugu ⚡' },
-            hi: { color: '#3b82f6', label: 'Hinglish Feed', btn: 'Post to Hindi ⚡' },
-            ta: { color: '#eab308', label: 'Tamlish Feed', btn: 'Post to Tamil ⚡' },
-            kn: { color: '#10b981', label: 'Kannadish Feed', btn: 'Post to Kannada ⚡' },
-            ml: { color: '#10b981', label: 'Manglish Feed', btn: 'Post to Malayalam ⚡' },
-            en: { color: '#ef4444', label: 'English Feed', btn: 'Post Anonymously' }
+            te: { color: '#ff6b00', bgTint: '#ff6b0015', label: 'Tenglish Feed 🧡', nativeLabel: 'తెలుగు Feed', btn: 'Post to Telugu ⚡' },
+            hi: { color: '#00d2ff', bgTint: '#00d2ff15', label: 'Hinglish Feed 💙', nativeLabel: 'हिंदी Feed', btn: 'Post to Hindi ⚡' },
+            ta: { color: '#ff007a', bgTint: '#ff007a15', label: 'Tamlish Feed 💖', nativeLabel: 'தமிழ் Feed', btn: 'Post to Tamil ⚡' },
+            kn: { color: '#7cfc00', bgTint: '#7cfc0015', label: 'Kannadish Feed 💚', nativeLabel: 'ಕನ್ನಡ Feed', btn: 'Post to Kannada ⚡' },
+            ml: { color: '#00ffa3', bgTint: '#00ffa315', label: 'Manglish Feed 🍏', nativeLabel: 'മലയാളം Feed', btn: 'Post to Malayalam ⚡' },
+            en: { color: '#6366f1', bgTint: '#6366f115', label: 'English Feed', nativeLabel: 'English Feed', btn: 'Post Anonymously' }
         };
 
-        const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy","maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde","lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "poolu", "modda","punda", "baadu", "thevidiya", "omala", "koothi", "bolimaga", "sule", "thayoli", "kunna", "pooru"];
+        // EXPANDED MULTILINGUAL ABUSE FILTER
+        const BAD_WORDS = [
+            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde",
+            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "modda", "na kodaka", "nee amma", "lanja munda", "puku", "dengey", "bevars", "howla", "bolimaga", "sule",
+            "punda", "baadu", "thevidiya", "omala", "koothi", "oomba", "gommala", "thailee", "thayoli", "kunna", "pooru", "vaanam", "naaye"
+        ];
 
         const msgInput = document.getElementById('msgInput');
         const userInput = document.getElementById('userInput');
@@ -217,73 +267,94 @@
         const submitBtn = document.getElementById('submitBtn');
         const previewBox = document.getElementById('previewContainer');
         const langTag = document.getElementById('p-lang-tag');
+        const langText = document.getElementById('lang-text');
+        const nativeBolt = document.getElementById('native-bolt');
         const confBar = document.getElementById('confidence-bar');
         const confPct = document.getElementById('conf-pct');
         const pMsg = document.getElementById('p-msg');
+        const vibeContainer = document.getElementById('vibe-meter-container');
+        const glowSound = document.getElementById('glowSound');
 
         let detectedLang = 'en';
-
-        // Mouse Glow motion logic
-        document.addEventListener('mousemove', (e) => {
-            const glow = document.getElementById('mouse-glow');
-            if (glow) {
-                glow.style.left = e.clientX + 'px';
-                glow.style.top = e.clientY + 'px';
-            }
-        });
+        let lastThemeColor = '';
 
         function updateUI() {
             const val = msgInput.value;
             const analysis = LanguageEngine.analyze(val);
+            const vibe = VibeEngine.getVibe(val);
             const theme = langTheme[analysis.lang];
             detectedLang = analysis.lang;
 
             pMsg.innerText = val ? `"${val}"` : "Your truth starts here...";
             if(val) { pMsg.classList.remove('opacity-60', 'italic'); } else { pMsg.classList.add('opacity-60', 'italic'); }
-            
             document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
             document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
             charCount.innerText = `${val.length} / 2000`;
 
-            previewBox.style.borderColor = theme.color;
-            langTag.innerText = theme.label;
-            langTag.style.backgroundColor = `${theme.color}15`;
+            // GLOW & SOUND LOGIC
+            if (analysis.lang !== 'en') {
+                previewBox.style.setProperty('--glow-color', theme.color);
+                previewBox.style.setProperty('--glow-bg', theme.bgTint);
+                previewBox.style.setProperty('--glow-bg-dark', theme.bgTint.replace('15', '25'));
+                
+                if (!previewBox.classList.contains('dialect-glow')) {
+                    previewBox.classList.add('dialect-glow');
+                    langTag.classList.add('badge-pulse');
+                    glowSound.currentTime = 0;
+                    glowSound.play().catch(e => {}); // Play sound only when glow is first triggered
+                }
+            } else {
+                previewBox.classList.remove('dialect-glow');
+                langTag.classList.remove('badge-pulse');
+            }
+
+            // UI LABELS
+            langText.innerText = analysis.isNative ? theme.nativeLabel : theme.label;
+            if (analysis.isNative) {
+                nativeBolt.classList.remove('hidden');
+                langTag.style.border = `1px solid ${theme.color}`;
+            } else {
+                nativeBolt.classList.add('hidden');
+                langTag.style.border = `none`;
+            }
+
+            langTag.style.backgroundColor = theme.bgTint;
             langTag.style.color = theme.color;
-            
             confBar.style.width = analysis.confidence + "%";
             confBar.style.backgroundColor = theme.color;
             confPct.innerText = analysis.confidence + "%";
             confPct.style.color = theme.color;
 
-            if(val.trim().length >= 10) {
+            // VIBE UI
+            if (val.length > 5) {
+                vibeContainer.innerHTML = `
+                    <div id="vibe-chip" class="flex items-center gap-2 px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest" 
+                         style="border-color: ${vibe.color}; color: ${vibe.color}; background: ${vibe.color}10">
+                        <span class="vibe-glow" style="--vibe-color: ${vibe.color}">${vibe.emoji}</span>
+                        <span>${vibe.label}</span>
+                    </div>`;
+            } else { vibeContainer.innerHTML = ''; }
+
+            // SAFETY CHECK
+            const lowerText = val.toLowerCase();
+            const isAbuse = BAD_WORDS.some(word => lowerText.includes(word));
+            const hasPII = /(\+?\d{10})|(@[A-Za-z0-9._]+)|(ig:|insta:)/.test(lowerText);
+
+            if(val.trim().length >= 10 && !isAbuse && !hasPII) {
                 submitBtn.disabled = false;
                 submitBtn.innerText = theme.btn;
-                if(detectedLang === 'en') {
-                    submitBtn.classList.add('glow-red');
-                    submitBtn.style.backgroundColor = ""; 
-                    submitBtn.style.boxShadow = "";
-                } else {
-                    submitBtn.classList.remove('glow-red');
-                    submitBtn.style.backgroundColor = theme.color;
-                    submitBtn.style.boxShadow = `0 10px 30px ${theme.color}40`;
-                }
+                submitBtn.style.backgroundColor = theme.color;
+                submitBtn.style.boxShadow = `0 10px 40px ${theme.color}60`;
             } else {
                 submitBtn.disabled = true;
-                submitBtn.innerText = "Write more...";
-                submitBtn.classList.remove('glow-red');
+                submitBtn.innerText = isAbuse || hasPII ? "Safety Error" : "Write more...";
                 submitBtn.style.backgroundColor = ""; 
                 submitBtn.style.boxShadow = "";
             }
 
-            const lowerText = val.toLowerCase();
-            const PHONE_REGEX = /(\+?\d{1,4}[\s-]?)?(\d{10})|(\d{3}[\s-]?\d{3}[\s-]?\d{4})/;
-            const SOCIAL_REGEX = /(@[A-Za-z0-9._]+)|(ig:|insta:|instagram:|tg:|telegram:)\s?[A-Za-z0-9._]+/i;
-            const isAbuse = BAD_WORDS.some(word => lowerText.includes(word));
-            
-            if(PHONE_REGEX.test(lowerText) || SOCIAL_REGEX.test(lowerText) || isAbuse) {
-                safetyText.innerText = "Conflict detected! Remove contact info/abuse.";
+            if(isAbuse || hasPII) {
+                safetyText.innerText = isAbuse ? "Conflict: Toxic Language." : "Conflict: Private Data.";
                 safetyText.style.color = "#ef4444";
-                submitBtn.disabled = true;
             } else {
                 safetyText.innerText = "Social IDs & Abuse are blocked.";
                 safetyText.style.color = "";
@@ -300,19 +371,10 @@
         }
         setInterval(updateClocks, 60000); updateClocks();
 
-        const scrollTab = document.getElementById('scrollTab');
-        const scrollIcon = document.getElementById('scrollIcon');
-        let isAtBottom = false;
-        window.addEventListener('scroll', () => {
-            scrollTab.classList.toggle('hidden', window.scrollY <= 300);
-            isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
-            scrollIcon.style.transform = isAtBottom ? "rotate(180deg)" : "rotate(0deg)";
-        });
-        function handleScrollAction() { window.scrollTo({ top: isAtBottom ? 0 : document.body.scrollHeight, behavior: 'smooth' }); }
-
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
+            const vibe = VibeEngine.getVibe(content);
             submitBtn.disabled = true; submitBtn.innerText = "Securing...";
             try {
                 await db.collection('confessions').add({
@@ -320,6 +382,7 @@
                     category: catInput.value,
                     content: content,
                     language: detectedLang,
+                    vibe: vibe.label,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, meTooCount: 0, status: "public"
                 });
@@ -329,6 +392,11 @@
                 submitBtn.disabled = false; updateUI();
                 alert("Connection failed.");
             }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.getElementById('mouse-glow');
+            if (glow) { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; }
         });
     </script>
 </body>
