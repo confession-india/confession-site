@@ -17,23 +17,10 @@
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
-    
-    <style>
-        html, body { margin: 0; padding: 0; min-height: 100vh; display: flex; flex-direction: column; }
-        #submitBtn:disabled { background-color: #94a3b8 !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-        
-        @keyframes strike {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 5px #facc15); }
-            100% { opacity: 0.3; transform: scale(0.8); }
-        }
-        .bolt-active { animation: strike 1s infinite; display: inline-block; margin-right: 4px; }
-    </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
     
     <audio id="glowSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
-
     <div id="mouse-glow"></div>
 
     <div id="toast">
@@ -42,23 +29,17 @@
         </div>
     </div>
 
-    <button id="scrollTab" onclick="handleScrollAction()" class="fixed bottom-8 right-8 z-[500] bg-indigo-600 text-white p-4 rounded-2xl shadow-2xl flex items-center justify-center hover:bg-indigo-700 active:scale-90 transition-all hidden">
-        <svg id="scrollIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-    </button>
-
-   <header class="sticky top-0 z-[90] bg-white dark:bg-[#0b1120] backdrop-blur-xl global-header" style="background-color: inherit !important;">
-    <div class="max-w-4xl mx-auto p-4 flex justify-between items-center w-full">
-        <div class="flex flex-col">
-            <a href="index.html" class="hover:opacity-80 transition-opacity">
-                <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess<span class="italic">India</span></h1>
-            </a>
-            <span class="text-[10px] text-gray-400 dark:text-slate-500 font-bold tracking-widest uppercase mt-1 ml-0.5">Share Your Truth</span>
+    <header class="sticky top-0 z-[90] bg-white dark:bg-[#0b1120] backdrop-blur-xl global-header" style="background-color: inherit !important;">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center w-full">
+            <div class="flex flex-col">
+                <a href="index.html" class="hover:opacity-80 transition-opacity">
+                    <h1 class="text-2xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent leading-none">Confess<span class="italic">India</span></h1>
+                </a>
+                <span class="text-[10px] text-gray-400 dark:text-slate-500 font-bold tracking-widest uppercase mt-1 ml-0.5">Share Your Truth</span>
+            </div>
+            <a href="index.html" class="bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl font-bold text-[10px] hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-slate-100 dark:border-slate-700">Cancel</a>
         </div>
-        <a href="index.html" class="bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 px-4 py-2 rounded-xl font-bold text-[10px] hover:text-red-500 hover:bg-red-50 transition-all uppercase tracking-widest border border-slate-100 dark:border-slate-700">Cancel</a>
-    </div>
-</header>
+    </header>
 
     <main class="max-w-2xl mx-auto px-6 py-10 pb-24 flex-grow w-full">
         <div class="mb-10">
@@ -72,7 +53,9 @@
                         </div>
                         <div class="flex items-center gap-2 mt-1">
                             <span id="p-lang-tag" class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md w-fit bg-slate-100 text-slate-500 flex items-center">
-                                <span id="native-bolt" class="hidden bolt-active">⚡</span>
+                                <span id="native-bolt" class="hidden native-legend-preview-tag">
+                                    <span class="bolt-active">⚡</span> Legend
+                                </span>
                                 <span id="lang-text">English Feed</span>
                             </span>
                             <div id="vibe-meter-container"></div>
@@ -218,7 +201,7 @@
 
         const VibeEngine = {
             keywords: {
-                sad:  ['pagilipotundi', 'valikidhu', 'vazhikku', 'bejaru', 'rona', 'badha', 'edupu', 'hurt', 'pain', 'alone', 'cry', 'vadhilesi', 'mosam', 'dukh', 'rona', 'dhokha', 'valikidhu', 'kannir', 'sankata', 'visham', 'feeling low', 'brokeback', 'tears', 'upset', 'broken', 'disappointed'],
+                sad: ['pagilipotundi', 'valikidhu', 'vazhikku', 'bejaru', 'rona', 'badha', 'edupu', 'hurt', 'pain', 'alone', 'cry', 'vadhilesi', 'mosam', 'dukh', 'rona', 'dhokha', 'valikidhu', 'kannir', 'sankata', 'visham', 'feeling low', 'brokeback', 'tears', 'upset', 'broken', 'disappointed'],
                 love: ['prema', 'pelli', 'ishtam', 'crush', 'lover', 'pranam', 'loveu', 'pyar', 'mohabbat', 'ishq', 'kadhal', 'preethi', 'sneham', 'miss you', 'darling', 'heart', 'relationship', 'cute', 'forever', 'proposal'],
                 angry: ['abaddhalu', 'thittu', 'torture', 'gaslighting', 'kopam', 'chi', 'daridram', 'hate', 'gussa', 'bakwas', 'shame', 'kobha', 'poda', 'kadi', 'irritating', 'waste', 'bloody', 'annoying', 'angry', 'shut up', 'fake', 'liar', 'cheater'],
                 chill: ['mowa', 'vibe', 'chill', 'party', 'enjoy', 'scene', 'racha', 'mast', 'mazza', 'super', 'adipoli', 'pwoli', 'fun', 'happy', 'cool', 'awesome', 'lol', 'lmao', 'lit', 'fire']
@@ -250,11 +233,7 @@
             en: { color: '#6366f1', bgTint: 'rgba(99, 102, 241, 0.1)', bgDark: 'rgba(99, 102, 241, 0.2)', label: 'English Feed', nativeLabel: 'English Feed', btn: 'Post Anonymously' }
         };
 
-        const BAD_WORDS = [
-            "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde",
-            "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "modda", "na kodaka", "nee amma", "lanja munda", "puku", "dengey", "bevars", "howla", "bolimaga", "sule",
-            "punda", "baadu", "thevidiya", "omala", "koothi", "oomba", "gommala", "thailee", "thayoli", "kunna", "pooru", "vaanam", "naaye"
-        ];
+        const BAD_WORDS = ["fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde", "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "modda", "na kodaka", "nee amma", "lanja munda", "puku", "dengey", "bevars", "howla", "bolimaga", "sule", "punda", "baadu", "thevidiya", "omala", "koothi", "oomba", "gommala", "thailee", "thayoli", "kunna", "pooru", "vaanam", "naaye"];
 
         const msgInput = document.getElementById('msgInput');
         const userInput = document.getElementById('userInput');
@@ -288,7 +267,7 @@
             charCount.innerText = `${val.length} / 2000`;
             charCount.classList.toggle('char-limit-near', val.length > 1800);
 
-            // DIALECT GLOW & VARIABLES - FIXED INJECTION
+            // DIALECT GLOW & VARIABLES
             if (analysis.lang !== 'en') {
                 previewBox.style.setProperty('--glow-color', theme.color);
                 previewBox.style.setProperty('--glow-bg', theme.bgTint);
