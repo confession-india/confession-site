@@ -242,12 +242,12 @@
         };
 
         const langTheme = {
-            te: { color: '#ff6b00', bgTint: '#ff6b0015', bgDark: 'rgba(255, 107, 0, 0.2)', label: 'Tenglish Feed 🧡', nativeLabel: 'తెలుగు Feed', btn: 'Post to Telugu ⚡' },
-            hi: { color: '#00d2ff', bgTint: '#00d2ff15', bgDark: 'rgba(0, 210, 255, 0.2)', label: 'Hinglish Feed 💙', nativeLabel: 'हिंदी Feed', btn: 'Post to Hindi ⚡' },
-            ta: { color: '#ff007a', bgTint: '#ff007a15', bgDark: 'rgba(255, 0, 122, 0.2)', label: 'Tamlish Feed 💖', nativeLabel: 'தமிழ் Feed', btn: 'Post to Tamil ⚡' },
-            kn: { color: '#7cfc00', bgTint: '#7cfc0015', bgDark: 'rgba(124, 252, 0, 0.2)', label: 'Kannadish Feed 💚', nativeLabel: 'ಕನ್ನಡ Feed', btn: 'Post to Kannada ⚡' },
-            ml: { color: '#00ffa3', bgTint: '#00ffa315', bgDark: 'rgba(0, 255, 163, 0.2)', label: 'Manglish Feed 🍏', nativeLabel: 'മലയാളം Feed', btn: 'Post to Malayalam ⚡' },
-            en: { color: '#6366f1', bgTint: '#6366f115', bgDark: 'rgba(99, 102, 241, 0.2)', label: 'English Feed', nativeLabel: 'English Feed', btn: 'Post Anonymously' }
+            te: { color: '#ff6b00', bgTint: 'rgba(255, 107, 0, 0.1)', bgDark: 'rgba(255, 107, 0, 0.2)', label: 'Tenglish Feed 🧡', nativeLabel: 'తెలుగు Feed', btn: 'Post to Telugu ⚡' },
+            hi: { color: '#00d2ff', bgTint: 'rgba(0, 210, 255, 0.1)', bgDark: 'rgba(0, 210, 255, 0.2)', label: 'Hinglish Feed 💙', nativeLabel: 'हिंदी Feed', btn: 'Post to Hindi ⚡' },
+            ta: { color: '#ff007a', bgTint: 'rgba(255, 0, 122, 0.1)', bgDark: 'rgba(255, 0, 122, 0.2)', label: 'Tamlish Feed 💖', nativeLabel: 'தமிழ் Feed', btn: 'Post to Tamil ⚡' },
+            kn: { color: '#7cfc00', bgTint: 'rgba(124, 252, 0, 0.1)', bgDark: 'rgba(124, 252, 0, 0.2)', label: 'Kannadish Feed 💚', nativeLabel: 'ಕನ್ನಡ Feed', btn: 'Post to Kannada ⚡' },
+            ml: { color: '#00ffa3', bgTint: 'rgba(0, 255, 163, 0.1)', bgDark: 'rgba(0, 255, 163, 0.2)', label: 'Manglish Feed 🍏', nativeLabel: 'മലയാളം Feed', btn: 'Post to Malayalam ⚡' },
+            en: { color: '#6366f1', bgTint: 'rgba(99, 102, 241, 0.1)', bgDark: 'rgba(99, 102, 241, 0.2)', label: 'English Feed', nativeLabel: 'English Feed', btn: 'Post Anonymously' }
         };
 
         const BAD_WORDS = [
@@ -285,15 +285,15 @@
             document.getElementById('p-user').innerText = "BY " + (userVal.toUpperCase() || "...");
             document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
             
-            // Character Count UI logic
             charCount.innerText = `${val.length} / 2000`;
             charCount.classList.toggle('char-limit-near', val.length > 1800);
 
-            // DIALECT GLOW & VARIABLES
+            // DIALECT GLOW & VARIABLES - FIXED INJECTION
             if (analysis.lang !== 'en') {
                 previewBox.style.setProperty('--glow-color', theme.color);
                 previewBox.style.setProperty('--glow-bg', theme.bgTint);
                 previewBox.style.setProperty('--glow-bg-dark', theme.bgDark);
+                
                 if (!previewBox.classList.contains('dialect-glow')) {
                     previewBox.classList.add('dialect-glow');
                     glowSound.currentTime = 0;
@@ -302,6 +302,9 @@
                 nativeBolt.classList.toggle('hidden', !analysis.isNative);
             } else {
                 previewBox.classList.remove('dialect-glow');
+                previewBox.style.removeProperty('--glow-color');
+                previewBox.style.removeProperty('--glow-bg');
+                previewBox.style.removeProperty('--glow-bg-dark');
                 nativeBolt.classList.add('hidden');
             }
 
@@ -311,7 +314,6 @@
             const isAbuse = BAD_WORDS.some(word => lowerMsg.includes(word) || lowerUser.includes(word));
             const hasPII = /(\+?\d{10})|(@[A-Za-z0-9._]+)|(ig:|insta:)/.test(lowerMsg);
 
-            // Visual feedback for Pen Name abuse
             userInput.classList.toggle('shake-active', BAD_WORDS.some(word => lowerUser.includes(word)));
 
             if(val.trim().length >= 10 && userVal.length >= 1 && !isAbuse && !hasPII) {
