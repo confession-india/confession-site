@@ -187,7 +187,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // MASSIVE EXPANDED DICTIONARY
         const LanguageEngine = {
             patterns: { te: /[\u0c00-\u0c7f]/, hi: /[\u0900-\u097f]/, ta: /[\u0b80-\u0bff]/, kn: /[\u0c80-\u0cff]/, ml: /[\u0d00-\u0d7f]/ },
             dictionaries: {
@@ -206,7 +205,7 @@
                 let scores = { te: 0, hi: 0, ta: 0, kn: 0, ml: 0 };
                 words.forEach(word => {
                     for (const lang in this.dictionaries) {
-                        if (this.dictionaries[lang].includes(word)) scores[lang] += 3; // Boosted weights
+                        if (this.dictionaries[lang].includes(word)) scores[lang] += 3;
                     }
                 });
                 let winner = 'en', maxScore = 0;
@@ -217,14 +216,12 @@
             }
         };
 
-        // EXPANDED VIBE ENGINE
         const VibeEngine = {
             keywords: {
                 sad:  ['pagilipotundi', 'valikidhu', 'vazhikku', 'bejaru', 'rona', 'badha', 'edupu', 'hurt', 'pain', 'alone', 'cry', 'vadhilesi', 'mosam', 'dukh', 'rona', 'dhokha', 'valikidhu', 'kannir', 'sankata', 'visham', 'feeling low', 'brokeback', 'tears', 'upset', 'broken', 'disappointed'],
                 love: ['prema', 'pelli', 'ishtam', 'crush', 'lover', 'pranam', 'loveu', 'pyar', 'mohabbat', 'ishq', 'kadhal', 'preethi', 'sneham', 'miss you', 'darling', 'heart', 'relationship', 'cute', 'forever', 'proposal'],
                 angry: ['abaddhalu', 'thittu', 'torture', 'gaslighting', 'kopam', 'chi', 'daridram', 'hate', 'gussa', 'bakwas', 'shame', 'kobha', 'poda', 'kadi', 'irritating', 'waste', 'bloody', 'annoying', 'angry', 'shut up', 'fake', 'liar', 'cheater'],
                 chill: ['mowa', 'vibe', 'chill', 'party', 'enjoy', 'scene', 'racha', 'mast', 'mazza', 'super', 'adipoli', 'pwoli', 'fun', 'happy', 'cool', 'awesome', 'lol', 'lmao', 'lit', 'fire']
-                
             },
             getVibe: function(text) {
                 const lowerText = text.toLowerCase();
@@ -245,15 +242,14 @@
         };
 
         const langTheme = {
-            te: { color: '#ff6b00', bgTint: '#ff6b0015', label: 'Tenglish Feed 🧡', nativeLabel: 'తెలుగు Feed', btn: 'Post to Telugu ⚡' },
-            hi: { color: '#00d2ff', bgTint: '#00d2ff15', label: 'Hinglish Feed 💙', nativeLabel: 'हिंदी Feed', btn: 'Post to Hindi ⚡' },
-            ta: { color: '#ff007a', bgTint: '#ff007a15', label: 'Tamlish Feed 💖', nativeLabel: 'தமிழ் Feed', btn: 'Post to Tamil ⚡' },
-            kn: { color: '#7cfc00', bgTint: '#7cfc0015', label: 'Kannadish Feed 💚', nativeLabel: 'ಕನ್ನಡ Feed', btn: 'Post to Kannada ⚡' },
-            ml: { color: '#00ffa3', bgTint: '#00ffa315', label: 'Manglish Feed 🍏', nativeLabel: 'മലയാളം Feed', btn: 'Post to Malayalam ⚡' },
-            en: { color: '#6366f1', bgTint: '#6366f115', label: 'English Feed', nativeLabel: 'English Feed', btn: 'Post Anonymously' }
+            te: { color: '#ff6b00', bgTint: '#ff6b0015', bgDark: 'rgba(255, 107, 0, 0.2)', label: 'Tenglish Feed 🧡', nativeLabel: 'తెలుగు Feed', btn: 'Post to Telugu ⚡' },
+            hi: { color: '#00d2ff', bgTint: '#00d2ff15', bgDark: 'rgba(0, 210, 255, 0.2)', label: 'Hinglish Feed 💙', nativeLabel: 'हिंदी Feed', btn: 'Post to Hindi ⚡' },
+            ta: { color: '#ff007a', bgTint: '#ff007a15', bgDark: 'rgba(255, 0, 122, 0.2)', label: 'Tamlish Feed 💖', nativeLabel: 'தமிழ் Feed', btn: 'Post to Tamil ⚡' },
+            kn: { color: '#7cfc00', bgTint: '#7cfc0015', bgDark: 'rgba(124, 252, 0, 0.2)', label: 'Kannadish Feed 💚', nativeLabel: 'ಕನ್ನಡ Feed', btn: 'Post to Kannada ⚡' },
+            ml: { color: '#00ffa3', bgTint: '#00ffa315', bgDark: 'rgba(0, 255, 163, 0.2)', label: 'Manglish Feed 🍏', nativeLabel: 'മലയാളം Feed', btn: 'Post to Malayalam ⚡' },
+            en: { color: '#6366f1', bgTint: '#6366f115', bgDark: 'rgba(99, 102, 241, 0.2)', label: 'English Feed', nativeLabel: 'English Feed', btn: 'Post Anonymously' }
         };
 
-        // EXPANDED MULTILINGUAL ABUSE FILTER
         const BAD_WORDS = [
             "fuck", "shit", "motherfucker", "bastard", "asshole", "bitch", "cunt", "dick", "pussy", "maderchod", "mc", "behenchod", "bc", "bhenchod", "gand", "chutiya", "randi", "saala", "lavde",
             "lanja", "munda", "kodaka", "dengu", "pooku", "sunni", "modda", "na kodaka", "nee amma", "lanja munda", "puku", "dengey", "bevars", "howla", "bolimaga", "sule",
@@ -276,49 +272,78 @@
         const vibeContainer = document.getElementById('vibe-meter-container');
         const glowSound = document.getElementById('glowSound');
 
-        let detectedLang = 'en';
-        let lastThemeColor = '';
-
         function updateUI() {
             const val = msgInput.value;
+            const userVal = userInput.value.trim();
             const analysis = LanguageEngine.analyze(val);
             const vibe = VibeEngine.getVibe(val);
             const theme = langTheme[analysis.lang];
-            detectedLang = analysis.lang;
 
             pMsg.innerText = val ? `"${val}"` : "Your truth starts here...";
             if(val) { pMsg.classList.remove('opacity-60', 'italic'); } else { pMsg.classList.add('opacity-60', 'italic'); }
-            document.getElementById('p-user').innerText = "BY " + (userInput.value.toUpperCase() || "ANONYMOUS");
+            
+            document.getElementById('p-user').innerText = "BY " + (userVal.toUpperCase() || "...");
             document.getElementById('p-cat').innerText = catInput.options[catInput.selectedIndex].text.toUpperCase();
+            
+            // Character Count UI logic
             charCount.innerText = `${val.length} / 2000`;
+            charCount.classList.toggle('char-limit-near', val.length > 1800);
 
-            // GLOW & SOUND LOGIC
+            // DIALECT GLOW & VARIABLES
             if (analysis.lang !== 'en') {
                 previewBox.style.setProperty('--glow-color', theme.color);
                 previewBox.style.setProperty('--glow-bg', theme.bgTint);
-                previewBox.style.setProperty('--glow-bg-dark', theme.bgTint.replace('15', '25'));
-                
+                previewBox.style.setProperty('--glow-bg-dark', theme.bgDark);
                 if (!previewBox.classList.contains('dialect-glow')) {
                     previewBox.classList.add('dialect-glow');
-                    langTag.classList.add('badge-pulse');
                     glowSound.currentTime = 0;
-                    glowSound.play().catch(e => {}); // Play sound only when glow is first triggered
+                    glowSound.play().catch(e => {});
                 }
+                nativeBolt.classList.toggle('hidden', !analysis.isNative);
             } else {
                 previewBox.classList.remove('dialect-glow');
-                langTag.classList.remove('badge-pulse');
-            }
-
-            // UI LABELS
-            langText.innerText = analysis.isNative ? theme.nativeLabel : theme.label;
-            if (analysis.isNative) {
-                nativeBolt.classList.remove('hidden');
-                langTag.style.border = `1px solid ${theme.color}`;
-            } else {
                 nativeBolt.classList.add('hidden');
-                langTag.style.border = `none`;
             }
 
+            // SAFETY & SHAKE LOGIC
+            const lowerMsg = val.toLowerCase();
+            const lowerUser = userVal.toLowerCase();
+            const isAbuse = BAD_WORDS.some(word => lowerMsg.includes(word) || lowerUser.includes(word));
+            const hasPII = /(\+?\d{10})|(@[A-Za-z0-9._]+)|(ig:|insta:)/.test(lowerMsg);
+
+            // Visual feedback for Pen Name abuse
+            userInput.classList.toggle('shake-active', BAD_WORDS.some(word => lowerUser.includes(word)));
+
+            if(val.trim().length >= 10 && userVal.length >= 1 && !isAbuse && !hasPII) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = theme.btn;
+                submitBtn.style.backgroundColor = theme.color;
+                submitBtn.style.boxShadow = `0 10px 40px ${theme.color}60`;
+            } else {
+                submitBtn.disabled = true;
+                if (isAbuse || hasPII) {
+                    submitBtn.innerText = "Safety Error";
+                } else if (userVal.length < 1) {
+                    submitBtn.innerText = "Enter Pen Name";
+                } else {
+                    submitBtn.innerText = "Write more...";
+                }
+                submitBtn.style.backgroundColor = ""; 
+                submitBtn.style.boxShadow = "";
+            }
+
+            if(isAbuse || hasPII) {
+                safetyText.innerText = isAbuse ? "Conflict: Toxic Language." : "Conflict: Private Data.";
+                safetyText.style.color = "#ef4444";
+                document.getElementById('redAlertNote').classList.add('conflict-shake');
+            } else {
+                safetyText.innerText = "Social IDs & Abuse are blocked.";
+                safetyText.style.color = "";
+                document.getElementById('redAlertNote').classList.remove('conflict-shake');
+            }
+
+            // FINAL LABELS
+            langText.innerText = analysis.isNative ? theme.nativeLabel : theme.label;
             langTag.style.backgroundColor = theme.bgTint;
             langTag.style.color = theme.color;
             confBar.style.width = analysis.confidence + "%";
@@ -326,7 +351,6 @@
             confPct.innerText = analysis.confidence + "%";
             confPct.style.color = theme.color;
 
-            // VIBE UI
             if (val.length > 5) {
                 vibeContainer.innerHTML = `
                     <div id="vibe-chip" class="flex items-center gap-2 px-2 py-0.5 rounded-full border text-[8px] font-black uppercase tracking-widest" 
@@ -335,31 +359,6 @@
                         <span>${vibe.label}</span>
                     </div>`;
             } else { vibeContainer.innerHTML = ''; }
-
-            // SAFETY CHECK
-            const lowerText = val.toLowerCase();
-            const isAbuse = BAD_WORDS.some(word => lowerText.includes(word));
-            const hasPII = /(\+?\d{10})|(@[A-Za-z0-9._]+)|(ig:|insta:)/.test(lowerText);
-
-            if(val.trim().length >= 10 && !isAbuse && !hasPII) {
-                submitBtn.disabled = false;
-                submitBtn.innerText = theme.btn;
-                submitBtn.style.backgroundColor = theme.color;
-                submitBtn.style.boxShadow = `0 10px 40px ${theme.color}60`;
-            } else {
-                submitBtn.disabled = true;
-                submitBtn.innerText = isAbuse || hasPII ? "Safety Error" : "Write more...";
-                submitBtn.style.backgroundColor = ""; 
-                submitBtn.style.boxShadow = "";
-            }
-
-            if(isAbuse || hasPII) {
-                safetyText.innerText = isAbuse ? "Conflict: Toxic Language." : "Conflict: Private Data.";
-                safetyText.style.color = "#ef4444";
-            } else {
-                safetyText.innerText = "Social IDs & Abuse are blocked.";
-                safetyText.style.color = "";
-            }
         }
 
         [msgInput, userInput].forEach(el => el.addEventListener('input', updateUI));
@@ -375,6 +374,7 @@
         document.getElementById('postForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const content = msgInput.value.trim();
+            const analysis = LanguageEngine.analyze(content);
             const vibe = VibeEngine.getVibe(content);
             submitBtn.disabled = true; submitBtn.innerText = "Securing...";
             try {
@@ -382,7 +382,8 @@
                     username: userInput.value || "Anonymous",
                     category: catInput.value,
                     content: content,
-                    language: detectedLang,
+                    language: analysis.lang,
+                    isNative: analysis.isNative,
                     vibe: vibe.label,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     supportCount: 0, meTooCount: 0, status: "public"
