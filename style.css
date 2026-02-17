@@ -394,3 +394,60 @@ button, .cursor-pointer {
     filter: grayscale(1);
     cursor: not-allowed;
 }
+
+/* --- POST.HTML REFINEMENTS & DYNAMIC THEMING --- */
+
+/* 1. Enhanced Dialect Glow System */
+/* This handles the smooth color transition when the AI detects a language */
+.dialect-glow {
+    position: relative;
+    border-color: var(--glow-color) !important;
+    background-color: var(--glow-bg) !important;
+    box-shadow: 0 10px 40px -10px var(--glow-bg), inset 0 0 20px var(--glow-bg) !important;
+    transform: translateY(-4px) scale(1.01);
+    transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 2. Dark Mode Support for Glow */
+/* In dark mode, we use a slightly more opaque background tint so the color pops */
+.dark .dialect-glow {
+    background-color: rgba(30, 41, 59, 0.7) !important; /* Slate-800 with transparency */
+    border-color: var(--glow-color) !important;
+    box-shadow: 0 0 30px -5px var(--glow-color), inset 0 0 10px var(--glow-color) !important;
+}
+
+/* 3. Vibe Chip & Emoji Glow */
+/* Makes the vibe emoji glow with its specific mood color */
+.vibe-glow {
+    display: inline-block;
+    filter: drop-shadow(0 0 8px var(--vibe-color));
+    animation: vibe-float 2s ease-in-out infinite;
+}
+
+@keyframes vibe-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* 4. Smooth Preview Transitions */
+/* Prevents the preview box from "jumping" when the text content expands */
+#previewContainer {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 5. Character Count Warning */
+/* Changes color when the user is approaching the 2000 limit */
+.char-limit-near {
+    color: #ef4444 !important;
+    font-weight: 800;
+}
+
+/* 6. Fix for Mobile Safari Input Zoom */
+@media screen and (max-width: 768px) {
+    input, textarea, select {
+        font-size: 16px !important; /* Prevents auto-zoom on focus */
+    }
+}
