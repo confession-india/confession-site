@@ -395,6 +395,45 @@ button, .cursor-pointer {
     cursor: not-allowed;
 }
 
+/* 27. NATIVE LEGEND PREVIEW SYSTEM */
+@keyframes strike {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 5px #facc15); }
+    100% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.bolt-active { 
+    animation: strike 1s infinite; 
+    display: inline-block; 
+    margin-right: 4px; 
+}
+
+.native-legend-preview-tag {
+    background: linear-gradient(90deg, #facc15, #fbbf24);
+    color: #000;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 2px 8px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3);
+    margin-right: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+}
+
+/* Fix for the Submit Button scaling on Post page */
+#submitBtn:disabled { 
+    background-color: #94a3b8 !important; 
+    cursor: not-allowed; 
+    transform: none !important; 
+    box-shadow: none !important; 
+    opacity: 0.6;
+}
+
 /* --- POST.HTML REFINEMENTS & DYNAMIC THEMING --- */
 
 /* 1. Enhanced Dialect Glow System */
