@@ -11,7 +11,21 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="E0eroPpuSrFX_H8NK5GV0vtHNz5S-xScaEDuM25Zth4" />
+    
     <title>Confess India | Share Your Truth Anonymously</title>
+    <meta name="title" content="Confess India | Share Your Truth Anonymously">
+    <meta name="description" content="The safest digital space for Indians worldwide to share their truths without judgment, fear, or recognition. 100% Anonymous.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://confessionindia.in/">
+    <meta property="og:title" content="Confess India | Share Your Truth Anonymously">
+    <meta property="og:description" content="Read and share anonymous secrets from across India. No cookies, no emails, just the truth.">
+    <meta property="og:image" content="https://confessionindia.in/og-image.png"> <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://confessionindia.in/">
+    <meta property="twitter:title" content="Confess India | Share Your Truth Anonymously">
+    <meta property="twitter:description" content="Read and share anonymous secrets from across India. No cookies, no emails, just the truth.">
+    <meta property="twitter:image" content="https://confessionindia.in/og-image.png">
+
     <link rel="icon" href="https://fav.farm/🤫">
     
     <script>
@@ -30,71 +44,32 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Essential Inline Styles for logic-heavy components */
         #dynamic-scroll-btn { 
-            position: fixed; 
-            right: 25px; 
-            bottom: 30px; 
-            z-index: 1000; 
-            opacity: 0; 
-            pointer-events: none; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(20px);
+            position: fixed; right: 25px; bottom: 30px; z-index: 1000; opacity: 0; pointer-events: none; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform: translateY(20px);
         }
         #dynamic-scroll-btn.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        
         .custom-scroll-pill { 
-            background: #6366f1; 
-            color: white; 
-            width: 54px; 
-            height: 54px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 18px; 
-            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4); 
-            transition: all 0.3s ease; 
-            border: none; 
+            background: #6366f1; color: white; width: 54px; height: 54px; display: flex; 
+            align-items: center; justify-content: center; border-radius: 18px; 
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4); transition: all 0.3s ease; 
         }
         .custom-scroll-pill:hover { transform: scale(1.1); background: #4f46e5; }
-        
         #scrollIcon { transition: transform 0.4s ease, opacity 0.3s ease; }
         .icon-flip { transform: rotate(180deg); }
         .icon-fade { opacity: 0; }
 
-        /* FIXED: Share Modal Positioning */
         #shareModal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            display: none; /* Hidden by default */
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            padding: 20px;
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
         }
         #shareModal.show { display: flex; animation: modalFadeIn 0.3s ease; }
-        
-        /* Modal Content Animation */
-        #shareModal > div {
-            animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
+        #shareModal > div { animation: modalSlideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
         @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes modalSlideUp { 
-            from { transform: translateY(30px); opacity: 0; } 
-            to { transform: translateY(0); opacity: 1; } 
-        }
+        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Hide Capture Area from main UI */
-        #capture-area {
-            position: absolute;
-            left: -9999px;
-            width: 1080px;
-            padding: 100px;
-            background: #0f172a;
-        }
+        #capture-area { position: absolute; left: -9999px; width: 1080px; padding: 100px; background: #0f172a; }
     </style>
 </head>
 <body class="bg-[#fdfdff] dark:bg-[#0b1120] min-h-screen font-sans transition-colors duration-300">
@@ -216,7 +191,7 @@
         
         const translations = {
             en: { shareTruth: "Share Truth", potd: "Post of the Day" },
-            te: { shareTruth: "షేర్ చేయండి", potd: "ఈరోజు ఉత్తమ పోస్ట్" },
+            te: { shareTruth: "షేర్ చేయండి", potd: "ഈరోజు ఉత్తమ പോസ്റ്റ്" },
             hi: { shareTruth: "साझा करें", potd: "आज की खास पोस्ट" },
             ta: { shareTruth: "பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
             kn: { shareTruth: "ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
@@ -227,14 +202,12 @@
         let currentCategory = 'all';
         let unsubscribe = null;
 
-        // Mouse Glow
         const glow = document.getElementById('mouse-glow');
         document.addEventListener('mousemove', (e) => {
             glow.style.left = e.clientX + 'px';
             glow.style.top = e.clientY + 'px';
         });
 
-        // Directional Scroll Button Logic
         let lastScrollTop = 0;
         const scrollBtnWrapper = document.getElementById('dynamic-scroll-btn');
         const scrollActionBtn = document.getElementById('scrollActionBtn');
@@ -303,9 +276,13 @@
 
         function getCardHTML(post, isPotd, langData) {
             const content = post.content || "";
-            const displayName = post.displayName || post.name || post.username || "Anonymous";
+            const displayName = post.displayName || post.name || "Anonymous";
             const isLong = content.length > 250;
             
+            // Logic to check if post is pure native language
+            const nativeRegex = /[\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F]/;
+            const isNative = nativeRegex.test(content) && !/[a-zA-Z]/.test(content);
+
             const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
             const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
             const hasReported = localStorage.getItem(`reportCount-${post.id}`);
@@ -319,7 +296,10 @@
 
             return `
                 <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
-                    ${isPotd ? `<div class="mb-4 inline-block bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
+                    <div class="flex gap-2 mb-4">
+                        ${isPotd ? `<div class="bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
+                        ${isNative ? `<div class="bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🔥 Native Legend</div>` : ''}
+                    </div>
                     
                     <div class="mb-4 flex justify-between items-start">
                         <div>
@@ -357,7 +337,6 @@
             }
 
             const visiblePosts = posts.filter(post => (post.reportCount || 0) < 10);
-
             if (visiblePosts.length === 0) {
                 feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>';
                 potdContainer.innerHTML = '';
@@ -388,9 +367,7 @@
                     btn.style.pointerEvents = "none";
                 } else {
                     const countSpan = btn.querySelector('.count');
-                    if(countSpan) {
-                        countSpan.innerText = parseInt(countSpan.innerText) + 1;
-                    }
+                    if(countSpan) countSpan.innerText = parseInt(countSpan.innerText) + 1;
                     btn.classList.add('active-interact', 'opacity-50');
                 }
                 localStorage.setItem(`${field}-${id}`, 'true');
@@ -417,6 +394,7 @@
             const modal = document.getElementById('shareModal');
             modal.classList.add('show');
             const preview = content.substring(0, 80) + "...";
+            
             document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(preview + " Read more: " + shareUrl)}`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(preview)}`);
