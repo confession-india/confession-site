@@ -130,6 +130,28 @@
 
             <div id="potd-container" class="mb-10"></div>
             <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
+
+            <section class="max-w-4xl mx-auto px-6 py-16 border-t border-slate-100 dark:border-slate-800/50">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="group">
+            <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">🛡️</div>
+            <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">Zero Logs</h4>
+            <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
+        </div>
+
+        <div class="group">
+            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">👻</div>
+            <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">No Accounts</h4>
+            <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
+        </div>
+
+        <div class="group">
+            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">👀</div>
+            <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">Human Moderated</h4>
+            <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
+        </div>
+    </div>
+</section>
         </main>
 
         <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 border-t border-slate-800">
@@ -276,7 +298,7 @@
 
         function getCardHTML(post, isPotd, langData) {
             const content = post.content || "";
-            const displayName = post.displayName || post.name || "Anonymous";
+            const displayName = post.username || post.displayName || post.name || "Anonymous";
             const isLong = content.length > 250;
             
             // Logic to check if post is pure native language
