@@ -1,6 +1,7 @@
 /* Confess India - Ultimate Unified Design System 
     Theme: London-Hyderabad Hybrid (Indigo/Red/Deep Slate)
     Architecture by: Sanjeev Raju (MSc Advanced CS)
+    Refinements: GPU Optimization & Mobile Stability
 */
 
 /* 1. ANIMATIONS & MICRO-INTERACTIONS */
@@ -54,6 +55,12 @@
 /* 2. CORE LAYOUT & MOUSE GLOW */
 html { scroll-behavior: smooth; }
 
+/* FIX: Added smooth font rendering for London-style typography */
+body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 #mouse-glow {
     position: fixed;
     top: 0; left: 0;
@@ -66,6 +73,7 @@ html { scroll-behavior: smooth; }
     z-index: -1; 
     filter: blur(60px);
     transition: opacity 0.5s ease;
+    will-change: transform; /* PERFORMANCE FIX */
 }
 
 /* 3. COMPONENT STYLING */
@@ -73,9 +81,10 @@ html { scroll-behavior: smooth; }
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     /* STABILITY FIXES: Stops card from jumping/shaking during inner animation */
     backface-visibility: hidden;
-    transform: translateZ(0);
+    transform: translateZ(0); /* GPU ACCELERATION FIX */
     contain: layout; 
     will-change: transform, box-shadow;
+    perspective: 1000px; /* London-style depth fix */
 }
 
 .confession-card:hover {
@@ -110,14 +119,22 @@ html { scroll-behavior: smooth; }
 #shareModal {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(12px) saturate(180%);
+    background: rgba(15, 23, 42, 0.9); /* Fallback for browsers without blur */
     z-index: 10000;
     display: none;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
 }
+
+/* FIX: Glassmorphism optimization for performance */
+@supports (backdrop-filter: blur(12px)) {
+    #shareModal {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px) saturate(180%);
+    }
+}
+
 #shareModal.show { opacity: 1; pointer-events: auto; display: flex !important; }
 
 .share-pill {
@@ -434,7 +451,7 @@ button, .cursor-pointer {
     opacity: 0.6;
 }
 
-/* --- ADD TO DEDICATED STYLESHEET --- */
+/* --- ADDITIONAL DEDICATED STYLES --- */
 
 /* Report Modal & Overlay */
 #reportModal {
@@ -465,7 +482,6 @@ button, .cursor-pointer {
 /* --- POST.HTML REFINEMENTS & DYNAMIC THEMING --- */
 
 /* 1. Enhanced Dialect Glow System */
-/* This handles the smooth color transition when the AI detects a language */
 .dialect-glow {
     position: relative;
     border-color: var(--glow-color) !important;
@@ -476,15 +492,13 @@ button, .cursor-pointer {
 }
 
 /* 2. Dark Mode Support for Glow */
-/* In dark mode, we use a slightly more opaque background tint so the color pops */
 .dark .dialect-glow {
-    background-color: rgba(30, 41, 59, 0.7) !important; /* Slate-800 with transparency */
+    background-color: rgba(30, 41, 59, 0.7) !important; 
     border-color: var(--glow-color) !important;
     box-shadow: 0 0 30px -5px var(--glow-color), inset 0 0 10px var(--glow-color) !important;
 }
 
 /* 3. Vibe Chip & Emoji Glow */
-/* Makes the vibe emoji glow with its specific mood color */
 .vibe-glow {
     display: inline-block;
     filter: drop-shadow(0 0 8px var(--vibe-color));
@@ -497,7 +511,6 @@ button, .cursor-pointer {
 }
 
 /* 4. Smooth Preview Transitions */
-/* Prevents the preview box from "jumping" when the text content expands */
 #previewContainer {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 200px;
@@ -506,15 +519,24 @@ button, .cursor-pointer {
 }
 
 /* 5. Character Count Warning */
-/* Changes color when the user is approaching the 2000 limit */
 .char-limit-near {
     color: #ef4444 !important;
     font-weight: 800;
 }
 
-/* 6. Fix for Mobile Safari Input Zoom */
+/* 6. FIX: Mobile Safari Input Zoom & Scroll Performance */
 @media screen and (max-width: 768px) {
     input, textarea, select {
-        font-size: 16px !important; /* Prevents auto-zoom on focus */
+        font-size: 16px !important; 
+    }
+}
+
+/* 7. PERFORMANCE: Reduced Motion Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
