@@ -20,7 +20,8 @@
     <meta property="og:url" content="https://confessionindia.in/">
     <meta property="og:title" content="Confess India | Share Your Truth Anonymously">
     <meta property="og:description" content="Read and share anonymous secrets from across India. No cookies, no emails, just the truth.">
-    <meta property="og:image" content="https://confessionindia.in/og-image.png"> <meta property="twitter:card" content="summary_large_image">
+    <meta property="og:image" content="https://confessionindia.in/og-image.png"> 
+    <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://confessionindia.in/">
     <meta property="twitter:title" content="Confess India | Share Your Truth Anonymously">
     <meta property="twitter:description" content="Read and share anonymous secrets from across India. No cookies, no emails, just the truth.">
@@ -114,26 +115,26 @@
         </div>
 
         <div id="reportModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-[3000] p-4">
-    <div class="bg-white dark:bg-[#1e293b] rounded-[40px] w-full max-w-sm overflow-hidden shadow-2xl border dark:border-slate-700">
-        <div id="reportStep1" class="p-8">
-            <h3 class="font-black text-xl text-slate-800 dark:text-white mb-2 text-center">Report Content</h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 text-center mb-6 font-bold uppercase tracking-wider">Why are you reporting this?</p>
-            <div class="grid gap-2">
-                <button onclick="submitReport('Hate Speech')" class="w-full py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all border border-transparent hover:border-red-200">Hate Speech / Bullying</button>
-                <button onclick="submitReport('Sexual Content')" class="w-full py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all border border-transparent hover:border-red-200">Inappropriate / Sexual</button>
-                <button onclick="submitReport('Spam')" class="w-full py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all border border-transparent hover:border-red-200">Spam / Advertising</button>
+            <div class="bg-white dark:bg-[#1e293b] rounded-[40px] w-full max-w-sm overflow-hidden shadow-2xl border dark:border-slate-700">
+                <div id="reportStep1" class="p-8">
+                    <h3 class="font-black text-xl text-slate-800 dark:text-white mb-2 text-center">Report Content</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 text-center mb-6 font-bold uppercase tracking-wider">Why are you reporting this?</p>
+                    <div class="grid gap-2">
+                        <button onclick="submitReport('Hate Speech')" class="w-full py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all border border-transparent hover:border-red-200">Hate Speech / Bullying</button>
+                        <button onclick="submitReport('Sexual Content')" class="w-full py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all border border-transparent hover:border-red-200">Inappropriate / Sexual</button>
+                        <button onclick="submitReport('Spam')" class="w-full py-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 font-bold text-sm transition-all border border-transparent hover:border-red-200">Spam / Advertising</button>
+                    </div>
+                    <button onclick="closeReportModal()" class="w-full mt-4 text-xs font-black text-slate-400 uppercase tracking-widest py-2">Cancel</button>
+                </div>
+                
+                <div id="reportStep2" class="hidden p-12 text-center">
+                    <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">✓</div>
+                    <h3 class="font-black text-xl text-slate-800 dark:text-white mb-2">Thank You</h3>
+                    <p class="text-sm text-slate-500 font-medium leading-relaxed">Our moderators will review this within 24 hours to keep the community safe.</p>
+                    <button onclick="closeReportModal()" class="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest">Close</button>
+                </div>
             </div>
-            <button onclick="closeReportModal()" class="w-full mt-4 text-xs font-black text-slate-400 uppercase tracking-widest py-2">Cancel</button>
         </div>
-        
-        <div id="reportStep2" class="hidden p-12 text-center">
-            <div class="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">✓</div>
-            <h3 class="font-black text-xl text-slate-800 dark:text-white mb-2">Thank You</h3>
-            <p class="text-sm text-slate-500 font-medium leading-relaxed">Our moderators will review this within 24 hours to keep the community safe.</p>
-            <button onclick="closeReportModal()" class="mt-8 bg-indigo-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest">Close</button>
-        </div>
-    </div>
-</div>
 
         <div id="capture-area">
             <div style="font-weight: 900; font-size: 24px; letter-spacing: 8px; color: #6366f1; margin-bottom: 40px; text-transform: uppercase;">Confess India</div>
@@ -154,26 +155,24 @@
             <div id="feed" class="grid grid-cols-1 gap-6 mt-2 min-h-[500px]"></div>
 
             <section class="max-w-4xl mx-auto px-6 py-16 border-t border-slate-100 dark:border-slate-800/50">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="group">
-            <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">🛡️</div>
-            <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">Zero Logs</h4>
-            <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
-        </div>
-
-        <div class="group">
-            <div class="w-10 h-10 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">👻</div>
-            <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">No Accounts</h4>
-            <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
-        </div>
-
-        <div class="group">
-            <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">👀</div>
-            <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">Human Moderated</h4>
-            <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
-        </div>
-    </div>
-</section>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="group">
+                        <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">🛡️</div>
+                        <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">Zero Logs</h4>
+                        <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">We don't store IP addresses or tracking data. Your secrets stay yours and cannot be traced back to you.</p>
+                    </div>
+                    <div class="group">
+                        <div class="w-10 h-10 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">👻</div>
+                        <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">No Accounts</h4>
+                        <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">No emails. No passwords. No data leaks. Complete anonymity by design for every Indian citizen.</p>
+                    </div>
+                    <div class="group">
+                        <div class="w-10 h-10 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center mb-4 text-xl transition-transform group-hover:-rotate-12">👀</div>
+                        <h4 class="font-black text-[11px] uppercase tracking-widest text-slate-800 dark:text-white mb-2">Human Moderated</h4>
+                        <p class="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Every report is checked by a person to keep the community safe, kind, and free of hate speech.</p>
+                    </div>
+                </div>
+            </section>
         </main>
 
         <footer id="mainFooter" class="bg-[#0f172a] text-slate-400 pt-16 pb-8 px-4 mt-10 relative z-10 border-t border-slate-800">
@@ -225,8 +224,6 @@
         </button>
     </div>
 
-    <div id="mouse-glow"></div>
-
     <script>
         const firebaseConfig = { apiKey: "AIzaSyA8JIiJ5sRc5Fxy6qcYAXD8_nA8ELOBwkI", authDomain: "confession-india.firebaseapp.com", projectId: "confession-india", storageBucket: "confession-india.firebasestorage.app", messagingSenderId: "345080016810", appId: "1:345080016810:web:3032f570077ea8d6dd45d3" };
         firebase.initializeApp(firebaseConfig);
@@ -234,23 +231,17 @@
         const SITE_URL = "https://confessionindia.in";
         
         const translations = {
-    en: { shareTruth: "Share Truth", potd: "Post of the Day" },
-    te: { shareTruth: "నిజం పంచుకోండి", potd: "ఈ రోజు ఉత్తమ పోస్ట్" }, // Fixed: Pure Telugu
-    hi: { shareTruth: "सच साझा करें", potd: "आज की खास पोस्ट" },
-    ta: { shareTruth: "உண்மையை பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
-    kn: { shareTruth: "ಸತ್ಯವನ್ನು ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
-    ml: { shareTruth: "സത്യം പങ്കുവെക്കുക", potd: "ഈ ദിവസത്തെ മികച്ച പോസ്റ്റ്" }
-};
+            en: { shareTruth: "Share Truth", potd: "Post of the Day" },
+            te: { shareTruth: "నిజం పంచుకోండి", potd: "ఈ రోజు ఉత్తమ పోస్ట్" },
+            hi: { shareTruth: "सच साझा करें", potd: "आज की खास पोस्ट" },
+            ta: { shareTruth: "உண்மையை பகிர்", potd: "இன்றைய சிறந்த பதிவு" },
+            kn: { shareTruth: "ಸತ್ಯವನ್ನು ಹಂಚಿಕೊಳ್ಳಿ", potd: "ದಿನದ ಪೋಸ್ಟ್" },
+            ml: { shareTruth: "സത്യം പങ്കുവെക്കുക", potd: "ഈ ദിവസത്തെ മികച്ച പോസ്റ്റ്" }
+        };
 
         let currentLang = localStorage.getItem('userLang') || 'en';
         let currentCategory = 'all';
         let unsubscribe = null;
-
-        const glow = document.getElementById('mouse-glow');
-        document.addEventListener('mousemove', (e) => {
-            glow.style.left = e.clientX + 'px';
-            glow.style.top = e.clientY + 'px';
-        });
 
         let lastScrollTop = 0;
         const scrollBtnWrapper = document.getElementById('dynamic-scroll-btn');
@@ -310,8 +301,7 @@
             if (currentCategory !== 'all') { query = query.where('category', '==', currentCategory); }
             query = query.orderBy('timestamp', 'desc');
             
-            unsubscribe = query.onSnapshot({ includeMetadataChanges: false }, snapshot => {
-                if (snapshot.metadata.hasPendingWrites) return;
+            unsubscribe = query.onSnapshot(snapshot => {
                 const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderPosts(posts);
                 setTimeout(() => checkDeepLink(posts), 500);
@@ -322,50 +312,36 @@
             const content = post.content || "";
             const displayName = post.username || post.displayName || post.name || "Anonymous";
             const isLong = content.length > 250;
-            
-            // Logic to check if post is pure native language
             const nativeRegex = /[\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F]/;
             const isNative = nativeRegex.test(content) && !/[a-zA-Z]/.test(content);
-
-            const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
-            const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
             const hasReported = localStorage.getItem(`reportCount-${post.id}`);
 
             const reportActionHTML = hasReported 
-                ? `<span class="text-[10px] font-black uppercase text-red-500 report-success">✅ Reported</span>`
-                : `<button type="button" onclick="interact(event, '${post.id}', 'reportCount', this)" 
-                           class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors">
-                    🚩 Report
-                   </button>`;
+                ? `<span class="text-[10px] font-black uppercase text-red-500">✅ Reported</span>`
+                : `<button type="button" onclick="interact(event, '${post.id}', 'reportCount', this)" class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors">🚩 Report</button>`;
 
             return `
-                <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
+                <div id="post-${post.id}" class="confession-card bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
                     <div class="flex gap-2 mb-4">
                         ${isPotd ? `<div class="bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
                         ${isNative ? `<div class="bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🔥 Native Legend</div>` : ''}
                     </div>
-                    
                     <div class="mb-4 flex justify-between items-start">
                         <div>
                             <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
                             <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
                             <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
                         </div>
-                        <div id="report-wrap-${post.id}">
-                            ${reportActionHTML}
-                        </div>
+                        <div>${reportActionHTML}</div>
                     </div>
-
                     <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
-                    
-                    ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
-                    
+                    ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest">Read More</button>` : '<div class="mb-4"></div>'}
                     <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
                         <div class="flex gap-2">
-                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-all active:scale-95 ${hasSupported ? 'active-interact opacity-50' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-all active:scale-95 ${hasMetoo ? 'active-interact opacity-50' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black">🫂 <span class="count">${post.meTooCount || 0}</span></button>
                         </div>
-                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest">${langData.shareTruth}</button>
                     </div>
                 </div>`;
         }
@@ -373,120 +349,75 @@
         function renderPosts(posts) {
             const feed = document.getElementById('feed');
             const potdContainer = document.getElementById('potd-container');
-            
-            if (!posts.length) { 
-                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; 
-                potdContainer.innerHTML = '';
-                return; 
-            }
-
+            if (!posts.length) { feed.innerHTML = '<div class="text-center py-20 text-slate-500">No secrets yet.</div>'; return; }
             const visiblePosts = posts.filter(post => (post.reportCount || 0) < 10);
-            if (visiblePosts.length === 0) {
-                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>';
-                potdContainer.innerHTML = '';
-                return;
-            }
-
             const potd = [...visiblePosts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
             const langData = translations[currentLang] || translations['en'];
-            
-            potdContainer.innerHTML = getCardHTML(potd, true, langData);
+            potdContainer.innerHTML = potd ? getCardHTML(potd, true, langData) : '';
             feed.innerHTML = '';
-            
-            visiblePosts.forEach(post => {
-                if(post.id !== potd.id) {
-                    feed.insertAdjacentHTML('beforeend', getCardHTML(post, false, langData));
-                }
-            });
+            visiblePosts.forEach(post => { if(potd && post.id !== potd.id) feed.insertAdjacentHTML('beforeend', getCardHTML(post, false, langData)); });
         }
 
-        let reportingId = null; // Store which post is being reported
+        let reportingId = null;
 
-async function interact(e, id, field, btn) {
-    if (e) { e.preventDefault(); e.stopPropagation(); }
-    if (localStorage.getItem(`${field}-${id}`)) return;
-    
-    // IF REPORTING: Open the Modal instead of just updating count
-    if (field === 'reportCount') {
-        reportingId = id;
-        document.getElementById('reportModal').classList.remove('hidden');
-        document.getElementById('reportModal').classList.add('flex');
-        document.getElementById('reportStep1').classList.remove('hidden');
-        document.getElementById('reportStep2').classList.add('hidden');
-        return;
-    }
-    
-    // NORMAL INTERACTION (Love/Me Too)
-    try {
-        btn.classList.add('animate-interact');
-        const countSpan = btn.querySelector('.count');
-        if(countSpan) countSpan.innerText = parseInt(countSpan.innerText) + 1;
-        btn.classList.add('active-interact', 'opacity-50');
-        
-        localStorage.setItem(`${field}-${id}`, 'true');
-        await db.collection('confessions').doc(id).update({ 
-            [field]: firebase.firestore.FieldValue.increment(1) 
-        });
-        setTimeout(() => btn.classList.remove('animate-interact'), 400);
-    } catch(err) { console.error(err); }
-}
+        async function interact(e, id, field, btn) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            if (localStorage.getItem(`${field}-${id}`)) return;
+            if (field === 'reportCount') {
+                reportingId = id;
+                const modal = document.getElementById('reportModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.style.display = 'flex'; // Force display
+                document.getElementById('reportStep1').classList.remove('hidden');
+                document.getElementById('reportStep2').classList.add('hidden');
+                return;
+            }
+            try {
+                const countSpan = btn.querySelector('.count');
+                if(countSpan) countSpan.innerText = parseInt(countSpan.innerText) + 1;
+                localStorage.setItem(`${field}-${id}`, 'true');
+                await db.collection('confessions').doc(id).update({ [field]: firebase.firestore.FieldValue.increment(1) });
+            } catch(err) { console.error(err); }
+        }
 
-// NEW FUNCTIONS FOR REPORT MODAL
-function closeReportModal() {
-    document.getElementById('reportModal').classList.add('hidden');
-    document.getElementById('reportModal').classList.remove('flex');
-}
+        function closeReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            modal.style.display = 'none';
+        }
 
-async function submitReport(reason) {
-    if (!reportingId) return;
-    try {
-        // Log the detailed report
-        await db.collection('detailed_reports').add({
-            postId: reportingId,
-            reason: reason,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        // Increment the main report count on the post
-        await db.collection('confessions').doc(reportingId).update({ 
-            reportCount: firebase.firestore.FieldValue.increment(1) 
-        });
-        
-        localStorage.setItem(`reportCount-${reportingId}`, 'true');
-        
-        // Update UI: Show Success Step
-        document.getElementById('reportStep1').classList.add('hidden');
-        document.getElementById('reportStep2').classList.remove('hidden');
-        
-        // Refresh feed so the "Reported" checkmark shows up
-        initFeed();
-    } catch(err) {
-        alert("Action failed. Try again.");
-    }
-}
+        async function submitReport(reason) {
+            if (!reportingId) return;
+            try {
+                await db.collection('detailed_reports').add({ postId: reportingId, reason: reason, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+                await db.collection('confessions').doc(reportingId).update({ reportCount: firebase.firestore.FieldValue.increment(1) });
+                localStorage.setItem(`reportCount-${reportingId}`, 'true');
+                document.getElementById('reportStep1').classList.add('hidden');
+                document.getElementById('reportStep2').classList.remove('hidden');
+                initFeed();
+            } catch(err) { alert("Action failed."); }
+        }
+
         function openShare(id, category) {
             const content = document.getElementById(`text-${id}`).innerText;
             const shareUrl = `${SITE_URL}/index.html?id=${id}&cat=${category}`;
             const modal = document.getElementById('shareModal');
             modal.classList.add('show');
             const preview = content.substring(0, 80) + "...";
-            
             document.getElementById('waBtn').onclick = () => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(preview + " Read more: " + shareUrl)}`);
             document.getElementById('fbBtn').onclick = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`);
             document.getElementById('xBtn').onclick = () => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(preview)}`);
             document.getElementById('copyBtn').onclick = () => { navigator.clipboard.writeText(shareUrl); alert("Link Copied!"); };
-            document.getElementById('copyTxtBtn').onclick = () => { 
-                navigator.clipboard.writeText(`"${content}"\n\nRead more anonymous truths at: confessionindia.in`); 
-                alert("Text copied!"); 
-            };
+            document.getElementById('copyTxtBtn').onclick = () => { navigator.clipboard.writeText(`"${content}"\n\nRead more anonymous truths at: confessionindia.in`); alert("Text copied!"); };
             document.getElementById('igBtn').onclick = async () => {
                 const btn = document.getElementById('igBtn');
-                btn.innerText = "Generating HD..."; btn.disabled = true;
+                btn.innerText = "Generating..."; btn.disabled = true;
                 const captureArea = document.getElementById('capture-area');
-                const captureText = document.getElementById('capture-text');
-                captureText.innerText = content;
-                captureText.style.fontSize = content.length > 500 ? "28px" : "36px";
+                document.getElementById('capture-text').innerText = content;
                 try {
-                    const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: '#0f172a', useCORS: true });
+                    const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: '#0f172a' });
                     const link = document.createElement('a');
                     link.download = `ConfessIndia-${id}.png`;
                     link.href = canvas.toDataURL("image/png");
@@ -514,15 +445,9 @@ async function submitReport(reason) {
         function checkDeepLink(posts) {
             const urlParams = new URLSearchParams(window.location.search);
             const targetId = urlParams.get('id');
-            const targetCat = urlParams.get('cat');
-            if (targetCat && targetCat !== currentCategory) { filterCat(targetCat); return; }
             if (targetId) {
                 const el = document.getElementById(`post-${targetId}`);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    el.classList.add('highlight-post');
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
+                if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); el.classList.add('highlight-post'); }
             }
         }
 
@@ -534,6 +459,7 @@ async function submitReport(reason) {
             if (seconds < 86400) return Math.floor(seconds / 3600) + "h ago";
             return Math.floor(seconds / 86400) + "d ago";
         }
+
         setLanguage(currentLang);
     </script>
 </body>
