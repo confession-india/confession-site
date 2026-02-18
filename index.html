@@ -389,16 +389,34 @@
         }
 
         async function submitReport(reason) {
-            if (!reportingId) return;
-            try {
-                await db.collection('detailed_reports').add({ postId: reportingId, reason: reason, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-                await db.collection('confessions').doc(reportingId).update({ reportCount: firebase.firestore.FieldValue.increment(1) });
-                localStorage.setItem(`reportCount-${reportingId}`, 'true');
-                document.getElementById('reportStep1').classList.add('hidden');
-                document.getElementById('reportStep2').classList.remove('hidden');
-                initFeed();
-            } catch(err) { alert("Action failed."); }
-        }
+    if (!reportingId) return;
+    try {
+        // 1. Log the detailed report in the new collection
+        await db.collection('detailed_reports').add({
+            postId: reportingId,
+            reason: reason,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // 2. Increment the main report count on the post
+        // We use a separate reference to ensure we only update the counter
+        const postRef = db.collection('confessions').doc(reportingId);
+        await postRef.update({ 
+            reportCount: firebase.firestore.FieldValue.increment(1) 
+        });
+        
+        localStorage.setItem(`reportCount-${reportingId}`, 'true');
+        
+        // UI Updates
+        document.getElementById('reportStep1').classList.add('hidden');
+        document.getElementById('reportStep2').classList.remove('hidden');
+        
+        initFeed();
+    } catch(err) {
+        console.error("Report Error:", err);
+        alert("Action failed. Check your Firebase rules for detailed_reports.");
+    }
+}
 
         function openShare(id, category) {
             const content = document.getElementById(`text-${id}`).innerText;
