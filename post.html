@@ -36,7 +36,26 @@
             </div>
         </div>
     </div>
-    
+    <link rel="canonical" href="https://confessionindia.in/post.html" />
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": "https://confessionindia.in"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Share Secret",
+    "item": "https://confessionindia.in/post.html"
+  }]
+}
+</script>
+
     <header class="sticky top-0 z-[90] bg-white dark:bg-[#0b1120] backdrop-blur-xl global-header" style="background-color: inherit !important;">
         <div class="max-w-4xl mx-auto p-4 flex justify-between items-center w-full">
             <div class="flex flex-col">
@@ -358,32 +377,45 @@
             document.getElementById('hyd-time').innerText = new Intl.DateTimeFormat('en-IN', { ...opt, timeZone: 'Asia/Kolkata' }).format(new Date());
             document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...opt, timeZone: 'Europe/London' }).format(new Date());
         }
-        setInterval(updateClocks, 60000); updateClocks();
+        setInterval(updateClocks, 1000); updateClocks();
 
         document.getElementById('postForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const content = msgInput.value.trim();
-            const analysis = LanguageEngine.analyze(content);
-            const vibe = VibeEngine.getVibe(content);
-            submitBtn.disabled = true; submitBtn.innerText = "Securing...";
-            try {
-                await db.collection('confessions').add({
-                    username: userInput.value || "Anonymous",
-                    category: catInput.value,
-                    content: content,
-                    language: analysis.lang,
-                    isNative: analysis.isNative,
-                    vibe: vibe.label,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    supportCount: 0, meTooCount: 0, status: "public"
-                });
-                document.getElementById('toast').classList.add('show');
-                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
-            } catch (err) {
-                submitBtn.disabled = false; updateUI();
-                alert("Connection failed.");
-            }
+    e.preventDefault();
+    const content = msgInput.value.trim();
+    const analysis = LanguageEngine.analyze(content);
+    const vibe = VibeEngine.getVibe(content);
+    
+    submitBtn.disabled = true; 
+    submitBtn.innerText = "Securing...";
+
+    try {
+        // Capture the document reference to get the new ID
+        const docRef = await db.collection('confessions').add({
+            username: userInput.value || "Anonymous",
+            category: catInput.value,
+            content: content,
+            language: analysis.lang,
+            isNative: analysis.isNative,
+            vibe: vibe.label,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            supportCount: 0, 
+            meTooCount: 0, 
+            status: "public"
         });
+
+        document.getElementById('toast').classList.add('show');
+
+        // NEW: Redirect passing the ID and Category to index.html
+        setTimeout(() => { 
+            window.location.href = `index.html?id=${docRef.id}&cat=${catInput.value}`; 
+        }, 2000);
+
+    } catch (err) {
+        submitBtn.disabled = false; 
+        updateUI();
+        alert("Connection failed.");
+    }
+});
 
         document.addEventListener('mousemove', (e) => {
             const glow = document.getElementById('mouse-glow');
