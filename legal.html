@@ -15,7 +15,36 @@
     <title>Confess India - Guidelines & Manifesto</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="canonical" href="https://confessionindia.in/legal.html" />
+    <link rel="icon" href="https://fav.farm/🤫">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Privacy Policy & Community Rules | Confess India",
+  "description": "Our commitment to 100% anonymity, zero-logs policy, and community guidelines.",
+  "url": "https://confessionindia.in/legal.html"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": "https://confessionindia.in/index.html"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Legal", 
+    "item": "https://confessionindia.in/legal.html"
+  }]
+}
+</script>
+
     <style>
         .legal-section h2 { 
             color: #1e293b; 
@@ -187,7 +216,7 @@
                 document.getElementById('ldn-time').innerText = new Intl.DateTimeFormat('en-GB', { ...options, timeZone: 'Europe/London' }).format(new Date());
             } catch (e) {}
         }
-        setInterval(updateClocks, 60000);
+        setInterval(updateClocks, 1000);
         updateClocks();
 
         const glow = document.getElementById('mouse-glow');
