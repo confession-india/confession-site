@@ -27,7 +27,55 @@
     <meta property="twitter:image" content="https://confessionindia.in/og-image.png">
 
     <link rel="icon" href="https://fav.farm/🤫">
-    
+    <link rel="canonical" href="https://confessionindia.in/" />
+
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Confess India | Anonymous Community Feed",
+  "description": "The safest digital space for Indians worldwide to share truths anonymously. No logs, no tracking.",
+  "url": "https://confessionindia.in",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Confess India",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://confessionindia.in/og-image.png"
+    }
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Anonymous Confessions",
+        "description": "Real, unedited anonymous stories from the Indian community.",
+        "url": "https://confessionindia.in"
+      }
+    ]
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": "https://confessionindia.in"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Post a Secret",
+    "item": "https://confessionindia.in/post.html"
+  }]
+}
+</script>    
     <script>
         if (localStorage.getItem('userLang') === null) { localStorage.setItem('userLang', 'en'); }
         if (window.matchMedia('(prefers-color-scheme: dark)').matches && !localStorage.getItem('theme')) {
@@ -297,87 +345,98 @@
         }
 
         function getCardHTML(post, isPotd, langData) {
-            const content = post.content || "";
-            const displayName = post.username || post.displayName || post.name || "Anonymous";
-            const isLong = content.length > 250;
+    const content = post.content || "";
+    const displayName = post.username || post.displayName || post.name || "Anonymous";
+    const isLong = content.length > 250;
+    
+    // Logic to check if post is pure native language
+    const nativeRegex = /[\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F]/;
+    const isNative = nativeRegex.test(content) && !/[a-zA-Z]/.test(content);
+
+    const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
+    const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
+    const hasReported = localStorage.getItem(`reportCount-${post.id}`);
+
+    // FIX: Force "1 day ago" for Post of the Day to make it feel curated/historical
+    const displayTime = isPotd ? "1 day ago" : timeAgo(post.timestamp);
+
+    const reportActionHTML = hasReported 
+        ? `<span class="text-[10px] font-black uppercase text-red-500 report-success">✅ Reported</span>`
+        : `<button type="button" onclick="interact(event, '${post.id}', 'reportCount', this)" 
+                   class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors">
+            🚩 Report
+           </button>`;
+
+    return `
+        <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
+            <div class="flex gap-2 mb-4">
+                ${isPotd ? `<div class="bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter shadow-sm">🏆 ${langData.potd}</div>` : ''}
+                ${isNative ? `<div class="bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🔥 Native Legend</div>` : ''}
+            </div>
             
-            // Logic to check if post is pure native language
-            const nativeRegex = /[\u0900-\u097F\u0C00-\u0C7F\u0B80-\u0BFF\u0C80-\u0CFF\u0D00-\u0D7F]/;
-            const isNative = nativeRegex.test(content) && !/[a-zA-Z]/.test(content);
+            <div class="mb-4 flex justify-between items-start">
+                <div>
+                    <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
+                    <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
+                    <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${displayTime}</div>
+                </div>
+                <div id="report-wrap-${post.id}">
+                    ${reportActionHTML}
+                </div>
+            </div>
 
-            const hasSupported = localStorage.getItem(`supportCount-${post.id}`);
-            const hasMetoo = localStorage.getItem(`meTooCount-${post.id}`);
-            const hasReported = localStorage.getItem(`reportCount-${post.id}`);
-
-            const reportActionHTML = hasReported 
-                ? `<span class="text-[10px] font-black uppercase text-red-500 report-success">✅ Reported</span>`
-                : `<button type="button" onclick="interact(event, '${post.id}', 'reportCount', this)" 
-                           class="text-[10px] font-black uppercase tracking-tighter text-slate-400 hover:text-red-500 transition-colors">
-                    🚩 Report
-                   </button>`;
-
-            return `
-                <div id="post-${post.id}" class="confession-card ${isPotd ? 'potd-card' : ''} bg-white dark:bg-[#1e293b] p-6 md:p-8 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-4">
-                    <div class="flex gap-2 mb-4">
-                        ${isPotd ? `<div class="bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🏆 ${langData.potd}</div>` : ''}
-                        ${isNative ? `<div class="bg-orange-500 text-white text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-tighter">🔥 Native Legend</div>` : ''}
-                    </div>
-                    
-                    <div class="mb-4 flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-black text-slate-800 dark:text-white block mb-0.5">${displayName}</span>
-                            <span class="text-[10px] font-black uppercase text-indigo-500">${post.category || 'other'}</span>
-                            <div class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">${timeAgo(post.timestamp)}</div>
-                        </div>
-                        <div id="report-wrap-${post.id}">
-                            ${reportActionHTML}
-                        </div>
-                    </div>
-
-                    <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
-                    
-                    ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
-                    
-                    <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
-                        <div class="flex gap-2">
-                            <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-all active:scale-95 ${hasSupported ? 'active-interact opacity-50' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
-                            <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-all active:scale-95 ${hasMetoo ? 'active-interact opacity-50' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
-                        </div>
-                        <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
-                    </div>
-                </div>`;
-        }
+            <p id="text-${post.id}" class="text-slate-600 dark:text-slate-300 text-lg leading-relaxed font-medium mb-2 break-words whitespace-pre-wrap ${isLong ? 'line-clamp-3' : ''}">${content}</p>
+            
+            ${isLong ? `<button id="rm-btn-${post.id}" onclick="toggleReadMore('${post.id}')" class="text-indigo-500 font-bold text-xs mb-6 uppercase tracking-widest cursor-pointer hover:underline">Read More</button>` : '<div class="mb-4"></div>'}
+            
+            <div class="grid grid-cols-2 gap-3 pt-6 border-t border-slate-50 dark:border-slate-800">
+                <div class="flex gap-2">
+                    <button type="button" onclick="interact(event, '${post.id}', 'supportCount', this)" class="flex-1 py-3 bg-pink-50 dark:bg-pink-900/10 rounded-2xl text-pink-600 text-xs font-black transition-all active:scale-95 ${hasSupported ? 'active-interact opacity-50' : ''}">❤️ <span class="count">${post.supportCount || 0}</span></button>
+                    <button type="button" onclick="interact(event, '${post.id}', 'meTooCount', this)" class="flex-1 py-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-2xl text-indigo-600 text-xs font-black transition-all active:scale-95 ${hasMetoo ? 'active-interact opacity-50' : ''}">🫂 <span class="count">${post.meTooCount || 0}</span></button>
+                </div>
+                <button type="button" onclick="openShare('${post.id}', '${post.category}')" class="btn-brand bg-indigo-600 text-white py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-indigo-700 transition-all">${langData.shareTruth}</button>
+            </div>
+        </div>`;
+}
 
         function renderPosts(posts) {
-            const feed = document.getElementById('feed');
-            const potdContainer = document.getElementById('potd-container');
-            
-            if (!posts.length) { 
-                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; 
-                potdContainer.innerHTML = '';
-                return; 
-            }
+    const feed = document.getElementById('feed');
+    const potdContainer = document.getElementById('potd-container');
+    
+    if (!posts.length) { 
+        feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>'; 
+        potdContainer.innerHTML = '';
+        return; 
+    }
 
-            const visiblePosts = posts.filter(post => (post.reportCount || 0) < 10);
-            if (visiblePosts.length === 0) {
-                feed.innerHTML = '<div class="text-center py-20 text-slate-500 font-bold">No secrets here yet.</div>';
-                potdContainer.innerHTML = '';
-                return;
-            }
+    // Filter out reported posts first
+    const visiblePosts = posts.filter(post => (post.reportCount || 0) < 10);
+    
+    // --- AUTOMATED DAILY SEED LOGIC ---
+    // This creates a unique number for today (e.g., 20260220)
+    const now = new Date();
+    const dateSeed = (now.getFullYear() * 10000) + ((now.getMonth() + 1) * 100) + now.getDate();
+    
+    // Pick a post using the seed so everyone sees the same "Random" post today
+    // It uses the visiblePosts array, so it respects the current Language and Category
+    const potdIndex = dateSeed % visiblePosts.length;
+    const potd = visiblePosts[potdIndex];
+    // ----------------------------------
 
-            const potd = [...visiblePosts].sort((a, b) => (b.supportCount || 0) - (a.supportCount || 0))[0];
-            const langData = translations[currentLang] || translations['en'];
-            
-            potdContainer.innerHTML = getCardHTML(potd, true, langData);
-            feed.innerHTML = '';
-            
-            visiblePosts.forEach(post => {
-                if(post.id !== potd.id) {
-                    feed.insertAdjacentHTML('beforeend', getCardHTML(post, false, langData));
-                }
-            });
+    const langData = translations[currentLang] || translations['en'];
+    
+    // Render the POTD with the unique 'true' flag
+    potdContainer.innerHTML = getCardHTML(potd, true, langData);
+    
+    // Render rest of the feed, excluding the one chosen as POTD
+    feed.innerHTML = '';
+    visiblePosts.forEach(post => {
+        // Strict check: Only show in feed if it is NOT the chosen POTD
+        if (post.id !== potd.id) {
+            feed.insertAdjacentHTML('beforeend', getCardHTML(post, false, langData));
         }
-
+    });
+}
         async function interact(e, id, field, btn) {
             if (e) { e.preventDefault(); e.stopPropagation(); }
             if (localStorage.getItem(`${field}-${id}`)) return;
@@ -462,12 +521,13 @@
             const urlParams = new URLSearchParams(window.location.search);
             const targetId = urlParams.get('id');
             const targetCat = urlParams.get('cat');
-            if (targetCat && targetCat !== currentCategory) { filterCat(targetCat); return; }
             if (targetId) {
                 const el = document.getElementById(`post-${targetId}`);
                 if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    el.classList.add('highlight-post');
+                    setTimeout(() => {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        el.classList.add('highlight-post');
+                    }, 1000);
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }
@@ -481,7 +541,47 @@
             if (seconds < 86400) return Math.floor(seconds / 3600) + "h ago";
             return Math.floor(seconds / 86400) + "d ago";
         }
-        setLanguage(currentLang);
+        // NEW: Smart initialization that handles Deep Links for any language
+        async function startApp() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetId = urlParams.get('id');
+
+            if (targetId) {
+                try {
+                    // 1. Look up the specific post to see what language it is
+                    const doc = await db.collection('confessions').doc(targetId).get();
+                    if (doc.exists) {
+                        const postData = doc.data();
+                        // 2. Switch the app to that post's language automatically
+                        currentLang = postData.language;
+                        localStorage.setItem('userLang', currentLang);
+                        
+                        // 3. Update the UI pills to show the correct active language
+                        document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active', 'bg-indigo-600', 'text-white'));
+                        const activeBtn = document.getElementById(`lang-${currentLang}`);
+                        if(activeBtn) activeBtn.classList.add('lang-active', 'bg-indigo-600', 'text-white');
+                    }
+                } catch (e) { 
+                    console.error("Deep link lookup failed", e); 
+                }
+            }
+            
+            // 4. Update UI labels and start the feed
+            setLanguage(currentLang);
+        }
+
+        // Modified setLanguage to ensure it doesn't loop
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('userLang', lang);
+            document.querySelectorAll('.lang-pill').forEach(btn => btn.classList.remove('lang-active', 'bg-indigo-600', 'text-white'));
+            const activeBtn = document.getElementById(`lang-${lang}`);
+            if(activeBtn) activeBtn.classList.add('lang-active', 'bg-indigo-600', 'text-white');
+            initFeed();
+        }
+
+        // Start the process
+        startApp();
     </script>
 </body>
 </html>
